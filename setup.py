@@ -12,11 +12,11 @@ setup(
 
     name="xbob.extension",
     version="0.1.0a0",
-    description="Helps projects building Bob/Python C++ extensions",
+    description="Helps projects building Python/C++ extensions for Bob",
     license="GPLv3",
     author='Andre Anjos',
     author_email='andre.anjos@idiap.ch',
-    #long_description=open('README.rst').read(),
+    long_description=open('README.rst').read(),
     url='http://pypi.python.org/pypi/xbob.extension',
 
     packages=find_packages(),
@@ -27,7 +27,6 @@ setup(
 
     install_requires=[
       'setuptools',
-      'bob',
       ],
 
     classifiers = [
