@@ -94,7 +94,7 @@ class Extension(ExtensionBase):
     Bob/Python adds a single parameter to the standard arguments of the
     constructor:
 
-    bob_modules : [list]
+    pkgconfig : [list]
       
       This should be a list of strings indicating the name of the bob
       (pkg-config) modules you would like to have linked to your extension
@@ -107,18 +107,13 @@ class Extension(ExtensionBase):
     
     modules = ['bob-python']
 
-    if kwargs.has_key('bob_modules') and kwargs['bob_modules']:
-      if isinstance(kwargs['bob_modules'], (str, unicode)):
-        modules.append(kwargs['bob_modules'])
+    if kwargs.has_key('pkgconfig') and kwargs['pkgconfig']:
+      if isinstance(kwargs['pkgconfig'], (str, unicode)):
+        modules.append(kwargs['pkgconfig'])
       else:
-        modules.extend(kwargs['bob_modules'])
+        modules.extend(kwargs['pkgconfig'])
 
-    if kwargs.has_key('bob_modules'): del kwargs['bob_modules']
-
-    # OpenCV module comes at the back 
-    if 'opencv' in modules:
-      modules.remove('opencv')
-      modules.append('opencv')
+    if kwargs.has_key('pkgconfig'): del kwargs['pkgconfig']
 
     # Only one instance of each
     modules = uniq(modules)
