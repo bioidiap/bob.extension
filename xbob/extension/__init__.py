@@ -136,12 +136,12 @@ class Extension(ExtensionBase):
       parameters[key] = uniq(parameters[key])
     
       # Tune input parameters if they were set
-      if kwargs.has_key(key): kwargs.extend(parameters[key])
+      if kwargs.has_key(key): kwargs[key].extend(parameters[key])
       else: kwargs[key] = parameters[key]
 
     # Set the runtime_library_dirs specially
     if kwargs.has_key('runtime_library_dirs'):
-      kwargs.extend(parameters('runtime_library_dirs'))
+      kwargs['runtime_library_dirs'].extend(parameters('runtime_library_dirs'))
     else:
       kwargs['runtime_library_dirs'] = parameters['library_dirs']
 
