@@ -40,7 +40,10 @@ so that you include the following::
         pkgconfig = [ #bob modules you depend on
           'bob-math',
           'bob-sp',
-          ]
+          ],
+        include_dirs = [ #optionally, include directories
+          "xbob/myext/ext/headers/",
+          ],
         ),
       ... #add more extensions if you wish
     ],
