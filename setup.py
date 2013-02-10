@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 setup(
 
     name="xbob.extension",
-    version="0.1.2",
+    version="0.1.3",
     description="Helps projects building Python/C++ extensions for Bob",
     license="GPLv3",
     author='Andre Anjos',
@@ -20,6 +20,7 @@ setup(
     url='http://pypi.python.org/pypi/xbob.extension',
 
     packages=find_packages(),
+    zip_safe=True,
 
     namespace_packages=[
       "xbob",
