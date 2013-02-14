@@ -131,6 +131,14 @@ class Extension(ExtensionBase):
         if config.has_key(key) and config[key]:
           parameters[key].extend(config[key])
 
+    # Reset the include_dirs to use '-isystem'
+    include_dirs = ['-isystem%s' % k for k in parameters['include_dirs']]
+    if kwargs.has_key('extra_compile_args'):
+      kwargs['extra_compile_args'].extend(include_dirs)
+    else:
+      kwargs['extra_compile_args'] = include_dirs
+    del parameters['include_dirs']
+
     # Filter and make unique
     for key in parameters.iterkeys():
       parameters[key] = uniq(parameters[key])
