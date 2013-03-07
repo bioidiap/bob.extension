@@ -7,6 +7,7 @@
 """
 
 import os
+import string
 import subprocess
 from distutils.extension import Extension as ExtensionBase
 from setuptools.command.build_ext import build_ext as build_ext_base
@@ -28,6 +29,23 @@ def pkgconfig(package):
       seen[marker] = 1
       result.append(item)
     return result
+
+  cmd = [
+      'pkg-config',
+      '--modversion',
+      package,
+      ]
+
+  proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
+      stderr=subprocess.STDOUT)
+
+  output = proc.communicate()[0]
+
+  if proc.returncode != 0:
+    raise RuntimeError, "PkgConfig did not find package %s. Output:\n%s" % \
+        (package, output.strip())
+
+  version = output.strip()
 
   flag_map = {
       '-I': 'include_dirs',
@@ -73,6 +91,13 @@ def pkgconfig(package):
 
   for k, v in kw.iteritems(): # remove duplicated
     kw[k] = uniq(v)
+
+  # adds version and HAVE flags
+  PACKAGE = package.upper().translate(string.maketrans(" -", "__"))
+  kw['define_macros'] = [
+      ('HAVE_%s' % PACKAGE, '1'),
+      ('%s_VERSION' % PACKAGE, '"%s"' % version),
+      ]
 
   return kw
 
@@ -125,6 +150,7 @@ class Extension(ExtensionBase):
         'include_dirs': [],
         'library_dirs': [],
         'libraries': [],
+        'define_macros': [],
         }
 
     for m in modules:
