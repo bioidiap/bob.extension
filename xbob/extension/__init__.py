@@ -42,8 +42,8 @@ def pkgconfig(package):
   output = proc.communicate()[0]
 
   if proc.returncode != 0:
-    raise RuntimeError, "PkgConfig did not find package %s. Output:\n%s" % \
-        (package, output.strip())
+    raise RuntimeError("PkgConfig did not find package %s. Output:\n%s" % \
+        (package, output.strip()))
 
   version = output.strip()
 
@@ -66,13 +66,13 @@ def pkgconfig(package):
   output = proc.communicate()[0]
 
   if proc.returncode != 0:
-    raise RuntimeError, "PkgConfig did not find package %s. Output:\n%s" % \
-        (package, output.strip())
+    raise RuntimeError("PkgConfig did not find package %s. Output:\n%s" % \
+        (package, output.strip()))
 
   kw = {}
 
   for token in output.split():
-    if flag_map.has_key(token[:2]):
+    if token[:2] in flag_map:
       kw.setdefault(flag_map.get(token[:2]), []).append(token[2:])
 
     elif token[0] == '-': # throw others to extra_link_args
@@ -89,7 +89,7 @@ def pkgconfig(package):
         if bname not in kw.get('libraries', []):
           kw.setdefault('libraries', []).append(bname)
 
-  for k, v in kw.iteritems(): # remove duplicated
+  for k, v in kw.items(): # remove duplicated
     kw[k] = uniq(v)
 
   # adds version and HAVE flags
@@ -134,13 +134,13 @@ class Extension(ExtensionBase):
     
     modules = ['bob-python']
 
-    if kwargs.has_key('pkgconfig') and kwargs['pkgconfig']:
-      if isinstance(kwargs['pkgconfig'], (str, unicode)):
+    if 'pkgconfig' in kwargs and kwargs['pkgconfig']:
+      if isinstance(kwargs['pkgconfig'], str):
         modules.append(kwargs['pkgconfig'])
       else:
         modules.extend(kwargs['pkgconfig'])
 
-    if kwargs.has_key('pkgconfig'): del kwargs['pkgconfig']
+    if 'pkgconfig' in kwargs: del kwargs['pkgconfig']
 
     # Only one instance of each
     modules = uniq(modules)
@@ -155,28 +155,28 @@ class Extension(ExtensionBase):
 
     for m in modules:
       config = pkgconfig(m)
-      for key in parameters.iterkeys():
-        if config.has_key(key) and config[key]:
+      for key in parameters.keys():
+        if key in config and config[key]:
           parameters[key].extend(config[key])
 
     # Reset the include_dirs to use '-isystem'
     include_dirs = ['-isystem%s' % k for k in parameters['include_dirs']]
-    if kwargs.has_key('extra_compile_args'):
+    if 'extra_compile_args' in kwargs:
       kwargs['extra_compile_args'].extend(include_dirs)
     else:
       kwargs['extra_compile_args'] = include_dirs
     del parameters['include_dirs']
 
     # Filter and make unique
-    for key in parameters.iterkeys():
+    for key in parameters.keys():
       parameters[key] = uniq(parameters[key])
     
       # Tune input parameters if they were set
-      if kwargs.has_key(key): kwargs[key].extend(parameters[key])
+      if key in kwargs: kwargs[key].extend(parameters[key])
       else: kwargs[key] = parameters[key]
 
     # Set the runtime_library_dirs specially
-    if kwargs.has_key('runtime_library_dirs'):
+    if 'runtime_library_dirs' in kwargs:
       kwargs['runtime_library_dirs'].extend(parameters('runtime_library_dirs'))
     else:
       kwargs['runtime_library_dirs'] = parameters['library_dirs']

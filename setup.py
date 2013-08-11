@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.anjos@idiap.ch>
-# Thu 20 Sep 2012 14:43:19 CEST 
+# Thu 20 Sep 2012 14:43:19 CEST
 
 """A package that contains a helper for Bob/Python C++ extension development
 """
@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 setup(
 
     name="xbob.extension",
-    version="0.1.6",
+    version="0.2.0",
     description="Helps projects building Python/C++ extensions for Bob",
     license="GPLv3",
     author='Andre Anjos',
@@ -38,5 +38,5 @@ setup(
       'Programming Language :: Python',
       'Topic :: Software Development :: Libraries :: Python Modules',
       ],
-    
+
     )
