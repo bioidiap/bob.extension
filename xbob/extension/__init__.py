@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
 # Andre Anjos <andre.anjos@idiap.ch>
-# Mon 28 Jan 2013 16:40:27 CET 
+# Mon 28 Jan 2013 16:40:27 CET
 
 """A custom build class for Bob/Python extensions
 """
@@ -92,8 +92,15 @@ def pkgconfig(package):
   for k, v in kw.items(): # remove duplicated
     kw[k] = uniq(v)
 
+  try:
+    # Python 3 style
+    maketrans = ''.maketrans
+  except AttributeError:
+    # fallback for Python 2
+    from string import maketrans
+
   # adds version and HAVE flags
-  PACKAGE = package.upper().translate(string.maketrans(" -", "__"))
+  PACKAGE = package.upper().translate(maketrans(" -", "__"))
   kw['define_macros'] = [
       ('HAVE_%s' % PACKAGE, '1'),
       ('%s_VERSION' % PACKAGE, '"%s"' % version),
@@ -110,28 +117,28 @@ def uniq(seq):
 
 class Extension(ExtensionBase):
   """Extension building with Bob/Python bindings.
-  
+
   See the documentation for :py:class:`distutils.extension.Extension` for more
   details on input parameters.
   """
 
   def __init__(self, *args, **kwargs):
-    """Initialize the extension with parameters. 
-    
+    """Initialize the extension with parameters.
+
     Bob/Python adds a single parameter to the standard arguments of the
     constructor:
 
     pkgconfig : [list]
-      
+
       This should be a list of strings indicating the name of the bob
       (pkg-config) modules you would like to have linked to your extension
       **additionally** to ``bob-python``. Candidates are module names like
-      "bob-machine" or "bob-math". 
-      
+      "bob-machine" or "bob-math".
+
       For convenience, you can also specify "opencv" or other 'pkg-config'
       registered packages as a dependencies.
     """
-    
+
     modules = ['bob-python']
 
     if 'pkgconfig' in kwargs and kwargs['pkgconfig']:
@@ -170,7 +177,7 @@ class Extension(ExtensionBase):
     # Filter and make unique
     for key in parameters.keys():
       parameters[key] = uniq(parameters[key])
-    
+
       # Tune input parameters if they were set
       if key in kwargs: kwargs[key].extend(parameters[key])
       else: kwargs[key] = parameters[key]
