@@ -195,8 +195,6 @@ class Extension(ExtensionBase):
     # Make sure the language is correctly set to C++
     kwargs['language'] = 'c++'
 
-    import ipdb; ipdb.set_trace()
-
     # Run the constructor for the base class
     ExtensionBase.__init__(self, *args, **kwargs)
 
