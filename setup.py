@@ -28,7 +28,6 @@ setup(
 
     install_requires=[
       'setuptools',
-      'pypkg',
       ],
 
     classifiers = [

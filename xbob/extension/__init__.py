@@ -3,12 +3,14 @@
 # Andre Anjos <andre.anjos@idiap.ch>
 # Mon 28 Jan 2013 16:40:27 CET
 
-"""A custom build class for Bob/Python extensions
+"""A custom build class for Pkg-config based extensions
 """
 
 import platform
-from pypkg import pkgconfig
+from .pkgconfig import pkgconfig
 from distutils.extension import Extension as DistutilsExtension
+
+__version__ = __import__('pkg_resources').require('xbob.extension')[0].version
 
 def uniq(seq):
   """Uniqu-fy preserving order"""
@@ -37,19 +39,20 @@ def check_packages(packages):
 
   from re import split
 
+  used = set()
   retval = []
 
   for requirement in uniq(packages):
 
     splitreq = split(r'\s*(?P<cmp>[<>=]+)\s*', requirement)
 
-    if len(splitreq) == 1: # just package name
+    if len(splitreq) not in (1, 3):
 
-      p = pkgconfig(splitreq[0])
+      raise RuntimeError("cannot parse requirement `%s'", requirement)
 
-    elif len(splitreq) == 3: # package + version number
+    p = pkgconfig(splitreq[0])
 
-      p = pkgconfig(splitreq[0]) 
+    if len(splitreq) == 3: # package + version number
 
       if splitreq[1] == '>': 
         assert p > splitreq[2], "%s version is not > `%s'" % (p, splitreq[2])
@@ -64,17 +67,17 @@ def check_packages(packages):
       else:
         raise RuntimeError("cannot parse requirement `%s'", requirement)
 
-    else:
-
-      raise RuntimeError("cannot parse requirement `%s'", requirement)
-
     retval.append(p)
+
+    if p.name in used:
+      raise RuntimeError("package `%s' had already been requested - cannot (currently) handle recurring requirements")
+    used.add(p.name)
 
   return retval
 
 
 class Extension(DistutilsExtension):
-  """Extension building with Bob/Python bindings.
+  """Extension building with pkg-config packages.
 
   See the documentation for :py:class:`distutils.extension.Extension` for more
   details on input parameters.
@@ -83,8 +86,8 @@ class Extension(DistutilsExtension):
   def __init__(self, *args, **kwargs):
     """Initialize the extension with parameters.
 
-    Bob/Python adds a single parameter to the standard arguments of the
-    constructor:
+    Pkg-config extensions adds a single parameter to the standard arguments of
+    the constructor:
 
     pkgconfig : [list]
 
