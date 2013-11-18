@@ -6,111 +6,9 @@
 """A custom build class for Bob/Python extensions
 """
 
-import os
-import string
-import subprocess
-from distutils.extension import Extension as ExtensionBase
-from setuptools.command.build_ext import build_ext as build_ext_base
-
-def pkgconfig(package):
-
-  def uniq(seq, idfun=None):
-    # order preserving
-    if idfun is None:
-      def idfun(x): return x
-    seen = {}
-    result = []
-    for item in seq:
-      marker = idfun(item)
-      # in old Python versions:
-      # if seen.has_key(marker)
-      # but in new ones:
-      if marker in seen: continue
-      seen[marker] = 1
-      result.append(item)
-    return result
-
-  cmd = [
-      'pkg-config',
-      '--modversion',
-      package,
-      ]
-
-  proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-      stderr=subprocess.STDOUT)
-
-  output = proc.communicate()[0]
-  if isinstance(output, bytes) and not isinstance(output, str):
-    output = output.decode('utf8')
-
-  if proc.returncode != 0:
-    raise RuntimeError("PkgConfig did not find package %s. Output:\n%s" % \
-        (package, output.strip()))
-
-  version = output.strip()
-
-  flag_map = {
-      '-I': 'include_dirs',
-      '-L': 'library_dirs',
-      '-l': 'libraries',
-      }
-
-  cmd = [
-      'pkg-config',
-      '--libs',
-      '--cflags',
-      package,
-      ]
-
-  proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-      stderr=subprocess.STDOUT)
-
-  output = proc.communicate()[0]
-  if isinstance(output, bytes) and not isinstance(output, str):
-    output = output.decode('utf8')
-
-  if proc.returncode != 0:
-    raise RuntimeError("PkgConfig did not find package %s. Output:\n%s" % \
-        (package, output.strip()))
-
-  kw = {}
-
-  for token in output.split():
-    if token[:2] in flag_map:
-      kw.setdefault(flag_map.get(token[:2]), []).append(token[2:])
-
-    elif token[0] == '-': # throw others to extra_link_args
-      kw.setdefault('extra_compile_args', []).append(token)
-
-    else: # these are maybe libraries
-      import os
-      if os.path.exists(token):
-        dirname = os.path.dirname(token)
-        if dirname not in kw.get('library_dirs', []):
-          kw.setdefault('library_dirs', []).append(dirname)
-
-        bname = os.path.splitext(os.path.basename(token))[0][3:]
-        if bname not in kw.get('libraries', []):
-          kw.setdefault('libraries', []).append(bname)
-
-  for k, v in kw.items(): # remove duplicated
-    kw[k] = uniq(v)
-
-  try:
-    # Python 3 style
-    maketrans = ''.maketrans
-  except AttributeError:
-    # fallback for Python 2
-    from string import maketrans
-
-  # adds version and HAVE flags
-  PACKAGE = package.upper().translate(maketrans(" -", "__"))
-  kw['define_macros'] = [
-      ('HAVE_%s' % PACKAGE, '1'),
-      ('%s_VERSION' % PACKAGE, '"%s"' % version),
-      ]
-
-  return kw
+import platform
+from pypkg import pkgconfig
+from distutils.extension import Extension as DistutilsExtension
 
 def uniq(seq):
   """Uniqu-fy preserving order"""
@@ -119,7 +17,63 @@ def uniq(seq):
   seen_add = seen.add
   return [ x for x in seq if x not in seen and not seen_add(x)]
 
-class Extension(ExtensionBase):
+def check_packages(packages):
+  """Checks if the requirements for the given packages are satisfied.
+
+  Raises a :py:class:`RuntimeError` in case requirements are not satisfied.
+  This means either not finding a package if no version number is specified or
+  veryfing that the package version does not match the required version by the
+  builder.
+
+  Package requirements can be set like this::
+
+    "pkg > VERSION"
+
+  In this case, the package version should be greater than the given version
+  number. Comparisons are done using :py:mod:`distutils.version.LooseVersion`.
+  You can use other comparators such as ``<``, ``<=``, ``>=`` or ``==``. If no
+  version number is given, then we only require that the package is installed.
+  """
+
+  from re import split
+
+  retval = []
+
+  for requirement in uniq(packages):
+
+    splitreq = split(r'\s*(?P<cmp>[<>=]+)\s*', requirement)
+
+    if len(splitreq) == 1: # just package name
+
+      p = pkgconfig(splitreq[0])
+
+    elif len(splitreq) == 3: # package + version number
+
+      p = pkgconfig(splitreq[0]) 
+
+      if splitreq[1] == '>': 
+        assert p > splitreq[2], "%s version is not > `%s'" % (p, splitreq[2])
+      elif splitreq[1] == '>=': 
+        assert p >= splitreq[2], "%s version is not >= `%s'" % (p, splitreq[2])
+      elif splitreq[1] == '<': 
+        assert p < splitreq[2], "%s version is not < `%s'" % (p, splitreq[2])
+      elif splitreq[1] == '<=': 
+        assert p <= splitreq[2], "%s version is not <= `%s'" % (p, splitreq[2])
+      elif splitreq[1] == '==': 
+        assert p <= splitreq[2], "%s version is not == `%s'" % (p, splitreq[2])
+      else:
+        raise RuntimeError("cannot parse requirement `%s'", requirement)
+
+    else:
+
+      raise RuntimeError("cannot parse requirement `%s'", requirement)
+
+    retval.append(p)
+
+  return retval
+
+
+class Extension(DistutilsExtension):
   """Extension building with Bob/Python bindings.
 
   See the documentation for :py:class:`distutils.extension.Extension` for more
@@ -143,102 +97,59 @@ class Extension(ExtensionBase):
       registered packages as a dependencies.
     """
 
-    modules = ['bob-python']
+    packages = []
 
-    if 'pkgconfig' in kwargs and kwargs['pkgconfig']:
-      if isinstance(kwargs['pkgconfig'], str):
-        modules.append(kwargs['pkgconfig'])
+    if 'packages' in kwargs and kwargs['packages']:
+      if isinstance(kwargs['packages'], str):
+        packages.append(kwargs['packages'])
       else:
-        modules.extend(kwargs['pkgconfig'])
+        packages.extend(kwargs['packages'])
 
-    if 'pkgconfig' in kwargs: del kwargs['pkgconfig']
+    if 'packages' in kwargs: del kwargs['packages']
 
-    # Only one instance of each
-    modules = uniq(modules)
+    # Check all requirements
+    pkgs = check_packages(packages)
 
     # Mixing
     parameters = {
-        'include_dirs': [],
-        'library_dirs': [],
-        'libraries': [],
         'define_macros': [],
+        'extra_compile_args': ['-std=c++11'],
+        'library_dirs': [],
+        'runtime_library_dirs': [],
+        'libraries': [],
         }
 
-    for m in modules:
-      config = pkgconfig(m)
-      for key in parameters.keys():
-        if key in config and config[key]:
-          parameters[key].extend(config[key])
+    # Compilation options
+    if platform.system() == 'Darwin':
+      parameters['extra_compile_args'] += ['-Wno-#warnings']
 
-    # Reset the include_dirs to use '-isystem'
-    include_dirs = ['-isystem%s' % k for k in parameters['include_dirs']]
-    if 'extra_compile_args' in kwargs:
-      kwargs['extra_compile_args'].extend(include_dirs)
-    else:
-      kwargs['extra_compile_args'] = include_dirs
-    del parameters['include_dirs']
+    for pkg in pkgs:
+
+      # Adds parameters for each package, in order
+      parameters['define_macros'] += pkg.package_macros()
+
+      # Include directories are added with a special path
+      for k in pkg.include_directories():
+        parameters['extra_compile_args'].extend(['-isystem', k])
+
+      parameters['define_macros'] += pkg.package_macros()
+      parameters['library_dirs'] += pkg.library_directories()
+      parameters['runtime_library_dirs'] += pkg.library_directories()
+      parameters['libraries'] += pkg.libraries()
 
     # Filter and make unique
     for key in parameters.keys():
-      parameters[key] = uniq(parameters[key])
 
       # Tune input parameters if they were set
       if key in kwargs: kwargs[key].extend(parameters[key])
       else: kwargs[key] = parameters[key]
 
-    # Set the runtime_library_dirs specially
-    if 'runtime_library_dirs' in kwargs:
-      kwargs['runtime_library_dirs'].extend(parameters('runtime_library_dirs'))
-    else:
-      kwargs['runtime_library_dirs'] = parameters['library_dirs']
+      if key in ('extra_compile_args'): continue 
+
+      kwargs[key] = uniq(kwargs[key])
 
     # Make sure the language is correctly set to C++
     kwargs['language'] = 'c++'
 
     # Run the constructor for the base class
-    ExtensionBase.__init__(self, *args, **kwargs)
-
-class build_ext(build_ext_base):
-  '''Customized extension to build bob.python bindings in the expected way'''
-
-  linker_is_smart = None
-
-  def __init__(self, *args, **kwargs):
-    build_ext_base.__init__(self, *args, **kwargs)
-
-  def build_extension(self, ext):
-    '''Concretely builds the extension given as input'''
-
-    def linker_can_remove_symbols(linker):
-      '''Tests if the `ld` linker can remove unused symbols from linked
-      libraries. In this case, use the --no-as-needed flag during link'''
-
-      import tempfile
-      f, name = tempfile.mkstemp()
-      del f
-
-      cmd = linker + ['-Wl,--no-as-needed', '-lm', '-o', name]
-      proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-          stderr=subprocess.STDOUT)
-      output = proc.communicate()[0]
-      if os.path.exists(name): os.unlink(name)
-      return True if proc.returncode == 0 else False
-
-    def ld_ok(opt):
-      '''Tells if a certain option is a go for the linker'''
-
-      if opt.find('-L') == 0: return False
-      return True
-
-    # Some clean-up on the linker which is screwed up...
-    self.compiler.linker_so = [k for k in self.compiler.linker_so if ld_ok(k)]
-
-    if self.linker_is_smart is None:
-      self.linker_is_smart = linker_can_remove_symbols(self.compiler.linker_so)
-      if self.linker_is_smart: self.compiler.linker_so += ['-Wl,--no-as-needed']
-
-    if hasattr(self.compiler, 'dll_libraries') and \
-        self.compiler.dll_libraries is None:
-      self.compiler.dll_libraries = []
-
-    build_ext_base.build_extension(self, ext)
+    DistutilsExtension.__init__(self, *args, **kwargs)

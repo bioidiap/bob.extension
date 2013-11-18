@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 setup(
 
     name="xbob.extension",
-    version="0.2.1",
+    version="0.3.0a0",
     description="Helps projects building Python/C++ extensions for Bob",
     license="GPLv3",
     author='Andre Anjos',
@@ -28,6 +28,7 @@ setup(
 
     install_requires=[
       'setuptools',
+      'pypkg',
       ],
 
     classifiers = [

@@ -2,9 +2,9 @@
  Python/C++ Bob Extension Building Support
 ===========================================
 
-This package provides a ``pkg-config`` bridge for Python/C++ extensions for
-`Bob <http://www.idiap.ch/software/bob/>`_. You use this package by including it
-in the ``setup_requires`` field of your ``setup.py`` file.
+This package provides a simple mechanims for building Python/C++ extensions for
+`Bob <http://www.idiap.ch/software/bob/>`_. You use this package by including
+it in your ``setup.py`` file.
 
 Building with ``zc.buildout`` is possible using the ``develop`` recipe in
 `xbob.buildout <http://pypi.python.org/pypi/xbob.buildout>`_. Follow the
@@ -16,7 +16,10 @@ Preparing for C++ Compilation
 Creating C++/Python bindings should be trivial. Firstly, edit your ``setup.py``
 so that you include the following::
 
+  from setuptools import dist
+  dist.Distribution(dict(setup_requires=['xbob.extension']))
   from xbob.extension import Extension
+
   ...
 
   setup(
@@ -37,9 +40,9 @@ so that you include the following::
           "xbob/myext/ext/file2.cpp",
           "xbob/myext/ext/main.cpp",
         ],
-        pkgconfig = [ #bob modules you depend on
-          'bob-math',
-          'bob-sp',
+        packages = [ #pkg-config modules to append
+          'blitz>=0.10',
+          'bob-core',
           ],
         include_dirs = [ #optionally, include directories
           "xbob/myext/ext/headers/",
@@ -52,17 +55,16 @@ so that you include the following::
     )
 
 These modifications will allow you to compile extensions that are linked
-against the named ``pkg-config`` modules. You can specify the modules of
-Bob you want to link against. You **don't** have to specify ``bob-python``,
-which is automatically added. Furthermore, you can specify any ``pkg-config``
-module and that will be linked in (for example, ``opencv``). Other modules and
-options can be set manually using `the standard options for python extensions
+against the named ``pkg-config`` modules. Other modules and options can be set
+manually using `the standard options for python extensions
 <http://docs.python.org/2/extending/building.html>`_. To hook-in the building
 on the package through ``zc.buildout``, add the following section to your
 ``buildout.cfg``::
 
   [xbob.myext]
   recipe = xbob.buildout:develop
+  verbose = true ;enables command-line verbosity
+  debug = true ;compiles the module in debug mode
 
 If you need to build multiple eggs, you will need **one entry per project** on
 your ``buildout.cfg``. This includes, possibly, dependent projects. Currently,
