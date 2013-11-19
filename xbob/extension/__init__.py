@@ -118,13 +118,15 @@ class Extension(DistutilsExtension):
         'define_macros': [],
         'extra_compile_args': ['-std=c++11'],
         'library_dirs': [],
-        'runtime_library_dirs': [],
         'libraries': [],
         }
 
     # Compilation options
     if platform.system() == 'Darwin':
       parameters['extra_compile_args'] += ['-Wno-#warnings']
+
+    user_includes = kwargs.get('include_dirs', [])
+    pkg_includes = []
 
     for pkg in pkgs:
 
@@ -133,12 +135,29 @@ class Extension(DistutilsExtension):
 
       # Include directories are added with a special path
       for k in pkg.include_directories():
+        if k in user_includes or k in pkg_includes: continue
         parameters['extra_compile_args'].extend(['-isystem', k])
+        pkg_includes.append(k)
 
       parameters['define_macros'] += pkg.package_macros()
       parameters['library_dirs'] += pkg.library_directories()
-      parameters['runtime_library_dirs'] += pkg.library_directories()
-      parameters['libraries'] += pkg.libraries()
+
+      if pkg.name.find('bob-') == 0: # one of bob's packages
+
+        # make-up the names of versioned Bob libraries we must link against
+
+        if platform.system() == 'Darwin':
+          libs = ['%s.%s' % (k, pkg.version) for k in pkg.libraries()]
+        elif platform.system() == 'Linux':
+          libs = [':lib%s.so.%s' % (k, pkg.version) for k in pkg.libraries()]
+        else:
+          raise RuntimeError("supports only MacOSX and Linux builds")
+
+      else:
+
+        libs = pkg.libraries()
+
+      parameters['libraries'] += libs
 
     # Filter and make unique
     for key in parameters.keys():
@@ -147,12 +166,21 @@ class Extension(DistutilsExtension):
       if key in kwargs: kwargs[key].extend(parameters[key])
       else: kwargs[key] = parameters[key]
 
-      if key in ('extra_compile_args'): continue 
+      if key in ('extra_compile_args'): continue
 
       kwargs[key] = uniq(kwargs[key])
 
+    # Uniq'fy parameters that are not on our parameter list
+    kwargs['include_dirs'] = uniq(kwargs.get('include_dirs', []))
+
     # Make sure the language is correctly set to C++
     kwargs['language'] = 'c++'
+
+    # On Linux, set the runtime path
+    if platform.system() == 'Linux':
+      kwargs.setdefault('runtime_library_dirs', [])
+      kwargs['runtime_library_dirs'] += kwargs['library_dirs']
+      kwargs['runtime_library_dirs'] = uniq(kwargs['runtime_library_dirs'])
 
     # Run the constructor for the base class
     DistutilsExtension.__init__(self, *args, **kwargs)
