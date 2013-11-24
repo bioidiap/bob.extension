@@ -75,6 +75,21 @@ def check_packages(packages):
 
   return retval
 
+def generate_self_macros(extname, version):
+  """Generates standard macros with library, module names and prefix"""
+
+  s = extname.rsplit('.', 1)
+
+  retval = [
+      ('XBOB_EXT_MODULE_PREFIX', '"%s"' % s[0]),
+      ('XBOB_EXT_MODULE_NAME', '"%s"' % s[1]),
+      ('XBOB_EXT_ENTRY_NAME', 'init%s' % s[1]),
+      ]
+
+  if version: retval.append(('XBOB_EXT_MODULE_VERSION', '"%s"' % version))
+
+  return retval
+
 
 class Extension(DistutilsExtension):
   """Extension building with pkg-config packages.
@@ -113,9 +128,15 @@ class Extension(DistutilsExtension):
     # Check all requirements
     pkgs = check_packages(packages)
 
+    # Was a version parameter given?
+    version = None
+    if 'version' in kwargs:
+      version = kwargs['version']
+      del kwargs['version']
+
     # Mixing
     parameters = {
-        'define_macros': [],
+        'define_macros': generate_self_macros(args[0], version),
         'extra_compile_args': ['-std=c++11'],
         'library_dirs': [],
         'libraries': [],
