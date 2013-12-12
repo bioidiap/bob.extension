@@ -54,15 +54,15 @@ def check_packages(packages):
 
     if len(splitreq) == 3: # package + version number
 
-      if splitreq[1] == '>': 
-        assert p > splitreq[2], "%s version is not > `%s'" % (p, splitreq[2])
-      elif splitreq[1] == '>=': 
-        assert p >= splitreq[2], "%s version is not >= `%s'" % (p, splitreq[2])
-      elif splitreq[1] == '<': 
+      if splitreq[1] == '>':
+        assert p > splitreq[2], "%s version is not > `%s'" % (p.name, splitreq[2])
+      elif splitreq[1] == '>=':
+        assert p >= splitreq[2], "%s version is not >= `%s'" % (p.name, splitreq[2])
+      elif splitreq[1] == '<':
         assert p < splitreq[2], "%s version is not < `%s'" % (p, splitreq[2])
-      elif splitreq[1] == '<=': 
+      elif splitreq[1] == '<=':
         assert p <= splitreq[2], "%s version is not <= `%s'" % (p, splitreq[2])
-      elif splitreq[1] == '==': 
+      elif splitreq[1] == '==':
         assert p <= splitreq[2], "%s version is not == `%s'" % (p, splitreq[2])
       else:
         raise RuntimeError("cannot parse requirement `%s'", requirement)
