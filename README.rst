@@ -23,7 +23,7 @@ so that you include the following::
   ...
 
   setup(
-    
+
     name="xbob.myext",
     version="1.0.0",
     ...
