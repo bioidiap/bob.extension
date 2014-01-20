@@ -51,17 +51,17 @@ def call_pkgconfig(cmd, paths=None):
   logging.debug("Running `%s'" % (" ".join(cmd),))
   stdout, stderr = subproc.communicate()
 
-  # always print the stdout
-  logger = logging.getLogger('pkgconfig')
-  for k in stdout.split('\n'):
-    if k: logger.debug(k)
-
   # handles py3k string conversion, if necessary
   if isinstance(stdout, bytes) and not isinstance(stdout, str):
     stdout = stdout.decode('utf8')
 
   if isinstance(stderr, bytes) and not isinstance(stderr, str):
     stderr = stderr.decode('utf8')
+
+  # always print the stdout
+  logger = logging.getLogger('pkgconfig')
+  for k in stdout.split('\n'):
+    if k: logger.debug(k)
 
   return subproc.returncode, stdout, stderr
 
@@ -133,6 +133,30 @@ class pkgconfig:
 
     from distutils.version import LooseVersion
     return cmp(self.version, LooseVersion(other))
+
+  def __ge__(self, other):
+    from distutils.version import LooseVersion
+    return LooseVersion(self.version) >= LooseVersion(other)
+
+  def __gt__(self, other):
+    from distutils.version import LooseVersion
+    return LooseVersion(self.version) > LooseVersion(other)
+
+  def __le__(self, other):
+    from distutils.version import LooseVersion
+    return LooseVersion(self.version) <= LooseVersion(other)
+
+  def __lt__(self, other):
+    from distutils.version import LooseVersion
+    return LooseVersion(self.version) < LooseVersion(other)
+
+  def __eq__(self, other):
+    from distutils.version import LooseVersion
+    return LooseVersion(self.version) == LooseVersion(other)
+
+  def __ne__(self, other):
+    from distutils.version import LooseVersion
+    return LooseVersion(self.version) != LooseVersion(other)
 
   def include_directories(self):
     """Returns a pre-processed list containing include directories.
