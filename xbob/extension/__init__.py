@@ -142,7 +142,7 @@ class Extension(DistutilsExtension):
     # Mixing
     parameters = {
         'define_macros': generate_self_macros(args[0], version),
-        'extra_compile_args': ['-std=c++11'],
+        'extra_compile_args': ['-std=c++0x'], #synomym for c++11?
         'library_dirs': [],
         'libraries': [],
         }
