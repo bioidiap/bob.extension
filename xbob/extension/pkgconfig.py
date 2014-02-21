@@ -65,6 +65,16 @@ def call_pkgconfig(cmd, paths=None):
 
   return subproc.returncode, stdout, stderr
 
+def version():
+  """Determines the version of pkg-config which is installed"""
+
+  status, stdout, stderr = call_pkgconfig(['--version'])
+
+  if status != 0:
+    raise RuntimeError("pkg-config is not installed - please do it")
+
+  return stdout.strip()
+
 class pkgconfig:
   """A class for capturing configuration information from pkg-config
 
@@ -116,7 +126,7 @@ class pkgconfig:
     self.paths = paths
 
   def __xcall__(self, cmd):
-    """Calls call_pkgconfig() with self.package and self.paths"""
+    """Calls call_pkgconfig() with self.name and self.paths"""
 
     return call_pkgconfig(cmd + [self.name], self.paths)
 
@@ -172,7 +182,7 @@ class pkgconfig:
     status, stdout, stderr = self.__xcall__(['--cflags-only-I'])
 
     if status != 0:
-      raise RuntimeError("error querying --cflags-only-I for package `%s': %s" % (self.package, stderr))
+      raise RuntimeError("error querying --cflags-only-I for package `%s': %s" % (self.name, stderr))
 
     retval = []
     for token in stdout.split():
@@ -197,7 +207,7 @@ class pkgconfig:
     status, stdout, stderr = self.__xcall__(['--cflags-only-other'])
 
     if status != 0:
-      raise RuntimeError("error querying --cflags-only-other for package `%s': %s" % (self.package, stderr))
+      raise RuntimeError("error querying --cflags-only-other for package `%s': %s" % (self.name, stderr))
 
     flag_map = {
         '-D': 'define_macros',
@@ -239,7 +249,7 @@ class pkgconfig:
     status, stdout, stderr = self.__xcall__(['--libs-only-l'])
 
     if status != 0:
-      raise RuntimeError("error querying --libs-only-l for package `%s': %s" % (self.package, stderr))
+      raise RuntimeError("error querying --libs-only-l for package `%s': %s" % (self.name, stderr))
 
     retval = []
     for token in stdout.split():
@@ -261,7 +271,7 @@ class pkgconfig:
     status, stdout, stderr = self.__xcall__(['--libs-only-L'])
 
     if status != 0:
-      raise RuntimeError("error querying --libs-only-L for package `%s': %s" % (self.package, stderr))
+      raise RuntimeError("error querying --libs-only-L for package `%s': %s" % (self.name, stderr))
 
     retval = []
     for token in stdout.split():
@@ -283,7 +293,7 @@ class pkgconfig:
     status, stdout, stderr = self.__xcall__(['--libs-only-other'])
 
     if status != 0:
-      raise RuntimeError("error querying --libs-only-other for package `%s': %s" % (self.package, stderr))
+      raise RuntimeError("error querying --libs-only-other for package `%s': %s" % (self.name, stderr))
 
     return stdout.strip().split()
 
@@ -301,7 +311,7 @@ class pkgconfig:
     status, stdout, stderr = self.__xcall__(['--print-variables'])
 
     if status != 0:
-      raise RuntimeError("error querying --print-variables for package `%s': %s" % (self.package, stderr))
+      raise RuntimeError("error querying --print-variables for package `%s': %s" % (self.name, stderr))
 
     return stdout.strip().split()
 
@@ -323,7 +333,7 @@ class pkgconfig:
     status, stdout, stderr = self.__xcall__(['--variable=%s' % name])
 
     if status != 0:
-      raise RuntimeError("error querying --variable=%s for package `%s': %s" % (name, self.package, stderr))
+      raise RuntimeError("error querying --variable=%s for package `%s': %s" % (name, self.name, stderr))
 
     return stdout.strip()
 

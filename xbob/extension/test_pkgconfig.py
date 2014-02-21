@@ -7,9 +7,16 @@
 """
 
 import nose
-from .pkgconfig import pkgconfig
+from .pkgconfig import pkgconfig, version
 
-test_package = 'zlib'
+test_package = 'blitz'
+pkg_config_version = '0.0'
+
+def test_pkgconfig_version():
+
+  assert version()
+  global pkg_config_version
+  pkg_config_version = version()
 
 def test_detect_ok():
   pkg = pkgconfig(test_package)
@@ -63,6 +70,16 @@ def test_extra_link_args():
   assert isinstance(obj, list)
   #print obj
 
+def skip_on_pkgconfig_lt_024(func):
+  from nose.plugins.skip import SkipTest
+  from distutils.version import LooseVersion
+  pkg_config_has_variables = LooseVersion(version()) >= '0.24'
+  def _():
+    if not pkg_config_has_variables: raise SkipTest('pkg-config version (%s) does not support variable listing' % pkg_config_version)
+  _.__name__ = func.__name__
+  return _
+
+@skip_on_pkgconfig_lt_024
 def test_variable_names():
   pkg = pkgconfig(test_package)
   obj = pkg.variable_names()
@@ -70,6 +87,7 @@ def test_variable_names():
   assert obj
   #print obj
 
+@skip_on_pkgconfig_lt_024
 def test_variable():
   pkg = pkgconfig(test_package)
   names = pkg.variable_names()
