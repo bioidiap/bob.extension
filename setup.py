@@ -28,6 +28,9 @@ setup(
 
     install_requires=[
       'setuptools',
+      'nose',
+      'sphinx',
+      'coverage',
       ],
 
     classifiers = [
