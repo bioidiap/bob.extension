@@ -13,7 +13,7 @@ setup(
     name="xbob.extension",
     version="0.3.0a0",
     description="Helps projects building Python/C++ extensions for Bob",
-    license="GPLv3",
+    license="BSD",
     author='Andre Anjos',
     author_email='andre.anjos@idiap.ch',
     long_description=open('README.rst').read(),
@@ -36,7 +36,7 @@ setup(
     classifiers = [
       'Development Status :: 3 - Alpha',
       'Intended Audience :: Developers',
-      'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+      'License :: OSI Approved :: BSD License',
       'Natural Language :: English',
       'Programming Language :: Python',
       'Programming Language :: Python :: 3',

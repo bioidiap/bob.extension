@@ -27,7 +27,7 @@ def uniq(seq, idfun=None):
 
 def call_pkgconfig(cmd, paths=None):
   """Runs a command as a subprocess and raises if that does not work
-  
+
   Returns the exit status, stdout and stderr.
   """
 
@@ -79,7 +79,7 @@ class pkgconfig:
        >>> glibc.library_directories() # doctest: SKIP
        ['/usr/lib']
 
-  If the package does not exist, a RuntimeError is raised. All calls to any 
+  If the package does not exist, a RuntimeError is raised. All calls to any
   methods of a ``pkgconfig`` object are translated into a subprocess call that
   queries for that specific information. If ``pkg-config`` fails, a
   RuntimeError is raised.
@@ -97,7 +97,7 @@ class pkgconfig:
     extra_paths
       Search paths to be added to the environment's PKG_CONFIG_PATH to search
       for packages.
-    
+
     Equivalent command line version:
 
     .. code-block:: sh
@@ -160,7 +160,7 @@ class pkgconfig:
 
   def include_directories(self):
     """Returns a pre-processed list containing include directories.
-    
+
     Equivalent command line version:
 
     .. code-block:: sh
@@ -171,7 +171,7 @@ class pkgconfig:
 
     status, stdout, stderr = self.__xcall__(['--cflags-only-I'])
 
-    if status != 0: 
+    if status != 0:
       raise RuntimeError("error querying --cflags-only-I for package `%s': %s" % (self.package, stderr))
 
     retval = []
@@ -182,7 +182,7 @@ class pkgconfig:
 
   def cflags_other(self):
     """Returns a pre-processed dictionary containing compilation options.
-   
+
     Equivalent command line version:
 
     .. code-block:: sh
@@ -190,13 +190,13 @@ class pkgconfig:
        $ PKG_CONFIG_PATH=<paths> pkg-config --cflags-only-other <name>
 
     The returned dictionary contains two entries ``extra_compile_args`` and
-    ``define_macros``. The ``define_macros`` entries are ready for deployment 
+    ``define_macros``. The ``define_macros`` entries are ready for deployment
     in the ``setup()`` function of your package.
     """
 
     status, stdout, stderr = self.__xcall__(['--cflags-only-other'])
 
-    if status != 0: 
+    if status != 0:
       raise RuntimeError("error querying --cflags-only-other for package `%s': %s" % (self.package, stderr))
 
     flag_map = {
@@ -227,7 +227,7 @@ class pkgconfig:
 
   def libraries(self):
     """Returns a pre-processed list containing libraries to link against
-    
+
     Equivalent command line version:
 
     .. code-block:: sh
@@ -238,7 +238,7 @@ class pkgconfig:
 
     status, stdout, stderr = self.__xcall__(['--libs-only-l'])
 
-    if status != 0: 
+    if status != 0:
       raise RuntimeError("error querying --libs-only-l for package `%s': %s" % (self.package, stderr))
 
     retval = []
@@ -249,7 +249,7 @@ class pkgconfig:
 
   def library_directories(self):
     """Returns a pre-processed list containing library directories.
-    
+
     Equivalent command line version:
 
     .. code-block:: sh
@@ -260,7 +260,7 @@ class pkgconfig:
 
     status, stdout, stderr = self.__xcall__(['--libs-only-L'])
 
-    if status != 0: 
+    if status != 0:
       raise RuntimeError("error querying --libs-only-L for package `%s': %s" % (self.package, stderr))
 
     retval = []
@@ -271,7 +271,7 @@ class pkgconfig:
 
   def extra_link_args(self):
     """Returns a pre-processed list containing extra link arguments.
-    
+
     Equivalent command line version:
 
     .. code-block:: sh
@@ -289,13 +289,13 @@ class pkgconfig:
 
   def variable_names(self):
     """Returns a list with all variable names know to this package
-    
+
     Equivalent command line version:
 
     .. code-block:: sh
 
        $ PKG_CONFIG_PATH=<paths> pkg-config --print-variables <name>
-    
+
     """
 
     status, stdout, stderr = self.__xcall__(['--print-variables'])
@@ -307,7 +307,7 @@ class pkgconfig:
 
   def variable(self, name):
     """Returns a variable with a specific name (if it exists)
-    
+
     Equivalent command line version:
 
     .. code-block:: sh
