@@ -7,6 +7,7 @@
 """
 
 import sys
+import os
 import platform
 from .pkgconfig import pkgconfig
 from distutils.extension import Extension as DistutilsExtension
@@ -25,7 +26,7 @@ def check_packages(packages):
 
   Raises a :py:class:`RuntimeError` in case requirements are not satisfied.
   This means either not finding a package if no version number is specified or
-  veryfing that the package version does not match the required version by the
+  verifying that the package version does not match the required version by the
   builder.
 
   Package requirements can be set like this::
@@ -210,3 +211,12 @@ class Extension(DistutilsExtension):
 
     # Run the constructor for the base class
     DistutilsExtension.__init__(self, *args, **kwargs)
+
+    # post-process the options since
+    # there is an erroneous '-Wstrict-prototypes' in the environment options
+    # see http://stackoverflow.com/questions/8106258/cc1plus-warning-command-line-option-wstrict-prototypes-is-valid-for-ada-c-o
+    # note: this seems to work for python 2 only; for python 3, we still get the warnings...
+    import distutils.sysconfig
+    opt = distutils.sysconfig.get_config_var('OPT')
+    os.environ['OPT'] = " ".join(flag for flag in opt.split() if flag != '-Wstrict-prototypes')
+
