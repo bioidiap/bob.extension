@@ -11,9 +11,9 @@
  Bob Satellite Package Development and Maintenance
 ===================================================
 
-This tutorial explains how to use `zc.buildout <http://www.buildout.org/>`_ to
-build complete `Python`-based working environments (a.k.a `satellite
-packages`). By following this recipe you will be able to:
+This tutorial explains how to use `zc.buildout`_ to build complete
+`Python`-based working environments (a.k.a `satellite packages`). By following
+this recipe you will be able to:
 
 * Create a basic working environment using either a stock |project|
   installation or your own compiled (and possibly uninstalled) version of
@@ -24,7 +24,7 @@ packages`). By following this recipe you will be able to:
   available Satellite Package;
 * Distribute your work to others in a clean and organized manner.
 
-One important advantage of using ``zc.buildout`` is that it does **not**
+One important advantage of using `zc.buildout`_ is that it does **not**
 require administrator privileges for setting up any of the above. Furthermore,
 you will be able to create distributable environments for each project you
 have. This is a great way to release code for laboratory exercises or for a
@@ -35,14 +35,12 @@ particular publication that depends on |project|.
   *deploying* Python packages. If you are not familiar with Python's
   ``setuptools``, ``distutils`` or PyPI, it can be beneficial to `learn about
   those <http://guide.python-distribute.org/>`_ before you start. Python
-  `Setuptools <http://pypi.python.org/pypi/setuptools/>`_ and `Distutils
-  <http://docs.python.org/distutils/>`_ are mechanisms to *define and
-  distribute* python code in a packaged format, optionally through `PyPI
-  <http://pypi.python.org/pypi>`_, a web-based Python package index and
-  distribution portal.
+  `Setuptools`_ and `Distutils`_ are mechanisms to *define and distribute*
+  python code in a packaged format, optionally through `PyPI`_, a web-based
+  Python package index and distribution portal.
 
-  `Buildout <http://www.buildout.org>`_ is a tool to *deploy* Python packages
-  locally, automatically setting up and encapsulating your work environment.
+  `zc.buildout`_ is a tool to *deploy* Python packages locally, automatically
+  setting up and encapsulating your work environment.
 
 Anatomy of a buildout Python package
 ------------------------------------
@@ -172,11 +170,10 @@ Everything is now setup for you to continue the development of this package.
 Modify all required files to setup your own package name, description and
 dependencies. Start adding files to your library (or libraries) and, if you
 wish, make this package available in a place with public access to make your
-research public. We recommend using Github. Optionally, `drop-us a
-message <https://groups.google.com/forum/?fromgroups#!forum/bob-devel>`_
-talking about the availability of this package so we can add it to the `growing
-list of available software
-<https://github.com/idiap/bob/wiki/Satellite-Packages>`_.
+research public. We recommend using Github. Optionally, `drop-us a message
+<https://groups.google.com/forum/?fromgroups#!forum/bob-devel>`_ talking about
+the availability of this package so we can add it to the growing list of
+`Satellite Packages`_.
 
 |project| is installed somewhere else
 =====================================
@@ -215,10 +212,9 @@ versions.
 Documentation
 =============
 
-To write documentation, use the `Sphinx Document Generator
-<http://sphinx.pocoo.org/>`_. A template has been setup for you under the
-``docs`` directory. Get familiar with Sphinx and then unleash the writer in
-you.
+To write documentation, use the `Sphinx`_ Document Generator. A template has
+been setup for you under the ``docs`` directory. Get familiar with Sphinx and
+then unleash the writer in you.
 
 Once you have edited both ``docs/conf.py`` and ``docs/index.rst`` you can run
 the document generator executing:
@@ -246,9 +242,8 @@ Unit Tests
 ==========
 
 Writing unit tests is an important asset on code that needs to run in different
-platforms and a great way to make sure all is OK. Test units are run with `nose
-<https://nose.readthedocs.org/en/latest/>`_. To run the test unitson your
-package:
+platforms and a great way to make sure all is OK. Test units are run with
+`nose`_. To run the test unitson your package:
 
 .. code-block:: sh
 
@@ -298,9 +293,8 @@ be described at the ``setup.py`` file with a special ``bob.db`` entry point:
       ],
 
 At present, there is no formal design guide for databases. Nevertheless, it is
-considered a good practice to follow the design of `currently existing database
-packages <https://github.com/idiap/bob/wiki/Satellite-Packages>`_. This should
-ease migration in case of future changes.
+considered a good practice to follow the design of currently existing database
+`satellite packages`_. This should ease migration in case of future changes.
 
 Creating C++/Python Bindings
 ----------------------------
@@ -382,8 +376,7 @@ In particular, if you are creating a database access API, please consider
 putting all of your package contents *inside* the namespace
 ``xbob.db.<package>``, therefore declaring two namespaces: ``xbob`` and
 ``xbob.db``. All standard database access APIs follow this strategy. Just look
-at our `currently existing database packages
-<https://github.com/idiap/bob/wiki/Satellite-Packages>`_ for examples.
+at our currently existing database `satellite packages`_ for examples.
 
 Distributing Your Work
 ----------------------
@@ -511,10 +504,11 @@ your satellite package:
 
 Upload Additional Documentation to PythonHosted.org
 ---------------------------------------------------
+
 In case you have written additional sphinx documentation in your satellite
 package that you want to share with the world, there is an easy way to push the
-documentation to `PythonHosted.org <http://pythonhosted.org>`_.
-More detailed information are given `here
+documentation to `PythonHosted.org <http://pythonhosted.org>`_.  More detailed
+information are given `here
 <http://pythonhosted.org/an_example_pypi_project/buildanduploadsphinx.html>`_,
 which translates roughly into:
 
@@ -562,12 +556,6 @@ building and before uploading.
 Satellite Packages Available
 ----------------------------
 
-Look `here for our growing list of Satellite Packages
-<https://github.com/idiap/bob/wiki/Satellite-Packages>`_.
-
-.. your links go here
-.. _pep 386: http://www.python.org/dev/peps/pep-0386/
+Look here for our growing list of `Satellite Packages`_.
 
 .. include:: links.rst
-
-.. Place here your external references

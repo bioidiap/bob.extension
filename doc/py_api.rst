@@ -6,6 +6,7 @@
  Python API to `xbob.extension`
 ================================
 
-This section includes information for using the Python API of ``xbob.extension``.
+This section includes information for using the Python API of
+``xbob.extension``.
 
 .. automodule:: xbob.extension
