@@ -220,3 +220,5 @@ class Extension(DistutilsExtension):
     opt = distutils.sysconfig.get_config_var('OPT')
     os.environ['OPT'] = " ".join(flag for flag in opt.split() if flag != '-Wstrict-prototypes')
 
+# gets sphinx autodoc done right - don't remove it
+__all__ = [_ for _ in dir() if not _.startswith('_')]
