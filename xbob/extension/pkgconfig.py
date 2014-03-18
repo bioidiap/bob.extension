@@ -80,14 +80,15 @@ class pkgconfig:
 
   Example usage:
 
-    .. doctest::
-       :options: +NORMALIZE_WHITESPACE +ELLIPSIS
+  .. doctest::
+     :options: +NORMALIZE_WHITESPACE +ELLIPSIS
 
-       >>> glibc = pkgconfig('glibc')
-       >>> glibc.include_directories() # doctest: SKIP
-       ['/usr/include']
-       >>> glibc.library_directories() # doctest: SKIP
-       ['/usr/lib']
+     >>> from xbob.extension import pkgconfig
+     >>> blitz = pkgconfig('blitz')
+     >>> blitz.include_directories()
+     [...]
+     >>> blitz.library_directories()
+     [...]
 
   If the package does not exist, a RuntimeError is raised. All calls to any
   methods of a ``pkgconfig`` object are translated into a subprocess call that
@@ -345,11 +346,13 @@ class pkgconfig:
     example, if the package is named ``foo`` and its version is ``1.4``, this
     command would return:
 
-    .. code-block:: sh
+    .. doctest::
+       :options: +NORMALIZE_WHITESPACE +ELLIPSIS
 
-       >>> foo = pkgconfig('foo')
-       >>> foo.package_macros()
-       [('HAVE_FOO', '1'), ('FOO_VERSION', '"1.4"')]
+       >>> from xbob.extension import pkgconfig
+       >>> blitz = pkgconfig('blitz')
+       >>> blitz.package_macros()
+       [('HAVE_BLITZ', '1'), ('BLITZ_VERSION', '"..."')]
 
     """
     from re import sub

@@ -2,11 +2,6 @@
 .. Andre Anjos <andre.dos.anjos@gmail.com>
 .. Tue 15 Oct 17:41:52 2013
 
-.. testsetup:: mathtest
-
-   import numpy
-   import xbob.math
-
 ===================================================
  Bob Satellite Package Development and Maintenance
 ===================================================
