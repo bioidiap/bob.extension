@@ -218,9 +218,6 @@ against our core Python-C++ bridge ``xbob.blitz``. You can specify any
 options can be set manually using `the standard options for python extensions
 <http://docs.python.org/2/extending/building.html>`_.
 
-This recipe for ``zc.buildout`` also can look at the ``prefixes`` setting, in
-case you are compiling against your own version of |project|.
-
 Document Generation and Unit Testing
 ------------------------------------
 
