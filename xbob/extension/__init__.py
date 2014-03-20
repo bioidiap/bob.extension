@@ -10,6 +10,7 @@ import sys
 import os
 import platform
 from .pkgconfig import pkgconfig
+from .boost import boost
 from distutils.extension import Extension as DistutilsExtension
 
 __version__ = __import__('pkg_resources').require('xbob.extension')[0].version
@@ -107,10 +108,10 @@ class Extension(DistutilsExtension):
   def __init__(self, *args, **kwargs):
     """Initialize the extension with parameters.
 
-    Pkg-config extensions adds a single parameter to the standard arguments of
-    the constructor:
+    External package extensions (mostly comming from pkg-config), adds a single
+    parameter to the standard arguments of the constructor:
 
-    pkgconfig : [list]
+    packages : [list]
 
       This should be a list of strings indicating the name of the bob
       (pkg-config) modules you would like to have linked to your extension
@@ -131,8 +132,24 @@ class Extension(DistutilsExtension):
 
     if 'packages' in kwargs: del kwargs['packages']
 
-    # Check all requirements
-    pkgs = check_packages(packages)
+    # Boost requires a special treatment
+    boost_req = ''
+    for i, pkg in enumerate(packages):
+      if pkg.lower().startswith('boost'):
+        boost_req = pkg.lower()
+        del packages[i]
+
+    # We still look for the keyword 'boost_modules'
+    boost_modules = []
+    if 'boost_modules' in kwargs and kwargs['boost_modules']:
+      if isinstance(kwargs['boost_modules'], str):
+        boost_modules.append(kwargs['boost_modules'])
+      else:
+        boost_modules.extend(kwargs['boost_modules'])
+
+    if 'boost_modules' in kwargs: del kwargs['boost_modules']
+
+    if boost_modules and not boost_req: boost_req = 'boost >= 1.0'
 
     # Was a version parameter given?
     version = None
@@ -154,6 +171,26 @@ class Extension(DistutilsExtension):
 
     user_includes = kwargs.get('include_dirs', [])
     pkg_includes = []
+
+    # Updates for boost
+    if boost_req:
+
+      # Adds include directory (enough for using just the template library)
+      boost_pkg = boost(boost_req.replace('boost', '').strip())
+      if boost_pkg.include_directory not in user_includes:
+        parameters['extra_compile_args'].extend([
+          '-isystem', boost_pkg.include_directory
+          ])
+        pkg_includes.append(boost_pkg.include_directory)
+
+      # Adds specific boost libraries requested by the user
+      if boost_modules:
+        boost_libdir, boost_libraries = boost_pkg(boost_modules)
+        parameters['library_dirs'].append(boost_libdir)
+        parameters['libraries'].extend(boost_libraries)
+
+    # Checks all other pkg-config requirements
+    pkgs = check_packages(packages)
 
     for pkg in pkgs:
 
