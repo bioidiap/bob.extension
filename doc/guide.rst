@@ -2,13 +2,13 @@
 .. Andre Anjos <andre.dos.anjos@gmail.com>
 .. Tue 15 Oct 17:41:52 2013
 
-===================================================
- Bob Satellite Package Development and Maintenance
-===================================================
+=========================================================
+ |project| Satellite Package Development and Maintenance
+=========================================================
 
-This tutorial explains how to use `zc.buildout`_ to build complete
-`Python`-based working environments (a.k.a `satellite packages`). By following
-this recipe you will be able to:
+This tutorial explains how to build and distribute `Python`-based working
+environments for |project|. By following these instructions you will be able
+to:
 
 * Create a basic working environment using either a stock |project|
   installation or your own compiled (and possibly uninstalled) version of
@@ -19,11 +19,12 @@ this recipe you will be able to:
   available Satellite Package;
 * Distribute your work to others in a clean and organized manner.
 
-One important advantage of using `zc.buildout`_ is that it does **not**
-require administrator privileges for setting up any of the above. Furthermore,
-you will be able to create distributable environments for each project you
-have. This is a great way to release code for laboratory exercises or for a
-particular publication that depends on |project|.
+These instructions heavily rely on the use of Python `distutils`_ and
+`zc.buildout`_. One important advantage of using `zc.buildout`_ is that it does
+**not** require administrator privileges for setting up any of the above.
+Furthermore, you will be able to create distributable environments for each
+project you have. This is a great way to release code for laboratory exercises
+or for a particular publication that depends on |project|.
 
 .. note::
   The core of our strategy is based on standard tools for *defining* and
@@ -60,63 +61,52 @@ The anatomy of a minimal package should look like the following:
 .. code-block:: sh
 
   .
-  |-- MANIFEST.in   # describes which files should be installed, besides the python ones
-  |-- README.rst    # a descriptive explanation of the package contents, in restructured-text format
-  |-- bootstrap.py  # stock script downloaded from http://svn.zope.org/*checkout*/zc.buildout/trunk/bootstrap/bootstrap.py
-  |-- buildout.cfg  # buildout configuration to create a local working environment for this package
-  |-- setup.py      # installation + requirements for this particular package
-  |-- docs          # documentation directory
-  |   |-- conf.py   # Sphinx configuration
-  |   |-- index.rst # Documentation starting point for Sphinx
-  |-- xbob          # python package (a.k.a. "the code")
-  |   |-- example
-  |   |   |-- script
-  |   |   |   |-- __init__.py
-  |   |   |   |-- version.py
-  |   |   |-- __init__.py
-  |   |   |-- test.py
-  |   |-- __init__.py
+  +-- MANIFEST.in   # extras to be installed, besides the python files
+  +-- README.rst    # a description of the package, in restructured-text format
+  +-- bootstrap.py  # stock script downloaded from zc.buildout's website
+  +-- buildout.cfg  # buildout configuration
+  +-- setup.py      # installation + requirements for this particular package
+  +-- docs          # documentation directory
+  |   +-- conf.py   # Sphinx configuration
+  |   +-- index.rst # Documentation starting point for Sphinx
+  +-- xbob          # python package (a.k.a. "the code")
+  |   +-- example
+  |   |   +-- script
+  |   |   |   +-- __init__.py
+  |   |   |   +-- version.py
+  |   |   +-- __init__.py
+  |   |   +-- test.py
+  |   +-- __init__.py
 
 Our example that you just downloaded contains these files and a few extra ones
 useful for this tutorial. Inspect the package so you are aware of its contents.
 All files are in text format and should be heavily commented. The most
 important file that requires your attention is ``setup.py``. This file contains
-the basic information for the Python package you will be creating and defines
-scripts it creates and dependencies it requires for execution. To customize the
-package to your needs, you will need to edit this file and modify it
-accordingly. Before doing so, it is suggested you go through all of this
+the basic information for the Python package you will be creating. It defines
+scripts the package provides and dependencies it requires for execution. To
+customize the package to your needs, you will need to edit this file and modify
+it accordingly. Before doing so, it is suggested you go through all of this
 tutorial so you are familiar with the whole environment. The example package,
 as it is distributed, contains a fully working example.
 
-In the remaining of this document, we explain how to setup ``buildout.cfg`` so
+In the remainder of this document, we explain how to setup ``buildout.cfg`` so
 you can work in different operational modes - the ones which are more common
 development scenarios.
 
-A Simple Python-only Package - |project| installed on the Host System
-=====================================================================
+Pure-Python Packages
+--------------------
 
-This is the typical case when you have installed one of our `pre-packaged
-versions of Bob <https://github.com/idiap/bob/wiki/Packages>`_ or you have
-setup your account on machine so that |project| is automatically found when you
-start your Python prompt. To check if you satisfy that condition, just fire up
-Python and try to ``import bob``:
+Pure-Python packages are the most common. They contain code that is exclusively
+written in Python. This contrasts to packages that are written in a mixture of
+Python and C/C++.
 
-.. code-block:: sh
-
-  $ python
-  >>> import bob
-
-If that works, setting-up your work environment is no different than what is
-described on the ``zc.buildout`` website. `Here is a screencast
-<http://video.google.com/videoplay?docid=3428163188647461098&hl=en>`_ by the
-author of ``zc.buildout`` that explains that process in details.
-
-The package you cloned above contains all elements to get you started. It
-defines a single library inside called ``xbob.example``, which declares a
-simple script, called ``version.py`` that prints out the version of |project|.
-When you clone the package, you will not find any executable as ``buildout``
-needs to check all dependencies and install missing ones before you can execute
-anything. Here is how to go from nothing to everything:
+The package you cloned above is a pure-Python example package and contains all
+elements to get you started. It defines a single library inside called
+``xbob.example``, which declares a simple script, called ``version.py`` that
+prints out the version of |project|.  When you clone the package, you will not
+find any executable as ``buildout`` needs to check all dependencies and install
+missing ones before you can execute anything. Here is how to go from nothing to
+everything:
 
 .. code-block:: sh
 
@@ -137,63 +127,99 @@ anything. Here is how to go from nothing to everything:
 
 .. note::
 
-  The python shell used in the first line of the previous command set
-  determines the python interpreter that will be used for all scripts developed
-  inside this package. Because this package makes use of Bob, you must make
-  sure that the bootstrap.py script is called with the same interpreter used to
-  build Bob, or unexpected problems might occur.
-
-  If Bob is installed by the administrator of your system, it is safe to
-  consider it uses the default python interpreter. In this case, the above 2
-  command lines should work as expected.
+  The Python shell used in the first line of the previous command set
+  determines the Python interpreter that will be used for all scripts developed
+  inside this package. To build your environment around a different version of
+  Python, just make sure to correctly choose the interpreter you wish to use.
+  If you just want to get things rolling, using ``python bootstrap.py`` will,
+  in most cases, do the right thing.
 
 You should now be able to execute ``./bin/version.py``:
 
 .. code-block:: sh
 
   $ ./bin/version.py
-  The installed version of bob is 1.1.1
-  bob is installed at: /usr/lib/python2.7/dist-packages
-  bob depends on the following Python packages:
-   * nose: 1.1.2 (/usr/lib/python2.7/dist-packages)
-   * scipy: 0.10.1 (/usr/lib/python2.7/dist-packages)
-   * sqlalchemy: 0.7.8 (/usr/lib/python2.7/dist-packages)
-   * matplotlib: 1.1.1 (/usr/lib/pymodules/python2.7)
+  The installed version of xbob.blitz is `2.0.0a0'
+  xbob.blitz is installed at `...'
+  xbob.blitz depends on the following Python packages:
+   * xbob.extension: 0.3.0a0 (...)
    * numpy: 1.6.2 (/usr/lib/python2.7/dist-packages)
+   * distribute: 0.6.28dev-r0 (/usr/lib/python2.7/dist-packages)
+   * coverage: 3.7.1 (...)
+   * sphinx: 1.1.3 (/usr/lib/python2.7/dist-packages)
+   * nose: 1.1.2 (/usr/lib/python2.7/dist-packages)
+   * docutils: 0.8.1 (/usr/lib/python2.7/dist-packages)
+   * jinja2: 2.6 (/usr/lib/python2.7/dist-packages)
+   * pygments: 1.5 (/usr/lib/python2.7/dist-packages)
+  xbob.blitz depends on the following C/C++ APIs:
+   * Python: 2.7.3
+   * Boost: 1.50.0
+   * Blitz++: 0.10
+   * NumPy: 0x01000009
+   * Compiler: ('gcc', '4.7.2')
 
 Everything is now setup for you to continue the development of this package.
 Modify all required files to setup your own package name, description and
 dependencies. Start adding files to your library (or libraries) and, if you
 wish, make this package available in a place with public access to make your
 research public. We recommend using Github. Optionally, `drop-us a message
-<https://groups.google.com/forum/?fromgroups#!forum/bob-devel>`_ talking about
-the availability of this package so we can add it to the growing list of
-`Satellite Packages`_.
+<https://groups.google.com/d/forum/bob-devel>`_ talking about the availability
+of this package so we can add it to the growing list of `Satellite Packages`_.
 
-|project| is installed somewhere else
-=====================================
+C or C++/Python Packages
+------------------------
 
-This is the typical case when you compile |project| from scratch, yourself, and
-decided not to install it formally in some automatically scanned location (like
-``/usr``). For example, you may want to test a new version of |project| with
-your setup or check which API changes will affect your released code. In such
-cases, you will need to tell ``zc.buildout`` what is the base build directory
-**or** installation prefix for |project|.
+Creating C++/Python bindings should be rather. Firstly, edit your ``setup.py``
+so that you include the following:
 
-To do that, alter or add the entry ``prefixes`` at the ``[buildout]`` section
-of ``buildout.cfg`` and replace or add directories (one per line) in which
-buildout will search for |project| python eggs (compiled and distributed with
-|project| builds). Here is an example:
+.. code-block:: python
 
-.. code-block:: ini
+  from setuptools import setup, find_packages, dist
+  dist.Distribution(dict(setup_requires=['xbob.blitz']))
+  from xbob.blitz.extension import Extension
+  ...
 
-  prefixes = /my/bob/installed/directory
-             /my/bob/build/directory
+  setup(
 
-The current used recipes for building scripts should be enough to hook-in
-locally built versions of |project| if one is found. Return ``./bin/buildout``
-and that should reset your scripts to take into considerations newly found
-versions of |project|.
+    name="xbob.myext",
+    version="1.0.0",
+    ...
+    install_requires=[
+      'setuptools',
+      'xbob.blitz',
+    ],
+    ...
+    namespace_packages=[
+      'xbob',
+    ],
+    ...
+    ext_modules=[
+      Extension("xbob.myext._myext",
+        [
+          "xbob/myext/ext/file1.cpp",
+          "xbob/myext/ext/file2.cpp",
+          "xbob/myext/ext/main.cpp",
+        ],
+        packages = [ #other c/c++ api dependences
+          'bob-math',
+          'bob-sp',
+          ]
+        ),
+      ... #add more extensions if you wish
+    ],
+
+    ...
+    )
+
+These modifications will allow you to compile extensions that are linked
+against our core Python-C++ bridge ``xbob.blitz``. You can specify any
+``pkg-config`` module and that will be linked in (for example, ``bob-ip`` or
+``opencv``) using the ``packages`` setting as shown above.  Other modules and
+options can be set manually using `the standard options for python extensions
+<http://docs.python.org/2/extending/building.html>`_.
+
+This recipe for ``zc.buildout`` also can look at the ``prefixes`` setting, in
+case you are compiling against your own version of |project|.
 
 Document Generation and Unit Testing
 ------------------------------------
@@ -242,7 +268,7 @@ platforms and a great way to make sure all is OK. Test units are run with
 
 .. code-block:: sh
 
-  $ ./bin/nosetests -v xbob
+  $ ./bin/nosetests -v
   test_version (xbob.example.test.MyTests) ... ok
 
   ----------------------------------------------------------------------
@@ -250,32 +276,14 @@ platforms and a great way to make sure all is OK. Test units are run with
 
   OK
 
-.. note::
-
-  Packages are sometimes distributed so that can be useful to other packages.
-  If you plan to distribute your package, make sure to declare a ``bob.test``
-  entry-point on your ``setup.py``. If you do that, others may be able to run
-  your tests from their package easily. An example script that could do that is
-  installed in our `xbob.db.aggregator
-  <http://github.com/bioidiap/xbob.db.aggregator>`_ package and looks `like this
-  <https://github.com/bioidiap/xbob.db.aggregator/blob/master/xbob/db/aggregator/test.py>`_:
-
-  .. code-block:: python
-
-    # execute all declared bob.test entries
-    import pkg_resources
-    for i, ep in enumerate(pkg_resources.iter_entry_points('bob.test')):
-      cls = ep.load()
-      exec('Test%d = cls' % i)
-
 Creating Database Satellite Packages
 ------------------------------------
 
 Database satellite packages are special satellite packages that can hook-in
-|project|'s database manager ``bob_dbmanage.py``. Except for this detail, they
+|project|'s database manager ``xbob_dbmanage.py``. Except for this detail, they
 should look exactly like a normal package.
 
-To allow the database to be hooked to the ``bob_dbmanage.py`` you must
+To allow the database to be hooked to the ``xbob_dbmanage.py`` you must
 implement a non-virtual python class that inherits from
 :py:class:`bob.db.driver.Interface`. Your concrete implementation should then
 be described at the ``setup.py`` file with a special ``bob.db`` entry point:
@@ -290,65 +298,6 @@ be described at the ``setup.py`` file with a special ``bob.db`` entry point:
 At present, there is no formal design guide for databases. Nevertheless, it is
 considered a good practice to follow the design of currently existing database
 `satellite packages`_. This should ease migration in case of future changes.
-
-Creating C++/Python Bindings
-----------------------------
-
-Creating C++/Python bindings should be trivial. Firstly, edit your ``setup.py``
-so that you include the following:
-
-.. code-block:: python
-
-  from setuptools import setup, find_packages
-  from xbob.extension import Extension
-  ...
-
-  setup(
-
-    name="xbob.myext",
-    version="1.0.0",
-    ...
-
-    setup_requires=[
-        'xbob.extension',
-        ],
-
-    ...
-    ext_modules=[
-      Extension("xbob.myext._myext",
-        [
-          "xbob/myext/ext/file1.cpp",
-          "xbob/myext/ext/file2.cpp",
-          "xbob/myext/ext/main.cpp",
-        ],
-        pkgconfig = [ #bob modules you depend on
-          'bob-math',
-          'bob-sp',
-          ]
-        ),
-      ... #add more extensions if you wish
-    ],
-
-    ...
-    )
-
-These modifications will allow you to compile extensions that are linked
-against |project|. You can specify the modules of |project| you want to link
-against. You **don't** have to specify ``bob-python``, which is automatically
-added. Furthermore, you can specify any ``pkg-config`` module and that will be
-linked in (for example, ``opencv``). Other modules and options can be set
-manually using `the standard options for python extensions
-<http://docs.python.org/2/extending/building.html>`_. To hook-in the building
-on the package through ``zc.buildout``, add the following section to your
-``buildout.cfg``:
-
-.. code-block:: ini
-
-  [xbob.myext]
-  recipe = xbob.buildout:develop
-
-This recipe for ``zc.buildout`` also can look at the ``prefixes`` setting, in
-case you are compiling against your own version of |project|.
 
 Python Package Namespace
 ------------------------
