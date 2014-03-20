@@ -194,3 +194,23 @@ class boost:
         if found: break
 
     return libpath, libraries
+
+  def macros(self):
+    """Returns package availability and version number macros
+
+    This method returns a python list with 2 macros indicating package
+    availability and a version number, using standard GNU compatible names. For
+    example, if the package is named ``foo`` and its version is ``1.4``, this
+    command would return:
+
+    .. doctest::
+       :options: +NORMALIZE_WHITESPACE +ELLIPSIS
+
+       >>> from xbob.extension import boost
+       >>> pkg = boost('>= 1.34')
+       >>> pkg.macros()
+       [('HAVE_BOOST', '1'), ('BOOST_VERSION', '"..."')]
+
+    """
+    return [('HAVE_BOOST', '1'), ('BOOST_VERSION', '"%s"' % self.version)]
+

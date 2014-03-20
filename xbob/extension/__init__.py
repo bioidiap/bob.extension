@@ -175,8 +175,12 @@ class Extension(DistutilsExtension):
     # Updates for boost
     if boost_req:
 
-      # Adds include directory (enough for using just the template library)
       boost_pkg = boost(boost_req.replace('boost', '').strip())
+
+      # Adds macros
+      parameters['define_macros'] += boost_pkg.macros()
+
+      # Adds include directory (enough for using just the template library)
       if boost_pkg.include_directory not in user_includes:
         parameters['extra_compile_args'].extend([
           '-isystem', boost_pkg.include_directory
