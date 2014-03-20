@@ -180,7 +180,7 @@ class Extension(DistutilsExtension):
       # Adds macros
       parameters['define_macros'] += boost_pkg.macros()
 
-      # Adds include directory (enough for using just the template library)
+      # Adds the include directory (enough for using just the template library)
       if boost_pkg.include_directory not in user_includes:
         parameters['extra_compile_args'].extend([
           '-isystem', boost_pkg.include_directory
@@ -231,7 +231,9 @@ class Extension(DistutilsExtension):
     for key in parameters.keys():
 
       # Tune input parameters if they were set
-      if key in kwargs: kwargs[key].extend(parameters[key])
+      if key in kwargs:
+        kwargs[key] = list(kwargs[key]) #deep copy
+        kwargs[key].extend(parameters[key])
       else: kwargs[key] = parameters[key]
 
       if key in ('extra_compile_args'): continue
