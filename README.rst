@@ -72,16 +72,16 @@ your ``buildout.cfg``. This includes, possibly, dependent projects. Currently,
 The recipe above creates a new interpreter that hooks that package in and
 builds the project considering variables like ``prefixes`` into consideration.
 
-Python API to pkg-config
-------------------------
+Python API to pkg-config and Boost
+----------------------------------
 
 This package alson contains a set of Pythonic bindings to the popular
 pkg-config configuration utility. It allows distutils-based setup files to
 query for libraries installed on the current system through that command line
 utility.  library.
 
-Using at your ``setup.py``
-==========================
+Using the ``pkgconfig`` class
+=============================
 
 To use this package at your ``setup.py`` file, you will need to let distutils
 know it needs it before importing it. You can achieve this with the following
@@ -110,3 +110,25 @@ After inclusion, you can just instantiate an object of type ``pkgconfig``::
   >>> zlib > '1.2.10'
   False
 
+Using the ``boost`` class
+=========================
+
+To use this package at your ``setup.py`` file, you will also need the same
+trick as with ``pkgconfig``::
+
+  from setuptools import dist
+  dist.Distribution(dict(setup_requires='xbob.extension'))
+  from xbob.extension.boost import boost
+
+After inclusion, you can just instantiate an object of type ``boost``::
+
+  >>> boost_pkg = boost('>= 1.47')
+  >>> boost.version # doctest: SKIP
+  1.50.0
+  >>> boost.include_directory # doctest: SKIP
+  '/usr/include'
+  >>> libpath, libnames = boost.libconfig(['system', 'python'])
+  >>> print(libpath) # doctest: SKIP
+  '/usr/lib'
+  >>> print(libnames) # doctest: SKIP
+  ['boost_system-mt', 'boost_python-mt-py27']
