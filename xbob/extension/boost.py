@@ -42,7 +42,7 @@ class boost:
      :options: +NORMALIZE_WHITESPACE +ELLIPSIS
 
      >>> from xbob.extension import boost
-     >>> boost = boost('>= 1.47')
+     >>> boost = boost('>= 1.35')
      >>> boost.include_directories()
      [...]
 
@@ -53,8 +53,8 @@ class boost:
      :options: +NORMALIZE_WHITESPACE +ELLIPSIS
 
      >>> from xbob.extension import boost
-     >>> boost = boost('>= 1.47')
-     >>> boost.library_configuration(['python', 'random'])
+     >>> boost = boost('>= 1.35')
+     >>> boost.libconfig(['python', 'random'])
      (...)
 
   """
