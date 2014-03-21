@@ -56,7 +56,7 @@ class boost:
 
      >>> from xbob.extension import boost
      >>> boost = boost('>= 1.35')
-     >>> boost.libconfig(['python', 'random'])
+     >>> boost.libconfig(['python', 'system'])
      (...)
 
   """
