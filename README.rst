@@ -1,3 +1,6 @@
+.. image:: https://travis-ci.org/bioidiap/xbob.extension.svg?branch=prototype
+   :target: https://travis-ci.org/bioidiap/xbob.extension
+
 ===========================================
  Python/C++ Bob Extension Building Support
 ===========================================
