@@ -11,8 +11,8 @@
 This module contains information on how to build and maintain Bob extensions
 written in pure Python or a mix of C/C++ and Python.
 
-Reference
----------
+User Guide
+----------
 
 .. toctree::
    :maxdepth: 2
