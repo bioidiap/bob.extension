@@ -20,38 +20,36 @@ def test_boost_version():
 def test_boost_simple_modules():
 
   b = boost()
-  directory, libname = b.libconfig(['system'])
-  assert directory
-  assert os.path.exists(directory)
-  assert libname
-  assert len(libname) == 1
+  directories, libname = b.libconfig(['system'])
+  nose.tools.eq_(len(directories), 1)
+  assert os.path.exists(directories[0])
+  nose.tools.eq_(len(libname), 1)
 
 def test_boost_python_modules():
 
   b = boost()
-  directory, libname = b.libconfig(['python'])
-  assert directory
-  assert os.path.exists(directory)
-  assert libname
-  assert len(libname) == 1
-  assert libname[0].find('-py%d%d' % sys.version_info[:2]) >= 0
+  directories, libname = b.libconfig(['python'])
+  nose.tools.eq_(len(directories), 1)
+  assert os.path.exists(directories[0])
+  nose.tools.eq_(len(libname), 1)
+  #assert libname[0].find('-py%d%d' % sys.version_info[:2]) >= 0
 
 def test_boost_multiple_modules():
 
   b = boost()
-  directory, libname = b.libconfig(['python', 'system'])
-  assert directory
-  assert os.path.exists(directory)
+  directories, libname = b.libconfig(['python', 'system'])
+  nose.tools.eq_(len(directories), 1)
+  assert os.path.exists(directories[0])
   assert libname
-  assert len(libname) == 2
-  assert libname[0].find('-py%d%d' % sys.version_info[:2]) >= 0
-  assert libname[1].find('-py%d%d' % sys.version_info[:2]) < 0
+  nose.tools.eq_(len(libname), 2)
+  #assert libname[0].find('-py%d%d' % sys.version_info[:2]) >= 0
+  #assert libname[1].find('-py%d%d' % sys.version_info[:2]) < 0
 
 def test_common_prefix():
 
   b = boost()
-  directory, libname = b.libconfig(['python', 'system'])
-  assert directory
-  assert os.path.exists(directory)
-  os.path.commonprefix([directory, b.include_directory])
-  assert len(os.path.commonprefix([directory, b.include_directory])) > 1
+  directories, libname = b.libconfig(['python', 'system'])
+  nose.tools.eq_(len(directories), 1)
+  assert os.path.exists(directories[0])
+  os.path.commonprefix([directories[0], b.include_directory])
+  assert len(os.path.commonprefix([directories[0], b.include_directory])) > 1

@@ -185,7 +185,7 @@ class boost:
     libpaths = [
         os.path.join(prefix, 'lib64'),
         os.path.join(prefix, 'lib32'),
-        os.path.join(prefx, 'lib'),
+        os.path.join(prefix, 'lib'),
         ]
 
     py = 'py%d%d' % sys.version_info[:2]
@@ -196,12 +196,12 @@ class boost:
       for extension in extensions:
         for template in templates:
           for libpath in libpaths:
-            modname = template % dict(name=k, version=self.version, py=py)
+            modname = template % dict(name=module, version=self.version, py=py)
             yield modname, os.path.join(libpath, 'lib' + modname + extension)
 
     items = {}
     for module in modules:
-      for modname, path in paths(k):
+      for modname, path in paths(module):
         if os.path.exists(path):
           items[module] = (os.path.dirname(path), modname)
           break
@@ -211,7 +211,7 @@ class boost:
       if module not in items:
         raise RuntimeError("cannot find required boost module `%s', searched as `%s'" % (module, ', '.join(paths(module))))
 
-    libpaths, libraries = zip(*items)
+    libpaths, libraries = zip(*items.values())
 
     return uniq(libpaths), uniq(libraries)
 
