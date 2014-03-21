@@ -127,8 +127,8 @@ After inclusion, you can just instantiate an object of type ``boost``::
   1.50.0
   >>> boost.include_directory # doctest: SKIP
   '/usr/include'
-  >>> libpath, libnames = boost.libconfig(['system', 'python'])
-  >>> print(libpath) # doctest: SKIP
-  '/usr/lib'
+  >>> libpaths, libnames = boost.libconfig(['system', 'python'])
+  >>> print(libpaths) # doctest: SKIP
+  ['/usr/lib']
   >>> print(libnames) # doctest: SKIP
   ['boost_system-mt', 'boost_python-mt-py27']
