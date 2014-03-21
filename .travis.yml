@@ -13,3 +13,5 @@ install:
   - "./bin/buildout"
 script:
   - "./bin/nosetests -sv"
+  - "./bin/sphinx-build -b doctest doc sphinx"
+  - "./bin/sphinx-build -b html doc sphinx"
