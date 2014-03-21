@@ -43,8 +43,10 @@ class boost:
 
      >>> from xbob.extension import boost
      >>> boost = boost('>= 1.35')
-     >>> boost.include_directories()
-     [...]
+     >>> boost.include_directory
+     ...
+     >>> boost.version
+     ...
 
   You can also use this class to retrieve information about installed Boost
   libraries and link information:
