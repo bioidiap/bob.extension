@@ -4,12 +4,12 @@
 ..
 .. Copyright (C) 2011-2014 Idiap Research Institute, Martigny, Switzerland
 
-=======================
- Bob Python Extensions
-=======================
+===========================
+ Bob Python/C++ Extensions
+===========================
 
-This module contains information on how to build and maintain Bob extensions
-written in pure Python or a mix of C/C++ and Python.
+This module contains information on how to build and maintain |project|
+extensions written in pure Python or a mix of C/C++ and Python.
 
 User Guide
 ----------
