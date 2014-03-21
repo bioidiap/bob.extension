@@ -11,6 +11,8 @@ import sys
 import glob
 from distutils.version import LooseVersion
 
+from .utils import uniq
+
 def boost_version(boost_dir):
 
   fname = os.path.join(boost_dir, "version.hpp")
@@ -61,26 +63,29 @@ class boost:
     """
     Searches for the Boost library in stock locations. Allows user to override.
 
-    If the user sets the environment variable BOOST_PREFIX_PATH, then **only**
-    the user defined path locations are searched.
+    If the user sets the environment variable XBOB_PREFIX_PATH, that prefixes
+    the standard path locations.
     """
 
-    if 'BOOST_PREFIX_PATH' in os.environ:
-      globs = os.environ['BOOST_PREFIX_PATH']
-      candidates = [k for k in globs.split(os.pathsep) if os.path.exists(k)]
-    else:
-      globs = [
-        "/usr/include/boost/",
-        "/usr/include/boost?*/",
-        "/usr/local/boost/",
-        "/usr/local/boost?*/",
-        "/opt/local/include/boost/",
-        "/opt/local/include/boost?*/",
-        "/usr/local/include/boost/",
-        "/usr/local/include/boost?*/",
+    default_roots = [
+        "/usr",
+        "/usr/local",
+        "/opt/local",
         ]
-      valid_globs = [glob.glob(k) for k in globs]
-      candidates = [d for k in valid_globs for d in k] #flatten
+
+    if 'XBOB_PREFIX_PATH' in os.environ:
+      roots = os.environ['XBOB_PREFIX_PATH'].split(os.pathsep) + default_roots
+    else:
+      roots = default_roots
+
+    globs = []
+    for k in roots:
+      globs += [
+          os.path.join(k, 'include', 'boost') + os.sep,
+          os.path.join(k, 'include', 'boost?*') + os.sep,
+          ]
+    valid_globs = [glob.glob(k) for k in globs]
+    candidates = [d for k in valid_globs for d in k] #flatten
 
     if not candidates:
       raise RuntimeError("could not find any version of boost on the file system (looked at: %s)" % (', '.join(candidates)))
@@ -158,8 +163,8 @@ class boost:
 
     Returns:
 
-    directory (string)
-      A directory indicating where the libraries are installed
+    directories (list of strings)
+      A list of directories indicating where the libraries are installed
 
     libs (list of strings)
       A list of strings indicating the names of the libraries you can use
@@ -175,25 +180,40 @@ class boost:
       else: # linux like
         extensions = ['.so', '.a']
 
-    dname = os.path.dirname
-    libpath = os.path.join(dname(dname(self.include_directory)), 'lib')
+    prefix = os.path.dirname(os.path.dirname(self.include_directory))
+
+    libpaths = [
+        os.path.join(prefix, 'lib64'),
+        os.path.join(prefix, 'lib32'),
+        os.path.join(prefx, 'lib'),
+        ]
 
     py = 'py%d%d' % sys.version_info[:2]
 
-    libraries = []
-    for k in modules:
-      for extension in extensions:
-        found = False
-        for template in templates:
-          modname = template % dict(name=k, version=self.version, py=py)
-          path = os.path.join(libpath, 'lib' + modname + extension)
-          if os.path.exists(path):
-            libraries.append(modname)
-            found = True
-            break
-        if found: break
+    def paths(module):
+      """Yields all possible paths for a module in good order"""
 
-    return libpath, libraries
+      for extension in extensions:
+        for template in templates:
+          for libpath in libpaths:
+            modname = template % dict(name=k, version=self.version, py=py)
+            yield modname, os.path.join(libpath, 'lib' + modname + extension)
+
+    items = {}
+    for module in modules:
+      for modname, path in paths(k):
+        if os.path.exists(path):
+          items[module] = (os.path.dirname(path), modname)
+          break
+
+    # checks all modules were found, reports
+    for module in modules:
+      if module not in items:
+        raise RuntimeError("cannot find required boost module `%s', searched as `%s'" % (module, ', '.join(paths(module))))
+
+    libpaths, libraries = zip(*items)
+
+    return uniq(libpaths), uniq(libraries)
 
   def macros(self):
     """Returns package availability and version number macros

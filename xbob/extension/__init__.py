@@ -9,18 +9,13 @@
 import sys
 import os
 import platform
-from .pkgconfig import pkgconfig
-from .boost import boost
 from distutils.extension import Extension as DistutilsExtension
 
+from .pkgconfig import pkgconfig
+from .boost import boost
+from .utils import uniq
+
 __version__ = __import__('pkg_resources').require('xbob.extension')[0].version
-
-def uniq(seq):
-  """Uniqu-fy preserving order"""
-
-  seen = set()
-  seen_add = seen.add
-  return [ x for x in seq if x not in seen and not seen_add(x)]
 
 def check_packages(packages):
   """Checks if the requirements for the given packages are satisfied.
@@ -189,8 +184,8 @@ class Extension(DistutilsExtension):
 
       # Adds specific boost libraries requested by the user
       if boost_modules:
-        boost_libdir, boost_libraries = boost_pkg(boost_modules)
-        parameters['library_dirs'].append(boost_libdir)
+        boost_libdirs, boost_libraries = boost_pkg(boost_modules)
+        parameters['library_dirs'].extend(boost_libdirs)
         parameters['libraries'].extend(boost_libraries)
 
     # Checks all other pkg-config requirements
