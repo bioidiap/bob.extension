@@ -211,7 +211,7 @@ class boost:
     # checks all modules were found, reports
     for module in modules:
       if module not in items:
-        raise RuntimeError("cannot find required boost module `%s', searched as `%s'" % (module, ', '.join(paths(module))))
+        raise RuntimeError("cannot find required boost module `%s', searched as `%s'" % (module, ', '.join([k[1] for k in paths(module)])))
 
     libpaths, libraries = zip(*items.values())
 
