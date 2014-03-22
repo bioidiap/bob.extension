@@ -267,11 +267,9 @@ def get_config():
   this = packages[0]
   deps = packages[1:]
 
-  retval =  "%s, version `%s'\n" % (this.key, this.version)
-  retval += "  - installed at: `%s'\n" % (this.location,)
+  retval =  "%s: %s (%s)\n" % (this.key, this.version, this.location)
   retval += "  - python dependencies:\n"
-  for d in deps:
-    retval += "    %s: %s (%s)\n" % (d.key, d.version, d.location)
+  for d in deps: retval += "    - %s: %s (%s)\n" % (d.key, d.version, d.location)
 
   return retval.strip()
 
