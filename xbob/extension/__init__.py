@@ -9,13 +9,14 @@
 import sys
 import os
 import platform
+import pkg_resources
 from distutils.extension import Extension as DistutilsExtension
 
 from .pkgconfig import pkgconfig
 from .boost import boost
 from .utils import uniq
 
-__version__ = __import__('pkg_resources').require('xbob.extension')[0].version
+__version__ = pkg_resources.require(__name__)[0].version
 
 def check_packages(packages):
   """Checks if the requirements for the given packages are satisfied.
@@ -257,6 +258,22 @@ class Extension(DistutilsExtension):
     import distutils.sysconfig
     opt = distutils.sysconfig.get_config_var('OPT')
     os.environ['OPT'] = " ".join(flag for flag in opt.split() if flag != '-Wstrict-prototypes')
+
+def get_config():
+  """Returns a string containing the configuration information.
+  """
+
+  packages = pkg_resources.require(__name__)
+  this = packages[0]
+  deps = packages[1:]
+
+  retval =  "%s, version `%s'\n" % (this.key, this.version)
+  retval += "  - installed at: `%s'\n" % (this.location,)
+  retval += "  - python dependencies:\n"
+  for d in deps:
+    retval += "    %s: %s (%s)\n" % (d.key, d.version, d.location)
+
+  return retval.strip()
 
 # gets sphinx autodoc done right - don't remove it
 __all__ = [_ for _ in dir() if not _.startswith('_')]
