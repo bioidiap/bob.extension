@@ -43,6 +43,7 @@ so that you include the following::
 
     setup_requires=[
         'xbob.extension',
+        'numpydoc' # see below
         ],
 
     ...
@@ -122,6 +123,106 @@ After inclusion, you can just instantiate an object of type ``pkgconfig``::
   True
   >>> zlib > '1.2.10'
   False
+
+Documenting your Python extension
+---------------------------------
+One part of this package are some functions that makes it easy to generate a proper python documentation for your bound C++ functions.
+This documentation can be used after::
+
+  #include <xbob.extension/documentation.h>
+
+The generated documentation relies on the ``numpydoc`` sphinx extension http://pypi.python.org/pypi/numpydoc, which is documented `here <http://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt>`_.
+To use this package, please add the following lines in the ``conf.py`` file of your documentation (which is usually located in ``doc/conf.py``)::
+
+  extensions = [
+    ...
+    'numpydoc',
+  ]
+  # Removes some warnings, see: https://github.com/phn/pytpm/issues/3
+  numpydoc_show_class_members = False
+
+
+Function documentation
+======================
+To generate a properly aligned function documentation, you can use::
+
+  static xbob::extension::FunctionDoc description(
+    "function_name",
+    "Short function description",
+    "Optional long function description"
+  );
+
+.. note::
+  Please assure that you define this variable as ``static``.
+
+Using this object, you can add several parts of the function that need documentation:
+
+1. ``description.add_prototype("variable1, variable2", "return1, return2");`` can be used to add function definitions (i.e., ways how to use your function).
+   This function needs to be called at least once.
+   If the function does not define a return value, it can be left out (in which case the default ``"None"`` is used).
+   
+2. ``description.add_parameter("variable1, variable2", "datatype", "Variable description");`` should be defined for each variable that you have used in the prototypes.
+
+3. ``description.add_return("return1", "datatype", "Return value description");`` should be defined for each return value that you have used in the prototypes.
+
+Finally, when binding you function, you can use:
+
+a) ``description.name()`` to get the name of the function
+
+b) ``description.doc()`` to get the aligned documentation of the function, properly indented and broken at 80 characters (by default).
+   By default, this call will check that all parameters and return values are documented, and add a ``.. todo`` directive if not.
+   You can call ``description.doc(false)`` to disable the checks.
+
+Sphinx directives like ``.. note::``, ``.. warning::`` or ``.. math::`` will be automatically detected and aligned, when they are used as one-line directive, e.g.:
+
+  "(more text)\n.. note:: This is a note\n(more text)"
+
+.. note::
+  The ``.. todo::`` directive seems not to like being broken at 80 characters.
+  If you want to use ``.. todo::``, please call ``description.doc(true, 10000)`` to avoid line breaking.
+
+
+Class documentation
+===================
+To document a bound C++ class, you can use the ``xbob::extension::ClassDoc("class_name", "Short class description", "Optional long class description")`` function to align and wrap your documentation.
+Again, during binding you can use the functions``description.name()`` and ``description.doc()`` as above.
+
+Additionally, the class documentation has a function to add constructor definitions, which takes an ``xbob::extension::FunctionDoc`` object.
+The shortest way to get a proper class documentation is::
+
+  static auto my_class_doc =
+      xbob::extension::ClassDoc("class_name", "Short description", "Long Description")
+        .add_constructor(
+          xbob::extension::FunctionDoc("class_name", "Constructor Description")
+           .add_prototype("param1", "")
+           .add_parameter("param1", "type1", "Description of param1")
+        )
+  ;
+
+.. note:: The second ``""`` in ``add_prototype`` prevents the output type (which otherwise defaults to ``"None"``) to be written.
+
+Possible speed issues
+=====================
+
+In order to speed up the loading time of the modules, you might want to reduce the amount of documentation that is generated (though I haven't experienced any speed differences).
+For this purpose, just compile your bindings using the "-DXBOB_SHORT_DOCSTRINGS" compiler option, e.g. by adding it to the setup.py as follows (see also above)::
+
+  ...
+  ext_modules=[
+    Extension("xbob.myext._myext",
+      [
+        ...
+      ],
+      ...
+      define_macros = [('XBOB_SHORT_DOCSTRINGS',1)],
+      ),
+  ],
+  ...
+
+or simply define an environment variable ``XBOB_SHORT_DOCSTRINGS=1`` before invoking buildout.
+
+In any of these cases, only the short descriptions will be returned as the doc string.
+
 
 Using the ``boost`` class
 =========================

@@ -11,6 +11,7 @@ import os
 import platform
 import pkg_resources
 from distutils.extension import Extension as DistutilsExtension
+from pkg_resources import resource_filename
 
 from .pkgconfig import pkgconfig
 from .boost import boost
@@ -236,8 +237,12 @@ class Extension(DistutilsExtension):
 
       kwargs[key] = uniq(kwargs[key])
 
+    # add our include dir by default
+    self_include_dir = resource_filename(__name__, 'include')
+    kwargs.setdefault('include_dirs', []).append(self_include_dir)
+
     # Uniq'fy parameters that are not on our parameter list
-    kwargs['include_dirs'] = uniq(kwargs.get('include_dirs', []))
+    kwargs['include_dirs'] = uniq(kwargs['include_dirs'])
 
     # Make sure the language is correctly set to C++
     kwargs['language'] = 'c++'
