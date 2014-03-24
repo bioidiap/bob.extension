@@ -6,9 +6,9 @@
    :target: https://travis-ci.org/bioidiap/xbob.extension
 .. image:: http://img.shields.io/github/tag/bioidiap/xbob.extension.svg
    :target: https://github.com/bioidiap/xbob.extension
-.. image:: http://img.shields.io/pypi/v/xbob.extension.svg
+.. image:: https://pypip.in/v/xbob.extension/badge.png
    :target: https://pypi.python.org/pypi/xbob.extension
-.. image:: http://img.shields.io/pypi/dm/xbob.extension.svg
+.. image:: https://pypip.in/d/xbob.extension/badge.png
    :target: https://pypi.python.org/pypi/xbob.extension
 
 ===========================================
