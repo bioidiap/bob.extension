@@ -14,3 +14,4 @@ dist
 .nfs*
 .gdb_history
 build
+.coverage
