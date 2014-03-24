@@ -2,10 +2,10 @@
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Thu 30 Jan 08:46:53 2014 CET
 
-.. image:: https://travis-ci.org/bioidiap/xbob.extension.svg?branch=prototype
-   :target: https://travis-ci.org/bioidiap/xbob.extension
 .. image:: https://img.shields.io/github/tag/bioidiap/xbob.extension.svg
    :target: https://github.com/bioidiap/xbob.extension
+.. image:: https://travis-ci.org/bioidiap/xbob.extension.svg?branch=prototype
+   :target: https://travis-ci.org/bioidiap/xbob.extension
 .. image:: https://pypip.in/v/xbob.extension/badge.png
    :target: https://pypi.python.org/pypi/xbob.extension
 .. image:: https://pypip.in/d/xbob.extension/badge.png
