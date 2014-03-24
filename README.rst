@@ -4,6 +4,8 @@
 
 .. image:: https://travis-ci.org/bioidiap/xbob.extension.svg?branch=prototype
    :target: https://travis-ci.org/bioidiap/xbob.extension
+.. image:: https://coveralls.io/repos/bioidiap/xbob.extension/badge.png
+   :target: https://coveralls.io/r/bioidiap/xbob.extension
 .. image:: http://img.shields.io/github/tag/bioidiap/xbob.extension.png
    :target: https://github.com/bioidiap/xbob.extension
 .. image:: http://img.shields.io/pypi/v/xbob.extension.png
