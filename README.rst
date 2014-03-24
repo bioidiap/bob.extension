@@ -6,8 +6,10 @@
    :target: https://travis-ci.org/bioidiap/xbob.extension
 
 .. image:: http://img.shields.io/pypi/v/xbob.extension.svg
+   :target: http://img.shields.io/pypi/v/xbob.extension
 
 .. image:: http://img.shields.io/pypi/dm/xbob.extension.svg
+   :target: http://img.shields.io/pypi/dm/xbob.extension
 
 ===========================================
  Python/C++ Bob Extension Building Support
