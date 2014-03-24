@@ -57,8 +57,8 @@ namespace xbob{
 
       private:
          // variable name and type
-         const std::string variable_name;
-         const std::string variable_type;
+         std::string variable_name;
+         std::string variable_type;
          // variable description
          std::string variable_description;
 
@@ -142,7 +142,7 @@ namespace xbob{
 
       private:
         // the function name
-        const std::string function_name;
+        std::string function_name;
         // the description
         std::string function_description;
         // prototypes
@@ -225,7 +225,7 @@ namespace xbob{
 
       private:
         // class name
-        const std::string class_name;
+        std::string class_name;
         // class description
         std::string class_description;
         // constructor
