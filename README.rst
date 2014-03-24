@@ -124,6 +124,31 @@ After inclusion, you can just instantiate an object of type ``pkgconfig``::
   >>> zlib > '1.2.10'
   False
 
+
+Using the ``boost`` class
+=========================
+
+To use this package at your ``setup.py`` file, you will also need the same
+trick as with ``pkgconfig``::
+
+  from setuptools import dist
+  dist.Distribution(dict(setup_requires='xbob.extension'))
+  from xbob.extension.boost import boost
+
+After inclusion, you can just instantiate an object of type ``boost``::
+
+  >>> boost_pkg = boost('>= 1.47')
+  >>> boost.version # doctest: SKIP
+  1.50.0
+  >>> boost.include_directory # doctest: SKIP
+  '/usr/include'
+  >>> libpaths, libnames = boost.libconfig(['system', 'python'])
+  >>> print(libpaths) # doctest: SKIP
+  ['/usr/lib']
+  >>> print(libnames) # doctest: SKIP
+  ['boost_system-mt', 'boost_python-mt-py27']
+
+
 Documenting your Python extension
 ---------------------------------
 One part of this package are some functions that makes it easy to generate a proper python documentation for your bound C++ functions.
@@ -160,7 +185,7 @@ Using this object, you can add several parts of the function that need documenta
 1. ``description.add_prototype("variable1, variable2", "return1, return2");`` can be used to add function definitions (i.e., ways how to use your function).
    This function needs to be called at least once.
    If the function does not define a return value, it can be left out (in which case the default ``"None"`` is used).
-   
+
 2. ``description.add_parameter("variable1, variable2", "datatype", "Variable description");`` should be defined for each variable that you have used in the prototypes.
 
 3. ``description.add_return("return1", "datatype", "Return value description");`` should be defined for each return value that you have used in the prototypes.
@@ -185,7 +210,7 @@ Sphinx directives like ``.. note::``, ``.. warning::`` or ``.. math::`` will be 
 Class documentation
 ===================
 To document a bound C++ class, you can use the ``xbob::extension::ClassDoc("class_name", "Short class description", "Optional long class description")`` function to align and wrap your documentation.
-Again, during binding you can use the functions``description.name()`` and ``description.doc()`` as above.
+Again, during binding you can use the functions ``description.name()`` and ``description.doc()`` as above.
 
 Additionally, the class documentation has a function to add constructor definitions, which takes an ``xbob::extension::FunctionDoc`` object.
 The shortest way to get a proper class documentation is::
@@ -224,25 +249,3 @@ or simply define an environment variable ``XBOB_SHORT_DOCSTRINGS=1`` before invo
 In any of these cases, only the short descriptions will be returned as the doc string.
 
 
-Using the ``boost`` class
-=========================
-
-To use this package at your ``setup.py`` file, you will also need the same
-trick as with ``pkgconfig``::
-
-  from setuptools import dist
-  dist.Distribution(dict(setup_requires='xbob.extension'))
-  from xbob.extension.boost import boost
-
-After inclusion, you can just instantiate an object of type ``boost``::
-
-  >>> boost_pkg = boost('>= 1.47')
-  >>> boost.version # doctest: SKIP
-  1.50.0
-  >>> boost.include_directory # doctest: SKIP
-  '/usr/include'
-  >>> libpaths, libnames = boost.libconfig(['system', 'python'])
-  >>> print(libpaths) # doctest: SKIP
-  ['/usr/lib']
-  >>> print(libnames) # doctest: SKIP
-  ['boost_system-mt', 'boost_python-mt-py27']
