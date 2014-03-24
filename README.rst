@@ -1,5 +1,13 @@
+.. vim: set fileencoding=utf-8 :
+.. Andre Anjos <andre.anjos@idiap.ch>
+.. Thu 30 Jan 08:46:53 2014 CET
+
 .. image:: https://travis-ci.org/bioidiap/xbob.extension.svg?branch=prototype
    :target: https://travis-ci.org/bioidiap/xbob.extension
+
+.. image:: http://img.shields.io/pypi/v/xbob.extension.svg
+
+.. image:: http://img.shields.io/pypi/dm/xbob.extension.svg
 
 ===========================================
  Python/C++ Bob Extension Building Support
