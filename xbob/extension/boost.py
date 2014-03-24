@@ -185,10 +185,19 @@ class boost:
     prefix = os.path.dirname(os.path.dirname(self.include_directory))
 
     libpaths = [
-        os.path.join(prefix, 'lib64'),
-        os.path.join(prefix, 'lib32'),
         os.path.join(prefix, 'lib'),
         ]
+
+    if __import__('platform').architecture()[0] == '32bit':
+      libpaths += [
+          os.path.join(prefix, 'lib', 'i386-linux-gnu'),
+          os.path.join(prefix, 'lib32'),
+          ]
+    else:
+      libpaths += [
+          os.path.join(prefix, 'lib', 'x86_64-linux-gnu'),
+          os.path.join(prefix, 'lib64'),
+          ]
 
     py = 'py%d%d' % sys.version_info[:2]
 
