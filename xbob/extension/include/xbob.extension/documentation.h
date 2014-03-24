@@ -14,7 +14,6 @@
 #include <string>
 #include <set>
 #include <stdexcept>
-#include <initializer_list>
 #include <bob/core/logging.h>
 
 namespace xbob{
