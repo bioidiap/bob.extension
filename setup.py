@@ -13,11 +13,11 @@ setup(
     name="xbob.extension",
     version="0.3.0a0",
     description="Helps projects building Python/C++ extensions for Bob",
+    url='http://github.com/bioidiap/xbob.extension',
     license="BSD",
     author='Andre Anjos',
     author_email='andre.anjos@idiap.ch',
     long_description=open('README.rst').read(),
-    url='http://pypi.python.org/pypi/xbob.extension',
 
     packages=find_packages(),
     zip_safe=True,
