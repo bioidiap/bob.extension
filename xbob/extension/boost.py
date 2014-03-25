@@ -92,9 +92,12 @@ class boost:
     if not candidates:
       raise RuntimeError("could not find any version of boost on the file system (looked at: %s)" % (', '.join(candidates)))
 
+    found = False
+
     if not requirement:
       self.include_directory = candidates[0]
       self.version = boost_version(self.include_directory)
+      found = True
 
     else:
 
@@ -112,8 +115,11 @@ class boost:
            (operator == '==' and available == required):
           self.include_directory = path
           self.version = version
-        else:
-          raise RuntimeError("could not find the required (%s) version of boost on the file system (looked at: %s)" % (requirement, ', '.join(candidates)))
+          found = True
+          break
+
+    if not found:
+      raise RuntimeError("could not find the required (%s) version of boost on the file system (looked at: %s)" % (requirement, ', '.join(candidates)))
 
     # normalize
     self.include_directory = os.path.normpath(self.include_directory)
