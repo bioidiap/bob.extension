@@ -11,27 +11,21 @@ import sys
 import glob
 from distutils.version import LooseVersion
 
-from .utils import uniq
+from .utils import uniq, egrep, find_header, find_library
 
-def boost_version(boost_dir):
+def boost_version(version_hpp):
 
-  fname = os.path.join(boost_dir, "version.hpp")
-  if not os.path.exists(fname):
-    fname = os.path.join(boost_dir, "boost/version.hpp")
-  if not os.path.exists(fname):
-    return None
+  matches = egrep(version_hpp, r"^#\s*define\s+BOOST_VERSION\s+(\d+)\s*$")
+  if not len(matches): return None
 
-  try:
-    m = re.search("#\s*define\s+BOOST_VERSION\s+(\d+)", open(fname).read())
-    if m:
-      version_int = int(m.group(1))
-      version_tuple = (version_int // 100000, (version_int // 100) % 1000,
-                       version_int % 100)
-      return '.'.join([str(k) for k in version_tuple])
-  except:
-    pass
-
-  return None
+  # we have a match, produce a string version of the version number
+  version_int = int(matches[0].group(1))
+  version_tuple = (
+      version_int // 100000,
+      (version_int // 100) % 1000,
+      version_int % 100,
+      )
+  return '.'.join([str(k) for k in version_tuple])
 
 class boost:
   """A class for capturing configuration information from boost
@@ -69,34 +63,16 @@ class boost:
     the standard path locations.
     """
 
-    default_roots = [
-        "/usr",
-        "/usr/local",
-        "/opt/local",
-        ]
-
-    if 'XBOB_PREFIX_PATH' in os.environ:
-      roots = os.environ['XBOB_PREFIX_PATH'].split(os.pathsep) + default_roots
-    else:
-      roots = default_roots
-
-    globs = []
-    for k in roots:
-      globs += [
-          os.path.join(k, 'include', 'boost') + os.sep,
-          os.path.join(k, 'include', 'boost?*') + os.sep,
-          ]
-    valid_globs = [glob.glob(k) for k in globs]
-    candidates = [d for k in valid_globs for d in k] #flatten
+    candidates = find_header('version.hpp', subpaths=['boost', 'boost?*'])
 
     if not candidates:
-      raise RuntimeError("could not find any version of boost on the file system (looked at: %s)" % (', '.join(candidates)))
+      raise RuntimeError("could not find boost's `version.hpp' - have you installed Boost on this machine?")
 
     found = False
 
     if not requirement:
-      self.include_directory = candidates[0]
-      self.version = boost_version(self.include_directory)
+      self.include_directory = os.path.dirname(candidates[0])
+      self.version = boost_version(candidates[0])
       found = True
 
     else:
@@ -156,7 +132,7 @@ class boost:
       %(name)s
         resolves to the module name you are searching for
 
-      %(version)s
+      %(ver)s
         resolves to the current boost version string (e.g. ``'1.50.0'``)
 
       %(py)s
@@ -167,7 +143,7 @@ class boost:
 
       * ``'boost_%(name)s-mt'``
       * ``'boost_%(name)s'``
-      * ``'boost_%(name)s-gcc43-%(version)s'``
+      * ``'boost_%(name)s-gcc43-%(ver)s'``
 
     Returns:
 
@@ -178,57 +154,38 @@ class boost:
       A list of strings indicating the names of the libraries you can use
     """
 
-    if only_static:
-      extensions = ['.a']
-    else:
-      if sys.platform == 'darwin':
-        extensions = ['.dylib', '.a']
-      elif sys.platform == 'win32':
-        extensions = ['.dll', '.a']
-      else: # linux like
-        extensions = ['.so', '.a']
-
+    # make the include header prefix preferential
     prefix = os.path.dirname(os.path.dirname(self.include_directory))
-
-    libpaths = [
-        os.path.join(prefix, 'lib'),
-        ]
-
-    if __import__('platform').architecture()[0] == '32bit':
-      libpaths += [
-          os.path.join(prefix, 'lib', 'i386-linux-gnu'),
-          os.path.join(prefix, 'lib32'),
-          ]
-    else:
-      libpaths += [
-          os.path.join(prefix, 'lib', 'x86_64-linux-gnu'),
-          os.path.join(prefix, 'lib64'),
-          ]
 
     py = 'py%d%d' % sys.version_info[:2]
 
-    def paths(module):
-      """Yields all possible paths for a module in good order"""
-
-      for extension in extensions:
-        for template in templates:
-          for libpath in libpaths:
-            modname = template % dict(name=module, version=self.version, py=py)
-            yield modname, os.path.join(libpath, 'lib' + modname + extension)
-
-    items = {}
+    filenames = []
     for module in modules:
-      for modname, path in paths(module):
-        if os.path.exists(path):
-          items[module] = (os.path.dirname(path), modname)
-          break
+      candidates = []
+      modnames = [k % dict(name=module, ver=self.version, py=py) for k in
+          templates]
 
-    # checks all modules were found, reports
-    for module in modules:
-      if module not in items:
-        raise RuntimeError("cannot find required boost module `%s', searched as `%s'" % (module, ', '.join([k[1] for k in paths(module)])))
+      for modname in modnames:
+        candidates += find_library(modname, version=self.version,
+            prefixes=[prefix], only_static=only_static)
 
-    libpaths, libraries = zip(*items.values())
+      if not candidates:
+        raise RuntimeError("cannot find required boost module `%s' - make sure boost is installed on `%s' and that this module is named %s on the filesystem" % (module, prefix, ' or '.join(modnames)))
+
+      # take only the first choice (supposed to be the best choice!)
+      filenames.append(candidates[0])
+
+    # libraries
+    libraries = []
+    for f in filenames:
+      name, ext = os.path.splitext(os.path.basename(f))
+      if ext in ['.so', '.a', '.dylib', '.dll']:
+        libraries.append(name[3:]) #strip 'lib' from the name
+      else: #link against the whole thing
+        libraries.append(':' + f)
+
+    # library paths
+    libpaths = [os.path.dirname(k) for k in filenames]
 
     return uniq(libpaths), uniq(libraries)
 
@@ -250,4 +207,3 @@ class boost:
 
     """
     return [('HAVE_BOOST', '1'), ('BOOST_VERSION', '"%s"' % self.version)]
-
