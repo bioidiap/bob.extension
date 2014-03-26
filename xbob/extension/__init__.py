@@ -129,11 +129,14 @@ class Extension(DistutilsExtension):
 
     if 'packages' in kwargs: del kwargs['packages']
 
+    # uniformize packages
+    packages = [k.strip().lower() for k in packages]
+
     # Boost requires a special treatment
     boost_req = ''
     for i, pkg in enumerate(packages):
-      if pkg.lower().startswith('boost'):
-        boost_req = pkg.lower()
+      if pkg.startswith('boost'):
+        boost_req = pkg
         del packages[i]
 
     # We still look for the keyword 'boost_modules'
