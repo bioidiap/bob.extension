@@ -188,7 +188,7 @@ a) ``description.name()`` to get the name of the function
 b) ``description.doc()`` to get the aligned documentation of the function, properly indented and broken at 80 characters (by default).
    This call will check that all parameters and return values are documented, and add a ``.. todo`` directive if not.
 
-Sphinx directives like ``.. note::``, ``.. warning::`` or ``.. math::`` will be automatically detected and aligned, when they are used as one-line directive, e.g.:
+Sphinx directives like ``.. note::``, ``.. warning::`` or ``.. math::`` will be automatically detected and aligned, when they are used as one-line directive, e.g.::
 
   "(more text)\n.. note:: This is a note\n(more text)"
 
