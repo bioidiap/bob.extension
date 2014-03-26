@@ -28,7 +28,6 @@ setup(
 
     install_requires=[
       'setuptools',
-      'numpydoc'
       ],
 
     classifiers = [

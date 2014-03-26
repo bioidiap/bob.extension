@@ -45,7 +45,6 @@ so that you include the following::
 
     setup_requires=[
         'xbob.extension',
-        'numpydoc' # see below
         ],
 
     ...
@@ -158,16 +157,6 @@ This documentation can be used after::
 
   #include <xbob.extension/documentation.h>
 
-The generated documentation relies on the ``numpydoc`` sphinx extension http://pypi.python.org/pypi/numpydoc, which is documented `here <http://github.com/numpy/numpy/blob/master/doc/HOWTO_DOCUMENT.rst.txt>`_.
-To use this package, please add the following lines in the ``conf.py`` file of your documentation (which is usually located in ``doc/conf.py``)::
-
-  extensions = [
-    ...
-    'numpydoc',
-  ]
-  # Removes some warnings, see: https://github.com/phn/pytpm/issues/3
-  numpydoc_show_class_members = False
-
 
 Function documentation
 ======================
@@ -197,16 +186,19 @@ Finally, when binding you function, you can use:
 a) ``description.name()`` to get the name of the function
 
 b) ``description.doc()`` to get the aligned documentation of the function, properly indented and broken at 80 characters (by default).
-   By default, this call will check that all parameters and return values are documented, and add a ``.. todo`` directive if not.
-   You can call ``description.doc(false)`` to disable the checks.
+   This call will check that all parameters and return values are documented, and add a ``.. todo`` directive if not.
 
 Sphinx directives like ``.. note::``, ``.. warning::`` or ``.. math::`` will be automatically detected and aligned, when they are used as one-line directive, e.g.:
 
   "(more text)\n.. note:: This is a note\n(more text)"
 
 .. note::
+  Please assure that directives are surrounded by ``\n`` characters (see example above).
+  Otherwise, they will not be displayed correctly.
+
+.. note::
   The ``.. todo::`` directive seems not to like being broken at 80 characters.
-  If you want to use ``.. todo::``, please call ``description.doc(true, 10000)`` to avoid line breaking.
+  If you want to use ``.. todo::``, please call, e.g., ``description.doc(10000)`` to avoid line breaking.
 
 
 Class documentation
@@ -227,6 +219,9 @@ The shortest way to get a proper class documentation is::
   ;
 
 .. note:: The second ``""`` in ``add_prototype`` prevents the output type (which otherwise defaults to ``"None"``) to be written.
+
+Currently, the ClassDoc allows to highlight member functions or variables at the beginning of the class documentation.
+This highlighting is still under development and might not work as expected.
 
 Possible speed issues
 =====================
