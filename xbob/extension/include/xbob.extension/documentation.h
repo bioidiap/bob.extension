@@ -317,13 +317,13 @@ static std::string _align(std::string str, unsigned indent=0, unsigned alignment
 
 // Aligns the parameter description
 static void _align_parameter(std::string& str, const std::string& name, const std::string& type, const std::string& description, unsigned alignment=76){
-  str += _align(name + " : " + type + "", 0, alignment);
+  str += _align("``" + name + "`` : " + type + "", 0, alignment);
   str += _align(description, 4, alignment);
 }
 
 static std::string _prototype(const std::string& name, const std::string& variables, const std::string& retval){
   if (retval.empty())
-    return name + "(" + variables + ")";
+    return "**" + name + "** (" + variables + ")";
   else
     return name + "(" + variables + ") -> " + retval;
 }
@@ -461,7 +461,8 @@ inline const char* const xbob::extension::FunctionDoc::doc(
 
   if (!parameter_names.empty()){
     // add parameter description
-    description += "\n" + _align("Parameters") + _align("----------");
+//    description += "\n" + _align("Parameters") + _align("----------");
+    description += "\n" + _align("**Parameters:**\n\n") + _align("");
     for (unsigned i = 0; i < parameter_names.size(); ++i){
       _align_parameter(description, parameter_names[i], parameter_types[i], parameter_descriptions[i], alignment);
     }
@@ -469,7 +470,8 @@ inline const char* const xbob::extension::FunctionDoc::doc(
 
   if (!return_names.empty()){
     // add return value description
-    description += "\n" + _align("Returns") + _align("--------");
+//    description += "\n" + _align("Returns") + _align("--------");
+    description += "\n" + _align("**Returns:**\n\n") + _align("");
     for (unsigned i = 0; i < return_names.size(); ++i){
       _align_parameter(description, return_names[i], return_types[i], return_descriptions[i], alignment);
     }
@@ -543,19 +545,22 @@ inline char* xbob::extension::ClassDoc::doc(
 #else
   description = _align(class_description, 0, alignment);
   if (!constructor.empty()){
-    description += _align("\n**Constructor Documentation** :\n\n");
+    description += _align("\n**Constructor Documentation:**\n\n");
     description += constructor.front().doc(alignment);
   }
+  description += _align("\n**Class Members:**\n\n");
   if (!highlighted_variables.empty()){
-    description += "\n" + _align("Attributes") + _align("----------");
+//    description += "\n" + _align("Attributes") + _align("----------");
+    description += "\n" + _align("**Attributes:**\n\n") + _align("");
     for (auto hightlight : highlighted_variables){
-      description += _align(hightlight.variable_name, 0, alignment) + _align(_split(hightlight.variable_description, '\n')[0], 4, alignment);
+      description += _align("``" + hightlight.variable_name + "``", 0, alignment) + _align(_split(hightlight.variable_description, '\n')[0], 4, alignment);
     }
   }
   if (!highlighted_functions.empty()){
-    description += "\n" + _align("Methods") + _align("-------");
+//    description += "\n" + _align("Methods") + _align("-------");
+    description += "\n" + _align("**Methods:**\n\n") + _align("");
     for (auto hightlight : highlighted_functions){
-      description += _align(hightlight.function_name, 0, alignment) + _align(_split(hightlight.function_description, '\n')[0], 4, alignment);
+      description += _align("**" + hightlight.function_name + "**", 0, alignment) + _align(_split(hightlight.function_description, '\n')[0], 4, alignment);
     }
   }
   return const_cast<char*>(description.c_str());
@@ -588,7 +593,7 @@ inline char* xbob::extension::VariableDoc::doc(
   return const_cast<char*>(variable_description.c_str());
 #else
   // The numpydoc standard does not use variable types, so I came up with my own way of it
-  description = _align("**" + variable_type + "**  <-- " + variable_description, 0, alignment);
+  description = _align("*" + variable_type + "*  <-- " + variable_description, 0, alignment);
   return const_cast<char*>(description.c_str());
 #endif // XBOB_SHORT_DOCSTRINGS
 }
