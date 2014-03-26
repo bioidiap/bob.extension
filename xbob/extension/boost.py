@@ -36,10 +36,10 @@ class boost:
      :options: +NORMALIZE_WHITESPACE +ELLIPSIS
 
      >>> from xbob.extension import boost
-     >>> boost = boost('>= 1.35')
-     >>> boost.include_directory
+     >>> pkg = boost('>= 1.35')
+     >>> pkg.include_directory
      '...'
-     >>> boost.version
+     >>> pkg.version
      '...'
 
   You can also use this class to retrieve information about installed Boost
@@ -49,8 +49,8 @@ class boost:
      :options: +NORMALIZE_WHITESPACE +ELLIPSIS
 
      >>> from xbob.extension import boost
-     >>> boost = boost('>= 1.35')
-     >>> boost.libconfig(['python', 'system'])
+     >>> pkg = boost('>= 1.35')
+     >>> pkg.libconfig(['python', 'system'])
      (...)
 
   """
@@ -193,9 +193,8 @@ class boost:
     """Returns package availability and version number macros
 
     This method returns a python list with 2 macros indicating package
-    availability and a version number, using standard GNU compatible names. For
-    example, if the package is named ``foo`` and its version is ``1.4``, this
-    command would return:
+    availability and a version number, using standard GNU compatible names.
+    Example:
 
     .. doctest::
        :options: +NORMALIZE_WHITESPACE +ELLIPSIS
