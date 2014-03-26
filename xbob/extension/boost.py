@@ -182,7 +182,7 @@ class boost:
       if ext in ['.so', '.a', '.dylib', '.dll']:
         libraries.append(name[3:]) #strip 'lib' from the name
       else: #link against the whole thing
-        libraries.append(':' + f)
+        libraries.append(':' + os.path.basename(f))
 
     # library paths
     libpaths = [os.path.dirname(k) for k in filenames]
