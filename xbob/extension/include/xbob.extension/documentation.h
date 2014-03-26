@@ -12,6 +12,7 @@
 #define XBOB_EXTENSION_DOCUMENTATION_H_INCLUDED
 
 #include <string>
+#include <vector>
 #include <set>
 #include <stdexcept>
 
