@@ -14,7 +14,6 @@
 #include <string>
 #include <set>
 #include <stdexcept>
-#include <bob/core/logging.h>
 
 namespace xbob{
   namespace extension{
@@ -47,12 +46,11 @@ namespace xbob{
 
         /**
          * Generates and returns the documentation string.
-         * @param checks    Currently ignored.
          * @param alignment The default alignment is 80 characters.
          *                  Since the documentation is automatically indented by 4 spaces in the python documentation, we need to subtract these values here...
          * @return The documentation string, properly aligned, possibly including "ToDo's" for detected problems.
          */
-        char* doc(bool checks = true, const unsigned alignment = 76) const;
+        char* doc(const unsigned alignment = 76) const;
 
       private:
          // variable name and type
@@ -109,7 +107,6 @@ namespace xbob{
           const char* const parameter_type,
           const char* const parameter_description
         );
-
         /**
          * Add the documentation of a return value added with the add_prototype function
          * @param return_name   The name assigned to the return value
@@ -130,13 +127,12 @@ namespace xbob{
 
         /**
          * Generates and returns the documentation string.
-         * @param checks If enabled, perform sanity checks, i.e., that at least one prototype is given, or that at all parameters are documented.
-         *               In this case, a ..todo:: directive is added for each detected mistake, and a warning is emitted.
+         * A ..todo:: directive is added for each detected mistake.
          * @param alignment The default alignment is 80 characters.
          *                  Since the documentation is automatically indented by 4 spaces in the python documentation, we need to subtract these values here...
          * @return The documentation string, properly aligned, possibly including "ToDo's" for detected problems.
          */
-        const char* const doc(bool checks = true, const unsigned alignment = 76) const;
+        const char* const doc(const unsigned alignment = 76) const;
 
 
       private:
@@ -214,12 +210,11 @@ namespace xbob{
 
         /**
          * Generates and returns the documentation string.
-         * @param checks    If enabled, performs checks in the constructor documentation; see FunctionDoc.doc() for details.
          * @param alignment The default alignment is 80 characters.
          *                  Since the documentation is automatically indented by 4 spaces in the python documentation, we need to subtract these values here...
          * @return The documentation string, properly aligned, possibly including "ToDo's" for detected problems.
          */
-        char* doc(bool checks = true, const unsigned alignment = 76) const;
+        char* doc(const unsigned alignment = 76) const;
 
 
       private:
@@ -227,8 +222,8 @@ namespace xbob{
         std::string class_name;
         // class description
         std::string class_description;
-        // constructor
-        std::shared_ptr<FunctionDoc> constructor;
+        // constructor; should be only one, though
+        std::vector<FunctionDoc> constructor;
 
         // highlighting
         std::vector<FunctionDoc> highlighted_functions;
@@ -363,7 +358,6 @@ static void _check(std::string& doc, const std::vector<std::string>& vars, const
     }
     if (!all.empty()){
       doc += _align(".. todo:: The " + type + "(s) '" + all + "' are used, but not documented.", 0, (unsigned)-1);
-      bob::core::warn << "The " << type << "(s) '" << all << "' are used, but not documented." << std::endl;
     }
   }
   if (unused.size()){
@@ -373,7 +367,6 @@ static void _check(std::string& doc, const std::vector<std::string>& vars, const
       all += p;
     }
     doc += _align(".. todo:: The " + type + "(s) '" + all + "' are documented, but nowhere used.", 0, (unsigned)-1);
-    bob::core::warn << "The " << type << "(s) '" << all << "' are documented, but nowhere used." << std::endl;
   }
 }
 
@@ -437,7 +430,6 @@ inline xbob::extension::FunctionDoc& xbob::extension::FunctionDoc::add_return(
 }
 
 inline const char* const xbob::extension::FunctionDoc::doc(
-  bool checks,
   const unsigned alignment
 ) const
 {
@@ -447,10 +439,7 @@ inline const char* const xbob::extension::FunctionDoc::doc(
   description = "";
   switch(prototype_variables.size()){
     case 0:
-      if (checks){
-        description = _align(".. todo:: Please use ``FunctionDoc.add_prototype`` to add at least one prototypical way to call this function", 0, (unsigned)-1);
-        bob::core::warn << "The bound function '" << function_name << "' has no prototype." << std::endl;
-      }
+      description = _align(".. todo:: Please use ``FunctionDoc.add_prototype`` to add at least one prototypical way to call this function", 0, (unsigned)-1);
       break;
     case 1:
       // only one way to call; use the default way
@@ -464,14 +453,11 @@ inline const char* const xbob::extension::FunctionDoc::doc(
   // add function description
   description += "\n" + _align(function_description, 0, alignment) + "\n";
 
-  if (checks){
+  // check that all parameters are documented
+  _check(description, prototype_variables, parameter_names, "parameter");
 
-    // check that all parameters are documented
-    _check(description, prototype_variables, parameter_names, "parameter");
-
-    // check that all return values are documented
-    _check(description, prototype_returns, return_names, "return value");
-  }
+  // check that all return values are documented
+  _check(description, prototype_returns, return_names, "return value");
 
   if (!parameter_names.empty()){
     // add parameter description
@@ -519,10 +505,10 @@ inline xbob::extension::ClassDoc& xbob::extension::ClassDoc::add_constructor(
 )
 {
 #ifndef XBOB_SHORT_DOCSTRINGS
-  if (constructor){
-    bob::core::warn << "The class documentation can have only a single constructor documentation" << std::endl;
+  if (!constructor.empty()){
+    throw std::runtime_error("The class documentation can have only a single constructor documentation");
   }
-  constructor.reset(new xbob::extension::FunctionDoc(constructor_documentation));
+  constructor.push_back(constructor_documentation);
 #endif // XBOB_SHORT_DOCSTRINGS
   return *this;
 }
@@ -549,7 +535,6 @@ inline xbob::extension::ClassDoc& xbob::extension::ClassDoc::highlight(
 
 
 inline char* xbob::extension::ClassDoc::doc(
-  bool checks,
   const unsigned alignment
 ) const
 {
@@ -557,9 +542,9 @@ inline char* xbob::extension::ClassDoc::doc(
   return const_cast<char*>(class_description.c_str());
 #else
   description = _align(class_description, 0, alignment);
-  if (constructor){
+  if (!constructor.empty()){
     description += _align("\n**Constructor Documentation** :\n\n");
-    description += constructor->doc(checks, alignment);
+    description += constructor.front().doc(alignment);
   }
   if (!highlighted_variables.empty()){
     description += "\n" + _align("Attributes") + _align("----------");
@@ -596,7 +581,6 @@ inline xbob::extension::VariableDoc::VariableDoc(
 }
 
 inline char* xbob::extension::VariableDoc::doc(
-  bool checks,
   const unsigned alignment
 ) const
 {
