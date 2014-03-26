@@ -189,7 +189,7 @@ class Extension(DistutilsExtension):
 
       # Adds specific boost libraries requested by the user
       if boost_modules:
-        boost_libdirs, boost_libraries = boost_pkg(boost_modules)
+        boost_libdirs, boost_libraries = boost_pkg.libconfig(boost_modules)
         parameters['library_dirs'].extend(boost_libdirs)
         parameters['libraries'].extend(boost_libraries)
 
