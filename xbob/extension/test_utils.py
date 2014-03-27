@@ -91,6 +91,7 @@ def test_find_versioned_library():
   version = '.'.join([str(k) for k in version_tuple])
 
   lib = find_library('boost_system', version=version)
+  lib += find_library('boost_system-mt', version=version)
 
   assert len(lib) >= 1
 
