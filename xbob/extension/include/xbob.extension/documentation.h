@@ -282,12 +282,12 @@ static std::string _align(std::string str, unsigned indent=0, unsigned alignment
   unsigned current_indent = indent;
   bool first_line = true;
   // now, split each line
-  for (auto line : lines){
-    auto words = _split(line);
+  for (auto line_it = lines.begin(); line_it != lines.end(); ++line_it){
+    auto words = _split(*line_it);
     // fill in one line
     unsigned len = 0;
-    for (auto word : words){
-      if (aligned.empty() || len + word.size() >= alignment || !first_line){
+    for (auto word_it = words.begin(); word_it != words.end(); ++word_it){
+      if (aligned.empty() || len + word_it->size() >= alignment || !first_line){
         // line reached alignment
         if (!aligned.empty()){
           aligned += "\n";
@@ -305,8 +305,8 @@ static std::string _align(std::string str, unsigned indent=0, unsigned alignment
         current_indent = indent + 3;
       }
       // add word
-      aligned += word + " ";
-      len += word.size() + 1;
+      aligned += *word_it + " ";
+      len += word_it->size() + 1;
     }
     current_indent = indent;
     aligned += "\n";
@@ -334,14 +334,16 @@ static void _check(std::string& doc, const std::vector<std::string>& vars, const
   std::set<std::string> undoc;
   std::set<std::string> unused;
   // gather parameters
-  for (auto p : vars){
-    for (auto s : _split(p, ',')){
-      undoc.insert(_strip(s));
+  for (auto pit = vars.begin(); pit != vars.end(); ++pit){
+    const auto splits = _split(*pit, ',');
+    for (auto sit = splits.begin(); sit != splits.end(); ++sit){
+      undoc.insert(_strip(*sit));
     }
   }
-  for (auto p : docs){
-    for (auto s : _split(p, ',')){
-      std::string x = _strip(s);
+  for (auto pit = docs.begin(); pit != docs.end(); ++pit){
+    const auto splits = _split(*pit, ',');
+    for (auto sit = splits.begin(); sit != splits.end(); ++sit){
+      std::string x = _strip(*sit);
       if (undoc.find(x) == undoc.end()){
         unused.insert(x);
       } else {
@@ -351,10 +353,10 @@ static void _check(std::string& doc, const std::vector<std::string>& vars, const
   }
   if (undoc.size()){
     std::string all;
-    for (auto p : undoc){
-      if (p != "None"){
+    for (auto pit = undoc.begin(); pit != undoc.end(); ++pit){
+      if (*pit != "None"){
         if (!all.empty()) all += ", ";
-        all += p;
+        all += *pit;
       }
     }
     if (!all.empty()){
@@ -363,9 +365,9 @@ static void _check(std::string& doc, const std::vector<std::string>& vars, const
   }
   if (unused.size()){
     std::string all;
-    for (auto p : unused){
+    for (auto pit = unused.begin(); pit != unused.end(); ++pit){
       if (!all.empty()) all += ", ";
-      all += p;
+      all += *pit;
     }
     doc += _align(".. todo:: The " + type + "(s) '" + all + "' are documented, but nowhere used.", 0, (unsigned)-1);
   }
@@ -553,15 +555,15 @@ inline char* xbob::extension::ClassDoc::doc(
   if (!highlighted_variables.empty()){
 //    description += "\n" + _align("Attributes") + _align("----------");
     description += "\n" + _align("**Attributes:**\n\n") + _align("");
-    for (auto hightlight : highlighted_variables){
-      description += _align("``" + hightlight.variable_name + "``", 0, alignment) + _align(_split(hightlight.variable_description, '\n')[0], 4, alignment);
+    for (auto hit = highlighted_variables.begin(); hit != highlighted_variables.end(); ++hit){
+      description += _align("``" + hit->variable_name + "``", 0, alignment) + _align(_split(hit->variable_description, '\n')[0], 4, alignment);
     }
   }
   if (!highlighted_functions.empty()){
 //    description += "\n" + _align("Methods") + _align("-------");
     description += "\n" + _align("**Methods:**\n\n") + _align("");
-    for (auto hightlight : highlighted_functions){
-      description += _align("**" + hightlight.function_name + "**", 0, alignment) + _align(_split(hightlight.function_description, '\n')[0], 4, alignment);
+    for (auto hit = highlighted_functions.begin(); hit != highlighted_functions.end(); ++hit){
+      description += _align("**" + hit->function_name + "**", 0, alignment) + _align(_split(hit->function_description, '\n')[0], 4, alignment);
     }
   }
   return const_cast<char*>(description.c_str());
