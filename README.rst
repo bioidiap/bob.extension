@@ -190,15 +190,31 @@ b) ``description.doc()`` to get the aligned documentation of the function, prope
 
 Sphinx directives like ``.. note::``, ``.. warning::`` or ``.. math::`` will be automatically detected and aligned, when they are used as one-line directive, e.g.::
 
-  "(more text)\n.. note:: This is a note\n(more text)"
+  "(more text)\n\n.. note:: This is a note\n\n(more text)"
+
+Also, enumerations and listings (using the ``*`` character to define a list element) are handled automatically::
+
+  "(more text)\n\n* Point 1\n* Point 2\n\n(more text)"
 
 .. note::
-  Please assure that directives are surrounded by ``\n`` characters (see example above).
+  Please assure that directives are surrounded by double ``\n`` characters (see example above) so that they are put as paragraphs.
   Otherwise, they will not be displayed correctly.
 
 .. note::
   The ``.. todo::`` directive seems not to like being broken at 80 characters.
   If you want to use ``.. todo::``, please call, e.g., ``description.doc(10000)`` to avoid line breaking.
+
+.. note::
+  To increase readability, you might want to split your documentation lines, e.g.::
+
+    "(more text)\n"
+    "\n"
+    "* Point 1\n"
+    "* Point 2\n"
+    "\n"
+    "(more text)"
+
+Leading white-spaces in the documentation string are handled correctly, so you can use several layers of indentation.
 
 
 Class documentation
@@ -218,7 +234,8 @@ The shortest way to get a proper class documentation is::
         )
   ;
 
-.. note:: The second ``""`` in ``add_prototype`` prevents the output type (which otherwise defaults to ``"None"``) to be written.
+.. note::
+  The second parameter ``""`` in ``add_prototype`` prevents the output type (which otherwise defaults to ``"None"``) to be written.
 
 Currently, the ClassDoc allows to highlight member functions or variables at the beginning of the class documentation.
 This highlighting is still under development and might not work as expected.

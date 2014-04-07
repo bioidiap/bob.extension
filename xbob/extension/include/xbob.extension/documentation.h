@@ -128,12 +128,12 @@ namespace xbob{
 
         /**
          * Generates and returns the documentation string.
-         * A ..todo:: directive is added for each detected mistake.
+         * A .. todo:: directive is added for each detected mistake.
          * @param alignment The default alignment is 80 characters.
          *                  Since the documentation is automatically indented by 4 spaces in the python documentation, we need to subtract these values here...
          * @return The documentation string, properly aligned, possibly including "ToDo's" for detected problems.
          */
-        const char* const doc(const unsigned alignment = 76) const;
+        const char* const doc(const unsigned alignment = 76, const unsigned indent = 0) const;
 
 
       private:
@@ -260,14 +260,15 @@ static std::string _strip(const std::string& str, char sep = ' '){
 // splits the given string by the given separator
 static std::vector<std::string> _split(const std::string& str, char limit = ' '){
   std::vector<std::string> splits;
-  int i = str.find(limit);
-  unsigned j = 0;
-  while (i != (int)std::string::npos){
+  size_t j = str.find_first_not_of(limit);
+  size_t i = str.find(limit, j);
+  j = 0;
+  while (i != std::string::npos){
     splits.push_back(str.substr(j, i-j));
     j = i+1;
     i = str.find(limit, j);
   }
-  if (j < str.size()) splits.push_back(str.substr(j));
+  splits.push_back(str.substr(j));
   return splits;
 }
 
@@ -280,6 +281,7 @@ static std::string _align(std::string str, unsigned indent=0, unsigned alignment
 
   std::string aligned;
   unsigned current_indent = indent;
+  unsigned auto_indent = indent;
   bool first_line = true;
   // now, split each line
   for (auto line_it = lines.begin(); line_it != lines.end(); ++line_it){
@@ -302,14 +304,20 @@ static std::string _align(std::string str, unsigned indent=0, unsigned alignment
       if ((w.size() == 2 && w[0] == '.' && w[1] == '.') ||
           (w.size() >= 1 && '0' <= w[0] && '9' >= w[0]) ||
           (w.size() == 1 && '*' == w[0]) ){
-        current_indent = indent + 3;
+        auto_indent = indent + 3;
+      }
+      size_t first_word_indent = line_it->find_first_not_of(' ');
+      if (first_word_indent != std::string::npos && first_word_indent != 0){
+        current_indent = auto_indent + first_word_indent;
+      } else {
+        current_indent = auto_indent;
       }
       // add word
       aligned += *word_it + " ";
       len += word_it->size() + 1;
     }
     current_indent = indent;
-    aligned += "\n";
+    auto_indent = indent;
     first_line = false;
   }
 
@@ -317,9 +325,9 @@ static std::string _align(std::string str, unsigned indent=0, unsigned alignment
 }
 
 // Aligns the parameter description
-static void _align_parameter(std::string& str, const std::string& name, const std::string& type, const std::string& description, unsigned alignment=76){
-  str += _align("``" + name + "`` : " + type + "", 0, alignment);
-  str += _align(description, 4, alignment);
+static void _align_parameter(std::string& str, const std::string& name, const std::string& type, const std::string& description, unsigned indent=0, unsigned alignment=76){
+  str += _align("``" + name + "`` : " + type + "", indent, alignment) + "\n";
+  str += _align(description, indent + 4, alignment) + "\n\n";
 }
 
 static std::string _prototype(const std::string& name, const std::string& variables, const std::string& retval){
@@ -360,7 +368,7 @@ static void _check(std::string& doc, const std::vector<std::string>& vars, const
       }
     }
     if (!all.empty()){
-      doc += _align(".. todo:: The " + type + "(s) '" + all + "' are used, but not documented.", 0, (unsigned)-1);
+      doc += "\n" + _align(".. todo:: The " + type + "(s) '" + all + "' are used, but not documented.", 0, (unsigned)-1) + "\n";
     }
   }
   if (unused.size()){
@@ -369,7 +377,7 @@ static void _check(std::string& doc, const std::vector<std::string>& vars, const
       if (!all.empty()) all += ", ";
       all += *pit;
     }
-    doc += _align(".. todo:: The " + type + "(s) '" + all + "' are documented, but nowhere used.", 0, (unsigned)-1);
+    doc += "\n" + _align(".. todo:: The " + type + "(s) '" + all + "' are documented, but nowhere used.", 0, (unsigned)-1) + "\n";
   }
 }
 
@@ -387,7 +395,7 @@ inline xbob::extension::FunctionDoc::FunctionDoc(
 {
 #ifndef XBOB_SHORT_DOCSTRINGS
   if (long_description){
-    function_description += "\n";
+    function_description += "\n\n";
     function_description += long_description;
   }
 #endif
@@ -433,7 +441,8 @@ inline xbob::extension::FunctionDoc& xbob::extension::FunctionDoc::add_return(
 }
 
 inline const char* const xbob::extension::FunctionDoc::doc(
-  const unsigned alignment
+  const unsigned alignment,
+  const unsigned indent
 ) const
 {
 #ifdef XBOB_SHORT_DOCSTRINGS
@@ -442,19 +451,19 @@ inline const char* const xbob::extension::FunctionDoc::doc(
   description = "";
   switch(prototype_variables.size()){
     case 0:
-      description = _align(".. todo:: Please use ``FunctionDoc.add_prototype`` to add at least one prototypical way to call this function", 0, (unsigned)-1);
+      description = _align(".. todo:: Please use ``FunctionDoc.add_prototype`` to add at least one prototypical way to call this function", 0, (unsigned)-1) + "\n";
       break;
     case 1:
       // only one way to call; use the default way
-      description = _align(_prototype(function_name, prototype_variables[0], prototype_returns[0]) + "\n", 0, alignment);
+      description = _align(_prototype(function_name, prototype_variables[0], prototype_returns[0]), indent, alignment) + "\n";
       break;
     default:
       // several ways to call; list them
       for (unsigned n = 0; n < prototype_variables.size(); ++n)
-        description += _align("* " + _prototype(function_name, prototype_variables[n], prototype_returns[n]) + "\n", 0, alignment);
+        description += _align("* " + _prototype(function_name, prototype_variables[n], prototype_returns[n]), indent, alignment) + "\n";
   }
   // add function description
-  description += "\n" + _align(function_description, 0, alignment) + "\n";
+  description += "\n" + _align(function_description, indent, alignment) + "\n";
 
   // check that all parameters are documented
   _check(description, prototype_variables, parameter_names, "parameter");
@@ -465,18 +474,18 @@ inline const char* const xbob::extension::FunctionDoc::doc(
   if (!parameter_names.empty()){
     // add parameter description
 //    description += "\n" + _align("Parameters") + _align("----------");
-    description += "\n" + _align("**Parameters:**\n\n") + _align("");
+    description += "\n" + _align("**Parameters:**", indent) + "\n\n";
     for (unsigned i = 0; i < parameter_names.size(); ++i){
-      _align_parameter(description, parameter_names[i], parameter_types[i], parameter_descriptions[i], alignment);
+      _align_parameter(description, parameter_names[i], parameter_types[i], parameter_descriptions[i], indent, alignment);
     }
   }
 
   if (!return_names.empty()){
     // add return value description
 //    description += "\n" + _align("Returns") + _align("--------");
-    description += "\n" + _align("**Returns:**\n\n") + _align("");
+    description += "\n" + _align("**Returns:**") + "\n\n";
     for (unsigned i = 0; i < return_names.size(); ++i){
-      _align_parameter(description, return_names[i], return_types[i], return_descriptions[i], alignment);
+      _align_parameter(description, return_names[i], return_types[i], return_descriptions[i], indent, alignment);
     }
   }
 
@@ -499,7 +508,7 @@ inline xbob::extension::ClassDoc::ClassDoc(
 {
 #ifndef XBOB_SHORT_DOCSTRINGS
   if (long_description){
-    class_description += "\n";
+    class_description += "\n\n";
     class_description += long_description;
   }
 #endif // ! XBOB_SHORT_DOCSTRINGS
@@ -546,24 +555,24 @@ inline char* xbob::extension::ClassDoc::doc(
 #ifdef XBOB_SHORT_DOCSTRINGS
   return const_cast<char*>(class_description.c_str());
 #else
-  description = _align(class_description, 0, alignment);
+  description = _align(class_description, 0, alignment) + "\n";
   if (!constructor.empty()){
-    description += _align("\n**Constructor Documentation:**\n\n");
-    description += constructor.front().doc(alignment);
+    description += "\n" + _align("**Constructor Documentation:**") + "\n\n";
+    description += constructor.front().doc(alignment, 2) + std::string("\n");
   }
-  description += _align("\n**Class Members:**\n\n");
-  if (!highlighted_variables.empty()){
-//    description += "\n" + _align("Attributes") + _align("----------");
-    description += "\n" + _align("**Attributes:**\n\n") + _align("");
-    for (auto hit = highlighted_variables.begin(); hit != highlighted_variables.end(); ++hit){
-      description += _align("``" + hit->variable_name + "``", 0, alignment) + _align(_split(hit->variable_description, '\n')[0], 4, alignment);
-    }
-  }
+  description += "\n" + _align("**Class Members:**") + "\n\n";
   if (!highlighted_functions.empty()){
 //    description += "\n" + _align("Methods") + _align("-------");
-    description += "\n" + _align("**Methods:**\n\n") + _align("");
+    description += "\n" + _align("**Highlighted Methods:**", 2) + "\n\n";
     for (auto hit = highlighted_functions.begin(); hit != highlighted_functions.end(); ++hit){
-      description += _align("**" + hit->function_name + "**", 0, alignment) + _align(_split(hit->function_description, '\n')[0], 4, alignment);
+      description += _align("* :func:`" + hit->function_name + "`", 2, alignment) + _align(_split(hit->function_description, '\n')[0], 4, alignment) + "\n";
+    }
+  }
+  if (!highlighted_variables.empty()){
+//    description += "\n" + _align("Attributes") + _align("----------");
+    description += "\n" + _align("**Highlighted Attributes:**", 2) + "\n\n";
+    for (auto hit = highlighted_variables.begin(); hit != highlighted_variables.end(); ++hit){
+      description += _align("* :obj:`" + hit->variable_name + "`", 2, alignment) + _align(_split(hit->variable_description, '\n')[0], 4, alignment) + "\n";
     }
   }
   return const_cast<char*>(description.c_str());
@@ -582,7 +591,7 @@ inline xbob::extension::VariableDoc::VariableDoc(
 {
 #ifndef XBOB_SHORT_DOCSTRINGS
   if (long_description){
-    variable_description += "\n";
+    variable_description += "\n\n";
     variable_description += long_description;
   }
 #endif // ! XBOB_SHORT_DOCSTRINGS
