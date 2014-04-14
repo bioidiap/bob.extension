@@ -529,6 +529,8 @@ inline xbob::extension::ClassDoc& xbob::extension::ClassDoc::add_constructor(
     throw std::runtime_error("The class documentation can have only a single constructor documentation");
   }
   constructor.push_back(constructor_documentation);
+  // since we indent the constructor documentation ourselves, we don't need to consider it to be a member function.
+  constructor.back().is_member = false;
 #endif // XBOB_SHORT_DOCSTRINGS
   return *this;
 }
@@ -564,7 +566,7 @@ inline char* xbob::extension::ClassDoc::doc(
   description = _align(class_description, 0, alignment) + "\n";
   if (!constructor.empty()){
     description += "\n" + _align("**Constructor Documentation:**", 0, alignment) + "\n\n";
-    description += constructor.front().doc(alignment, 2) + std::string("\n");
+    description += constructor.front().doc(alignment, 4) + std::string("\n");
   }
   description += "\n" + _align("**Class Members:**", 0, alignment) + "\n\n";
   if (!highlighted_functions.empty()){

@@ -171,6 +171,17 @@ To generate a properly aligned function documentation, you can use::
 .. note::
   Please assure that you define this variable as ``static``.
 
+.. note::
+  If you want to document a member function of a class, you should use set fourth boolean option to true.
+  This is required since the default python class member documentation is indented four more spaces, which we need to balance::
+
+    static xbob::extension::FunctionDoc member_function_description(
+      "function_name",
+      "Short function description",
+      "Optional long function description",
+      true
+    );
+
 Using this object, you can add several parts of the function that need documentation:
 
 1. ``description.add_prototype("variable1, variable2", "return1, return2");`` can be used to add function definitions (i.e., ways how to use your function).
@@ -180,6 +191,15 @@ Using this object, you can add several parts of the function that need documenta
 2. ``description.add_parameter("variable1, variable2", "datatype", "Variable description");`` should be defined for each variable that you have used in the prototypes.
 
 3. ``description.add_return("return1", "datatype", "Return value description");`` should be defined for each return value that you have used in the prototypes.
+
+.. note::
+  All these functions return a reference to the object, so that you can use them in line, e.g.::
+
+    static auto description = xbob::extension::FunctionDoc(...)
+      .add_prototype(...)
+      .add_parameter(...)
+      .add_return(...)
+    ;
 
 Finally, when binding you function, you can use:
 
@@ -236,6 +256,10 @@ The shortest way to get a proper class documentation is::
 
 .. note::
   The second parameter ``""`` in ``add_prototype`` prevents the output type (which otherwise defaults to ``"None"``) to be written.
+
+.. note::
+  For constructor documentations, there is no need to declare them as member functions.
+  This is done automatically for you.
 
 Currently, the ClassDoc allows to highlight member functions or variables at the beginning of the class documentation.
 This highlighting is still under development and might not work as expected.
