@@ -48,10 +48,10 @@ namespace xbob{
         /**
          * Generates and returns the documentation string.
          * @param alignment The default alignment is 80 characters.
-         *                  Since the documentation is automatically indented by 4 spaces in the python documentation, we need to subtract these values here...
+         *                  Since the package level documentation is automatically indented by 8 spaces in the python documentation, we need to subtract these values here...
          * @return The documentation string, properly aligned, possibly including "ToDo's" for detected problems.
          */
-        char* doc(const unsigned alignment = 76) const;
+        char* doc(const unsigned alignment = 72) const;
 
       private:
          // variable name and type
@@ -77,11 +77,13 @@ namespace xbob{
          * @param function_name     The name of the function you want to document
          * @param short_description A short description of what the function does
          * @param long_description  An optional long description of the function
+         * @param is_member_function  Set this to true if this documentation is the documentation of a member function
          */
         FunctionDoc(
           const char* const function_name,
           const char* const short_description,
-          const char* const long_description = 0
+          const char* const long_description = 0,
+          bool is_member_function = false
         );
 
         /**
@@ -120,7 +122,6 @@ namespace xbob{
           const char* const return_description
         );
 
-
         /**
          * Returns the name of the function that is documented (i.e., the function_name parameter of the constructor)
          */
@@ -130,10 +131,10 @@ namespace xbob{
          * Generates and returns the documentation string.
          * A .. todo:: directive is added for each detected mistake.
          * @param alignment The default alignment is 80 characters.
-         *                  Since the documentation is automatically indented by 4 spaces in the python documentation, we need to subtract these values here...
+         *                  Since the package level documentation is automatically indented by 8 spaces in the python documentation, we need to subtract these values here...
          * @return The documentation string, properly aligned, possibly including "ToDo's" for detected problems.
          */
-        const char* const doc(const unsigned alignment = 76, const unsigned indent = 0) const;
+        const char* const doc(const unsigned alignment = 72, const unsigned indent = 0) const;
 
 
       private:
@@ -141,6 +142,8 @@ namespace xbob{
         std::string function_name;
         // the description
         std::string function_description;
+        // if this is a member function, the indentation must be shorter
+        bool is_member;
         // prototypes
         std::vector<std::string> prototype_variables;
         std::vector<std::string> prototype_returns;
@@ -156,6 +159,7 @@ namespace xbob{
         // an internal string that is generated and returned.
         mutable std::string description;
     };
+
 
 
     /**
@@ -212,10 +216,10 @@ namespace xbob{
         /**
          * Generates and returns the documentation string.
          * @param alignment The default alignment is 80 characters.
-         *                  Since the documentation is automatically indented by 4 spaces in the python documentation, we need to subtract these values here...
+         *                  Since the package level documentation is automatically indented by 8 spaces in the python documentation, we need to subtract these values here...
          * @return The documentation string, properly aligned, possibly including "ToDo's" for detected problems.
          */
-        char* doc(const unsigned alignment = 76) const;
+        char* doc(const unsigned alignment = 72) const;
 
 
       private:
@@ -274,8 +278,7 @@ static std::vector<std::string> _split(const std::string& str, char limit = ' ')
 
 // aligns the given string using the given indent to the given alignment length;
 // line breaks are handled carefully.
-//static std::string _align(std::string str, unsigned first_line_indent=0, unsigned other_line_indent=4, unsigned alignment=76){
-static std::string _align(std::string str, unsigned indent=0, unsigned alignment=76){
+static std::string _align(std::string str, unsigned indent, unsigned alignment){
   // first, split the newlines
   auto lines = _split(str, '\n');
 
@@ -325,7 +328,7 @@ static std::string _align(std::string str, unsigned indent=0, unsigned alignment
 }
 
 // Aligns the parameter description
-static void _align_parameter(std::string& str, const std::string& name, const std::string& type, const std::string& description, unsigned indent=0, unsigned alignment=76){
+static void _align_parameter(std::string& str, const std::string& name, const std::string& type, const std::string& description, unsigned indent, unsigned alignment){
   str += _align("``" + name + "`` : " + type + "", indent, alignment) + "\n";
   str += _align(description, indent + 4, alignment) + "\n\n";
 }
@@ -390,8 +393,9 @@ static void _check(std::string& doc, const std::vector<std::string>& vars, const
 inline xbob::extension::FunctionDoc::FunctionDoc(
   const char* const function_name,
   const char* const short_description,
-  const char* const long_description
-) : function_name(function_name), function_description(short_description)
+  const char* const long_description,
+  bool is_member_function
+) : function_name(function_name), function_description(short_description), is_member(is_member_function)
 {
 #ifndef XBOB_SHORT_DOCSTRINGS
   if (long_description){
@@ -448,22 +452,24 @@ inline const char* const xbob::extension::FunctionDoc::doc(
 #ifdef XBOB_SHORT_DOCSTRINGS
   return function_description.c_str();
 #else
+  // in case of member functions, the alignment has to be decreased further since class member function are automatically indented by 4 further spaces.
+  unsigned align = is_member ? alignment - 4  : alignment;
   description = "";
   switch(prototype_variables.size()){
     case 0:
-      description = _align(".. todo:: Please use ``FunctionDoc.add_prototype`` to add at least one prototypical way to call this function", 0, (unsigned)-1) + "\n";
+      description = _align(".. todo:: Please use ``FunctionDoc.add_prototype`` to add at least one prototypical way to call this function", indent, (unsigned)-1) + "\n";
       break;
     case 1:
       // only one way to call; use the default way
-      description = _align(_prototype(function_name, prototype_variables[0], prototype_returns[0]), indent, alignment) + "\n";
+      description = _align(_prototype(function_name, prototype_variables[0], prototype_returns[0]), indent, unsigned(-1)) + "\n";
       break;
     default:
       // several ways to call; list them
       for (unsigned n = 0; n < prototype_variables.size(); ++n)
-        description += _align("* " + _prototype(function_name, prototype_variables[n], prototype_returns[n]), indent, alignment) + "\n";
+        description += _align("* " + _prototype(function_name, prototype_variables[n], prototype_returns[n]), indent, unsigned(-1)) + "\n";
   }
   // add function description
-  description += "\n" + _align(function_description, indent, alignment) + "\n";
+  description += "\n" + _align(function_description, indent, align) + "\n";
 
   // check that all parameters are documented
   _check(description, prototype_variables, parameter_names, "parameter");
@@ -474,18 +480,18 @@ inline const char* const xbob::extension::FunctionDoc::doc(
   if (!parameter_names.empty()){
     // add parameter description
 //    description += "\n" + _align("Parameters") + _align("----------");
-    description += "\n" + _align("**Parameters:**", indent) + "\n\n";
+    description += "\n" + _align("**Parameters:**", indent, align) + "\n\n";
     for (unsigned i = 0; i < parameter_names.size(); ++i){
-      _align_parameter(description, parameter_names[i], parameter_types[i], parameter_descriptions[i], indent, alignment);
+      _align_parameter(description, parameter_names[i], parameter_types[i], parameter_descriptions[i], indent, align);
     }
   }
 
   if (!return_names.empty()){
     // add return value description
 //    description += "\n" + _align("Returns") + _align("--------");
-    description += "\n" + _align("**Returns:**") + "\n\n";
+    description += "\n" + _align("**Returns:**", indent, align) + "\n\n";
     for (unsigned i = 0; i < return_names.size(); ++i){
-      _align_parameter(description, return_names[i], return_types[i], return_descriptions[i], indent, alignment);
+      _align_parameter(description, return_names[i], return_types[i], return_descriptions[i], indent, align);
     }
   }
 
@@ -557,20 +563,20 @@ inline char* xbob::extension::ClassDoc::doc(
 #else
   description = _align(class_description, 0, alignment) + "\n";
   if (!constructor.empty()){
-    description += "\n" + _align("**Constructor Documentation:**") + "\n\n";
+    description += "\n" + _align("**Constructor Documentation:**", 0, alignment) + "\n\n";
     description += constructor.front().doc(alignment, 2) + std::string("\n");
   }
-  description += "\n" + _align("**Class Members:**") + "\n\n";
+  description += "\n" + _align("**Class Members:**", 0, alignment) + "\n\n";
   if (!highlighted_functions.empty()){
 //    description += "\n" + _align("Methods") + _align("-------");
-    description += "\n" + _align("**Highlighted Methods:**", 2) + "\n\n";
+    description += "\n" + _align("**Highlighted Methods:**", 2, alignment) + "\n\n";
     for (auto hit = highlighted_functions.begin(); hit != highlighted_functions.end(); ++hit){
       description += _align("* :func:`" + hit->function_name + "`", 2, alignment) + _align(_split(hit->function_description, '\n')[0], 4, alignment) + "\n";
     }
   }
   if (!highlighted_variables.empty()){
 //    description += "\n" + _align("Attributes") + _align("----------");
-    description += "\n" + _align("**Highlighted Attributes:**", 2) + "\n\n";
+    description += "\n" + _align("**Highlighted Attributes:**", 2, alignment) + "\n\n";
     for (auto hit = highlighted_variables.begin(); hit != highlighted_variables.end(); ++hit){
       description += _align("* :obj:`" + hit->variable_name + "`", 2, alignment) + _align(_split(hit->variable_description, '\n')[0], 4, alignment) + "\n";
     }
