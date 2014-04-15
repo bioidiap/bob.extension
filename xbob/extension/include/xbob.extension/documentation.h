@@ -268,10 +268,10 @@ namespace xbob{
 
 #ifndef XBOB_SHORT_DOCSTRINGS
 // removes leading and trailing spaces
-static std::string _strip(const std::string& str, char sep = ' '){
+static std::string _strip(const std::string& str, const std::string& sep = " []()|"){
   unsigned first = 0, last = str.size();
-  while (first < str.size() && str[first] == sep) ++first;
-  while (last > 0 && str[last-1] == sep) --last;
+  while (first < str.size() && sep.find(str[first]) != std::string::npos) ++first;
+  while (last > 0 && sep.find(str[last-1]) != std::string::npos) --last;
   return str.substr(first, last-first);
 }
 
@@ -433,7 +433,10 @@ inline xbob::extension::FunctionDoc& xbob::extension::FunctionDoc::add_prototype
 ){
 #ifndef XBOB_SHORT_DOCSTRINGS
   prototype_variables.push_back(variables);
-  prototype_returns.push_back(return_values);
+  if (!return_values)
+    prototype_returns.push_back("");
+  else
+    prototype_returns.push_back(return_values);
 #endif // XBOB_SHORT_DOCSTRINGS
   return *this;
 }
@@ -524,8 +527,7 @@ inline const char* const xbob::extension::FunctionDoc::doc(
 #endif // XBOB_SHORT_DOCSTRINGS
 }
 
-inline void xbob::extension::FunctionDoc::print_usage(
-) const
+inline void xbob::extension::FunctionDoc::print_usage() const
 {
 #ifdef XBOB_SHORT_DOCSTRINGS
   return function_description.c_str();
