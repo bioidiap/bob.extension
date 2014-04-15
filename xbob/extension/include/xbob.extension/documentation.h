@@ -15,6 +15,7 @@
 #include <vector>
 #include <set>
 #include <stdexcept>
+#include <iostream>
 
 namespace xbob{
   namespace extension{
@@ -137,6 +138,14 @@ namespace xbob{
         const char* const doc(const unsigned alignment = 72, const unsigned indent = 0) const;
 
 
+        /**
+         * Generates and prints the usage string, simply listing the possible ways to call the function.
+         *
+         * The error meaasge is printed to the std::cerr stream
+         */
+        void print_usage() const;
+
+
       private:
         // the function name
         std::string function_name;
@@ -220,6 +229,11 @@ namespace xbob{
          * @return The documentation string, properly aligned, possibly including "ToDo's" for detected problems.
          */
         char* doc(const unsigned alignment = 72) const;
+
+        /**
+         * Prints the usage string of the constructor, if available.
+         */
+        void print_usage() const {if (!constructor.empty()) constructor.front().print_usage();}
 
 
       private:
@@ -339,6 +353,14 @@ static std::string _prototype(const std::string& name, const std::string& variab
   else
     return name + "(" + variables + ") -> " + retval;
 }
+
+static std::string _usage(const std::string& name, const std::string& variables, const std::string& retval){
+  if (retval.empty())
+    return name + "(" + variables + ")";
+  else
+    return name + "(" + variables + ") -> " + retval;
+}
+
 
 static void _check(std::string& doc, const std::vector<std::string>& vars, const std::vector<std::string>& docs, const std::string& type){
   // check that all parameters are documented. If not, add a TODO
@@ -502,6 +524,32 @@ inline const char* const xbob::extension::FunctionDoc::doc(
 #endif // XBOB_SHORT_DOCSTRINGS
 }
 
+inline void xbob::extension::FunctionDoc::print_usage(
+) const
+{
+#ifdef XBOB_SHORT_DOCSTRINGS
+  return function_description.c_str();
+#else
+  // in case of member functions, the alignment has to be decreased further since class member function are automatically indented by 4 further spaces.
+  std::cerr << "\nUsage (for details, see help):\n";
+  switch(prototype_variables.size()){
+    case 0:
+      std::cerr << _align("Error: The usage of this function is unknown", 0, (unsigned)-1)  << "\n";
+      break;
+    case 1:
+      // only one way to call; use the default way
+      std::cerr << _align(_usage(function_name, prototype_variables[0], prototype_returns[0]), 0, unsigned(-1)) << "\n";
+      break;
+    default:
+      // several ways to call; list them
+      for (unsigned n = 0; n < prototype_variables.size(); ++n)
+        std::cerr << _align(_usage(function_name, prototype_variables[n], prototype_returns[n]), 0, unsigned(-1)) << "\n";
+  }
+  std::cerr << std::endl;
+#endif // XBOB_SHORT_DOCSTRINGS
+}
+
+
 
 /////////////////////////////////////////////////////////////
 /// ClassDoc
@@ -531,6 +579,7 @@ inline xbob::extension::ClassDoc& xbob::extension::ClassDoc::add_constructor(
   constructor.push_back(constructor_documentation);
   // since we indent the constructor documentation ourselves, we don't need to consider it to be a member function.
   constructor.back().is_member = false;
+  constructor.back().function_name = class_name;
 #endif // XBOB_SHORT_DOCSTRINGS
   return *this;
 }
