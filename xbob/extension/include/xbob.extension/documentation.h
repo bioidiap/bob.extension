@@ -343,7 +343,7 @@ static std::string _align(std::string str, unsigned indent, unsigned alignment){
 
 // Aligns the parameter description
 static void _align_parameter(std::string& str, const std::string& name, const std::string& type, const std::string& description, unsigned indent, unsigned alignment){
-  str += _align("``" + name + "`` : " + type + "", indent, alignment) + "\n";
+  str += _align("``" + name + "`` : " + type + "", indent, alignment) + "\n\n";
   str += _align(description, indent + 4, alignment) + "\n\n";
 }
 
