@@ -343,7 +343,11 @@ static std::string _align(std::string str, unsigned indent, unsigned alignment){
 
 // Aligns the parameter description
 static void _align_parameter(std::string& str, const std::string& name, const std::string& type, const std::string& description, unsigned indent, unsigned alignment){
-  str += _align("``" + name + "`` : " + type + "", indent, alignment) + "\n\n";
+  if (type.find(':') != std::string::npos && type.find('`') != std::string::npos)
+    // we expect that this is a :py:class: directive, which is simply written (otherwise the *...*
+    str += _align("``" + name + "`` : " + type + "", indent, alignment) + "\n\n";
+  else
+    str += _align("``" + name + "`` : *" + type + "*", indent, alignment) + "\n\n";
   str += _align(description, indent + 4, alignment) + "\n\n";
 }
 
@@ -477,50 +481,51 @@ inline const char* const xbob::extension::FunctionDoc::doc(
 #ifdef XBOB_SHORT_DOCSTRINGS
   return function_description.c_str();
 #else
-  // in case of member functions, the alignment has to be decreased further since class member function are automatically indented by 4 further spaces.
-  unsigned align = is_member ? alignment - 4  : alignment;
-  description = "";
-  switch(prototype_variables.size()){
-    case 0:
-      description = _align(".. todo:: Please use ``FunctionDoc.add_prototype`` to add at least one prototypical way to call this function", indent, (unsigned)-1) + "\n";
-      break;
-    case 1:
-      // only one way to call; use the default way
-      description = _align(_prototype(function_name, prototype_variables[0], prototype_returns[0]), indent, unsigned(-1)) + "\n";
-      break;
-    default:
-      // several ways to call; list them
-      for (unsigned n = 0; n < prototype_variables.size(); ++n)
-        description += _align("* " + _prototype(function_name, prototype_variables[n], prototype_returns[n]), indent, unsigned(-1)) + "\n";
-  }
-  // add function description
-  description += "\n" + _align(function_description, indent, align) + "\n";
+  if (description.empty()){
+    // in case of member functions, the alignment has to be decreased further since class member function are automatically indented by 4 further spaces.
+    unsigned align = is_member ? alignment - 4  : alignment;
+    description = "";
+    switch(prototype_variables.size()){
+      case 0:
+        description = _align(".. todo:: Please use ``FunctionDoc.add_prototype`` to add at least one prototypical way to call this function", indent, (unsigned)-1) + "\n";
+        break;
+      case 1:
+        // only one way to call; use the default way
+        description = _align(_prototype(function_name, prototype_variables[0], prototype_returns[0]), indent, unsigned(-1)) + "\n";
+        break;
+      default:
+        // several ways to call; list them
+        for (unsigned n = 0; n < prototype_variables.size(); ++n)
+          description += _align("* " + _prototype(function_name, prototype_variables[n], prototype_returns[n]), indent, unsigned(-1)) + "\n";
+    }
+    // add function description
+    description += "\n" + _align(function_description, indent, align) + "\n";
 
-  // check that all parameters are documented
-  _check(description, prototype_variables, parameter_names, "parameter");
+    // check that all parameters are documented
+    _check(description, prototype_variables, parameter_names, "parameter");
 
-  // check that all return values are documented
-  _check(description, prototype_returns, return_names, "return value");
+    // check that all return values are documented
+    _check(description, prototype_returns, return_names, "return value");
 
-  if (!parameter_names.empty()){
-    // add parameter description
-//    description += "\n" + _align("Parameters") + _align("----------");
-    description += "\n" + _align("**Parameters:**", indent, align) + "\n\n";
-    for (unsigned i = 0; i < parameter_names.size(); ++i){
-      _align_parameter(description, parameter_names[i], parameter_types[i], parameter_descriptions[i], indent, align);
+    if (!parameter_names.empty()){
+      // add parameter description
+  //    description += "\n" + _align("Parameters") + _align("----------");
+      description += "\n" + _align("**Parameters:**", indent, align) + "\n\n";
+      for (unsigned i = 0; i < parameter_names.size(); ++i){
+        _align_parameter(description, parameter_names[i], parameter_types[i], parameter_descriptions[i], indent, align);
+      }
+    }
+
+    if (!return_names.empty()){
+      // add return value description
+  //    description += "\n" + _align("Returns") + _align("--------");
+      description += "\n" + _align("**Returns:**", indent, align) + "\n\n";
+      for (unsigned i = 0; i < return_names.size(); ++i){
+        _align_parameter(description, return_names[i], return_types[i], return_descriptions[i], indent, align);
+      }
     }
   }
-
-  if (!return_names.empty()){
-    // add return value description
-//    description += "\n" + _align("Returns") + _align("--------");
-    description += "\n" + _align("**Returns:**", indent, align) + "\n\n";
-    for (unsigned i = 0; i < return_names.size(); ++i){
-      _align_parameter(description, return_names[i], return_types[i], return_descriptions[i], indent, align);
-    }
-  }
-
-//  std::cout << description << std::endl;
+  //  std::cout << description << std::endl;
 
   // return the description
   return description.c_str();
@@ -614,24 +619,26 @@ inline char* xbob::extension::ClassDoc::doc(
 #ifdef XBOB_SHORT_DOCSTRINGS
   return const_cast<char*>(class_description.c_str());
 #else
-  description = _align(class_description, 0, alignment) + "\n";
-  if (!constructor.empty()){
-    description += "\n" + _align("**Constructor Documentation:**", 0, alignment) + "\n\n";
-    description += constructor.front().doc(alignment, 4) + std::string("\n");
-  }
-  description += "\n" + _align("**Class Members:**", 0, alignment) + "\n\n";
-  if (!highlighted_functions.empty()){
-//    description += "\n" + _align("Methods") + _align("-------");
-    description += "\n" + _align("**Highlighted Methods:**", 2, alignment) + "\n\n";
-    for (auto hit = highlighted_functions.begin(); hit != highlighted_functions.end(); ++hit){
-      description += _align("* :func:`" + hit->function_name + "`", 2, alignment) + _align(_split(hit->function_description, '\n')[0], 4, alignment) + "\n";
+  if (description.empty()){
+    description = _align(class_description, 0, alignment) + "\n";
+    if (!constructor.empty()){
+      description += "\n" + _align("**Constructor Documentation:**", 0, alignment) + "\n\n";
+      description += constructor.front().doc(alignment, 4) + std::string("\n");
     }
-  }
-  if (!highlighted_variables.empty()){
-//    description += "\n" + _align("Attributes") + _align("----------");
-    description += "\n" + _align("**Highlighted Attributes:**", 2, alignment) + "\n\n";
-    for (auto hit = highlighted_variables.begin(); hit != highlighted_variables.end(); ++hit){
-      description += _align("* :obj:`" + hit->variable_name + "`", 2, alignment) + _align(_split(hit->variable_description, '\n')[0], 4, alignment) + "\n";
+    description += "\n" + _align("**Class Members:**", 0, alignment) + "\n\n";
+    if (!highlighted_functions.empty()){
+  //    description += "\n" + _align("Methods") + _align("-------");
+      description += "\n" + _align("**Highlighted Methods:**", 2, alignment) + "\n\n";
+      for (auto hit = highlighted_functions.begin(); hit != highlighted_functions.end(); ++hit){
+        description += _align("* :func:`" + hit->function_name + "`", 2, alignment) + _align(_split(hit->function_description, '\n')[0], 4, alignment) + "\n";
+      }
+    }
+    if (!highlighted_variables.empty()){
+  //    description += "\n" + _align("Attributes") + _align("----------");
+      description += "\n" + _align("**Highlighted Attributes:**", 2, alignment) + "\n\n";
+      for (auto hit = highlighted_variables.begin(); hit != highlighted_variables.end(); ++hit){
+        description += _align("* :obj:`" + hit->variable_name + "`", 2, alignment) + _align(_split(hit->variable_description, '\n')[0], 4, alignment) + "\n";
+      }
     }
   }
   return const_cast<char*>(description.c_str());
@@ -663,7 +670,13 @@ inline char* xbob::extension::VariableDoc::doc(
 #ifdef XBOB_SHORT_DOCSTRINGS
   return const_cast<char*>(variable_description.c_str());
 #else
-  description = _align("*" + variable_type + "*  <-- " + variable_description, 0, alignment);
+  if (description.empty()){
+    if (variable_type.find(':') != std::string::npos && variable_type.find('`') != std::string::npos)
+      // we expect that this is a :py:class: directive, which is simply written (otherwise the *...*
+      description = _align(variable_type + "  <-- " + variable_description, 0, alignment);
+    else
+      description = _align("*" + variable_type + "*  <-- " + variable_description, 0, alignment);
+  }
   return const_cast<char*>(description.c_str());
 #endif // XBOB_SHORT_DOCSTRINGS
 }
