@@ -100,13 +100,16 @@ def reorganize_isystem(args):
   remainder = []
   includes = []
 
-  iterable = iter(args)
-  for k in iterable:
-    if k in ('-isystem',):
-      k = iterable.next()
-      includes.append(k)
+  skip = False
+  for i in range(len(args)):
+    if skip:
+      skip = False
+      continue
+    if args[i] == '-isystem':
+      includes.append(args[i+1])
+      skip = True
     else:
-      remainder.append(k)
+      remainder.append(args[i])
 
   includes = uniq(includes[::-1])[::-1]
 
