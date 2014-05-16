@@ -94,6 +94,25 @@ def generate_self_macros(extname, version):
 
   return retval
 
+def reorganize_isystem(args):
+  """Re-organizes the -isystem includes so that more specific paths come first"""
+
+  remainder = []
+  includes = []
+
+  iterable = iter(args)
+  for k in iterable:
+    if k in ('-isystem',):
+      k = iterable.next()
+      includes.append(k)
+    else:
+      remainder.append(k)
+
+  includes = uniq(includes[::-1])[::-1]
+
+  retval = [tuple(remainder)] + [('-isystem', k) for k in includes]
+  from itertools import chain
+  return list(chain.from_iterable(retval))
 
 class Extension(DistutilsExtension):
   """Extension building with pkg-config packages.
@@ -246,6 +265,9 @@ class Extension(DistutilsExtension):
 
     # Uniq'fy parameters that are not on our parameter list
     kwargs['include_dirs'] = uniq(kwargs['include_dirs'])
+
+    # Stream-line '-isystem' includes
+    kwargs['extra_compile_args'] = reorganize_isystem(kwargs['extra_compile_args'])
 
     # Make sure the language is correctly set to C++
     kwargs['language'] = 'c++'
