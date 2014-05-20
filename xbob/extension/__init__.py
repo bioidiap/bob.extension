@@ -95,7 +95,8 @@ def generate_self_macros(extname, version):
   return retval
 
 def reorganize_isystem(args):
-  """Re-organizes the -isystem includes so that more specific paths come first"""
+  """Re-organizes the -isystem includes so that more specific paths come
+  first"""
 
   remainder = []
   includes = []
@@ -112,6 +113,11 @@ def reorganize_isystem(args):
       remainder.append(args[i])
 
   includes = uniq(includes[::-1])[::-1]
+
+  # sort includes so that the shortest system includes go last
+  # this algorithm will ensure '/usr/include' comes after other
+  # overwrites
+  includes.sort(key=lambda item: (-len(item), item))
 
   retval = [tuple(remainder)] + [('-isystem', k) for k in includes]
   from itertools import chain
