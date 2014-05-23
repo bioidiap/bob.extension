@@ -123,6 +123,43 @@ def reorganize_isystem(args):
   from itertools import chain
   return list(chain.from_iterable(retval))
 
+def normalize_requirements(requirements):
+  """Normalizes the requirements keeping only the most tight"""
+
+  from re import split
+
+  parsed = {}
+
+  for requirement in requirements:
+    splitreq = split(r'\s*(?P<cmp>[<>=]+)\s*', requirement)
+
+    if len(splitreq) not in (1, 3):
+
+      raise RuntimeError("cannot parse requirement `%s'", requirement)
+
+    if len(splitreq) == 1: # only package
+
+      parsed.setdefault(splitreq[0], [])
+
+    if len(splitreq) == 3: # package + version number
+
+      parsed.setdefault(splitreq[0], []).append(splitreq[1:])
+
+  # at this point, all requirements are organised:
+  # requirement -> [(op, version), (op, version), ...]
+
+  leftovers = []
+
+  for key, value in parsed.items():
+    if not value:
+      leftovers.append(key)
+    elif len(value) == 1:
+      leftovers.append(' '.join((key, value[0][0], value[0][1])))
+
+  # TODO: solve conflicting requirements
+
+  return leftovers
+
 class Extension(DistutilsExtension):
   """Extension building with pkg-config packages.
 
@@ -158,7 +195,7 @@ class Extension(DistutilsExtension):
     if 'packages' in kwargs: del kwargs['packages']
 
     # uniformize packages
-    packages = [k.strip().lower() for k in packages]
+    packages = normalize_requirements([k.strip().lower() for k in packages])
 
     # Boost requires a special treatment
     boost_req = ''
