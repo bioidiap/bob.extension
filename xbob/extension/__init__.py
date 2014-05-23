@@ -155,8 +155,10 @@ def normalize_requirements(requirements):
       leftovers.append(key)
     elif len(value) == 1:
       leftovers.append(' '.join((key, value[0][0], value[0][1])))
-
-  # TODO: solve conflicting requirements
+    else:
+      # TODO: solve conflicting requirements
+      for v in value:
+        leftovers.append(' '.join((key, v[0][0], v[0][1]))) #keeping all
 
   return leftovers
 
