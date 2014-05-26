@@ -143,7 +143,7 @@ def normalize_requirements(requirements):
 
     if len(splitreq) == 3: # package + version number
 
-      parsed.setdefault(splitreq[0], []).append(splitreq[1:])
+      parsed.setdefault(splitreq[0], []).append(tuple(splitreq[1:]))
 
   # at this point, all requirements are organised:
   # requirement -> [(op, version), (op, version), ...]
@@ -151,14 +151,14 @@ def normalize_requirements(requirements):
   leftovers = []
 
   for key, value in parsed.items():
+    value = uniq(value)
+
     if not value:
       leftovers.append(key)
-    elif len(value) == 1:
-      leftovers.append(' '.join((key, value[0][0], value[0][1])))
-    else:
-      # TODO: solve conflicting requirements
-      for v in value:
-        leftovers.append(' '.join((key, v[0][0], v[0][1]))) #keeping all
+      continue
+
+    for v in value:
+      leftovers.append(' '.join((key, v[0], v[1])))
 
   return leftovers
 
