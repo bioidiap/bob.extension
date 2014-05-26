@@ -35,7 +35,7 @@ class boost:
   .. doctest::
      :options: +NORMALIZE_WHITESPACE +ELLIPSIS
 
-     >>> from xbob.extension import boost
+     >>> from bob.extension import boost
      >>> pkg = boost('>= 1.35')
      >>> pkg.include_directory
      '...'
@@ -48,7 +48,7 @@ class boost:
   .. doctest::
      :options: +NORMALIZE_WHITESPACE +ELLIPSIS
 
-     >>> from xbob.extension import boost
+     >>> from bob.extension import boost
      >>> pkg = boost('>= 1.35')
      >>> pkg.libconfig(['python', 'system'])
      (...)
@@ -59,7 +59,7 @@ class boost:
     """
     Searches for the Boost library in stock locations. Allows user to override.
 
-    If the user sets the environment variable XBOB_PREFIX_PATH, that prefixes
+    If the user sets the environment variable BOB_PREFIX_PATH, that prefixes
     the standard path locations.
     """
 
@@ -199,7 +199,7 @@ class boost:
     .. doctest::
        :options: +NORMALIZE_WHITESPACE +ELLIPSIS
 
-       >>> from xbob.extension import boost
+       >>> from bob.extension import boost
        >>> pkg = boost('>= 1.34')
        >>> pkg.macros()
        [('HAVE_BOOST', '1'), ('BOOST_VERSION', '"..."')]

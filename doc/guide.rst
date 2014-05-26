@@ -69,7 +69,7 @@ The anatomy of a minimal package should look like the following:
   +-- docs          # documentation directory
   |   +-- conf.py   # Sphinx configuration
   |   +-- index.rst # Documentation starting point for Sphinx
-  +-- xbob          # python package (a.k.a. "the code")
+  +-- bob          # python package (a.k.a. "the code")
   |   +-- example
   |   |   +-- script
   |   |   |   +-- __init__.py
@@ -102,7 +102,7 @@ Python and C/C++.
 
 The package you cloned above is a pure-Python example package and contains all
 elements to get you started. It defines a single library inside called
-``xbob.example``, which declares a simple script, called ``version.py`` that
+``bob.example``, which declares a simple script, called ``version.py`` that
 prints out the version of |project|.  When you clone the package, you will not
 find any executable as ``buildout`` needs to check all dependencies and install
 missing ones before you can execute anything. Here is how to go from nothing to
@@ -118,8 +118,8 @@ everything:
   Generated script '/home/user/work/tmp/bob.project.example/bin/buildout'.
   $ ./bin/buildout
   Develop: '/remote/filer.gx/user.active/aanjos/work/tmp/bob.project.example/.'
-  Getting distribution for 'xbob.buildout'.
-  Got xbob.buildout 0.2.13.
+  Getting distribution for 'bob.buildout'.
+  Got bob.buildout 0.2.13.
   Getting distribution for 'zc.recipe.egg>=2.0.0a3'.
   Got zc.recipe.egg 2.0.0.
   Installing scripts.
@@ -139,10 +139,10 @@ You should now be able to execute ``./bin/version.py``:
 .. code-block:: sh
 
   $ ./bin/version.py
-  The installed version of xbob.blitz is `2.0.0a0'
-  xbob.blitz is installed at `...'
-  xbob.blitz depends on the following Python packages:
-   * xbob.extension: 0.3.0a0 (...)
+  The installed version of bob.blitz is `2.0.0a0'
+  bob.blitz is installed at `...'
+  bob.blitz depends on the following Python packages:
+   * bob.extension: 0.3.0a0 (...)
    * numpy: 1.6.2 (/usr/lib/python2.7/dist-packages)
    * distribute: 0.6.28dev-r0 (/usr/lib/python2.7/dist-packages)
    * coverage: 3.7.1 (...)
@@ -151,7 +151,7 @@ You should now be able to execute ``./bin/version.py``:
    * docutils: 0.8.1 (/usr/lib/python2.7/dist-packages)
    * jinja2: 2.6 (/usr/lib/python2.7/dist-packages)
    * pygments: 1.5 (/usr/lib/python2.7/dist-packages)
-  xbob.blitz depends on the following C/C++ APIs:
+  bob.blitz depends on the following C/C++ APIs:
    * Python: 2.7.3
    * Boost: 1.50.0
    * Blitz++: 0.10
@@ -175,30 +175,30 @@ so that you include the following:
 .. code-block:: python
 
   from setuptools import setup, find_packages, dist
-  dist.Distribution(dict(setup_requires=['xbob.blitz']))
-  from xbob.blitz.extension import Extension
+  dist.Distribution(dict(setup_requires=['bob.blitz']))
+  from bob.blitz.extension import Extension
   ...
 
   setup(
 
-    name="xbob.myext",
+    name="bob.myext",
     version="1.0.0",
     ...
     install_requires=[
       'setuptools',
-      'xbob.blitz',
+      'bob.blitz',
     ],
     ...
     namespace_packages=[
-      'xbob',
+      'bob',
     ],
     ...
     ext_modules=[
-      Extension("xbob.myext._myext",
+      Extension("bob.myext._myext",
         [
-          "xbob/myext/ext/file1.cpp",
-          "xbob/myext/ext/file2.cpp",
-          "xbob/myext/ext/main.cpp",
+          "bob/myext/ext/file1.cpp",
+          "bob/myext/ext/file2.cpp",
+          "bob/myext/ext/main.cpp",
         ],
         packages = [ #other c/c++ api dependences
           'bob-math',
@@ -212,11 +212,204 @@ so that you include the following:
     )
 
 These modifications will allow you to compile extensions that are linked
-against our core Python-C++ bridge ``xbob.blitz``. You can specify any
+against our core Python-C++ bridge ``bob.blitz``. You can specify any
 ``pkg-config`` module and that will be linked in (for example, ``bob-ip`` or
 ``opencv``) using the ``packages`` setting as shown above.  Other modules and
 options can be set manually using `the standard options for python extensions
 <http://docs.python.org/2/extending/building.html>`_.
+
+Documenting your C/C++ Python Extension
+=======================================
+
+One part of this package are some functions that makes it easy to generate a
+proper python documentation for your bound C/C++ functions.  This documentation
+can be used after:
+
+.. code-block:: c++
+
+   #include <bob.extension/documentation.h>
+
+**Function documentation**
+
+To generate a properly aligned function documentation, you can use:
+
+.. code-block:: c++
+
+   static bob::extension::FunctionDoc description(
+     "function_name",
+     "Short function description",
+     "Optional long function description"
+   );
+
+.. note::
+
+   Please assure that you define this variable as ``static``.
+
+.. note::
+
+   If you want to document a member function of a class, you should use set
+   fourth boolean option to true.  This is required since the default python
+   class member documentation is indented four more spaces, which we need to
+   balance:
+
+   .. code-block:: c++
+
+      static bob::extension::FunctionDoc member_function_description(
+        "function_name",
+        "Short function description",
+        "Optional long function description",
+        true
+      );
+
+Using this object, you can add several parts of the function that need
+documentation:
+
+1. ``description.add_prototype("variable1, variable2", "return1, return2");``
+   can be used to add function definitions (i.e., ways how to use your
+   function).  This function needs to be called at least once.  If the function
+   does not define a return value, it can be left out (in which case the
+   default ``"None"`` is used).
+
+2. ``description.add_parameter("variable1, variable2", "datatype", "Variable
+   description");`` should be defined for each variable that you have used in
+   the prototypes.
+
+3. ``description.add_return("return1", "datatype", "Return value
+   description");`` should be defined for each return value that you have used
+   in the prototypes.
+
+.. note::
+
+   All these functions return a reference to the object, so that you can use
+   them in line, e.g.:
+
+   .. code-block:: c++
+
+      static auto description = bob::extension::FunctionDoc(...)
+        .add_prototype(...)
+        .add_parameter(...)
+        .add_return(...)
+      ;
+
+Finally, when binding you function, you can use:
+
+a. ``description.name()`` to get the name of the function
+
+b. ``description.doc()`` to get the aligned documentation of the function,
+   properly indented and broken at 80 characters (by default).  This call will
+   check that all parameters and return values are documented, and add a ``..
+   todo`` directive if not.
+
+Sphinx directives like ``.. note::``, ``.. warning::`` or ``.. math::`` will be
+automatically detected and aligned, when they are used as one-line directive,
+e.g.:
+
+.. code-block:: c++
+
+   "(more text)\n\n.. note:: This is a note\n\n(more text)"
+
+Also, enumerations and listings (using the ``*`` character to define a list
+element) are handled automatically:
+
+
+.. code-block:: c++
+
+   "(more text)\n\n* Point 1\n* Point 2\n\n(more text)"
+
+.. note::
+
+   Please assure that directives are surrounded by double ``\n`` characters
+   (see example above) so that they are put as paragraphs.  Otherwise, they
+   will not be displayed correctly.
+
+.. note::
+
+   The ``.. todo::`` directive seems not to like being broken at 80 characters.
+   If you want to use ``.. todo::``, please call, e.g.,
+   ``description.doc(10000)`` to avoid line breaking.
+
+.. note::
+
+   To increase readability, you might want to split your documentation lines,
+   e.g.:
+
+   .. code-block:: c++
+
+      "(more text)\n"
+      "\n"
+      "* Point 1\n"
+      "* Point 2\n"
+      "\n"
+      "(more text)"
+
+Leading white-spaces in the documentation string are handled correctly, so you
+can use several layers of indentation.
+
+**Class documentation**
+
+To document a bound class, you can use the
+``bob::extension::ClassDoc("class_name", "Short class description", "Optional
+long class description")`` function to align and wrap your documentation.
+Again, during binding you can use the functions ``description.name()`` and
+``description.doc()`` as above.
+
+Additionally, the class documentation has a function to add constructor
+definitions, which takes an ``bob::extension::FunctionDoc`` object.  The
+shortest way to get a proper class documentation is:
+
+.. code-block:: c++
+
+   static auto my_class_doc =
+       bob::extension::ClassDoc("class_name", "Short description", "Long Description")
+         .add_constructor(
+           bob::extension::FunctionDoc("class_name", "Constructor Description")
+            .add_prototype("param1", "")
+            .add_parameter("param1", "type1", "Description of param1")
+         )
+   ;
+
+.. note::
+
+   The second parameter ``""`` in ``add_prototype`` prevents the output type
+   (which otherwise defaults to ``"None"``) to be written.
+
+.. note::
+
+   For constructor documentations, there is no need to declare them as member
+   functions. This is done automatically for you.
+
+Currently, the ClassDoc allows to highlight member functions or variables at
+the beginning of the class documentation.  This highlighting is still under
+development and might not work as expected.
+
+Possible speed issues
+=====================
+
+In order to speed up the loading time of the modules, you might want to reduce
+the amount of documentation that is generated (though I haven't experienced any
+speed differences).  For this purpose, just compile your bindings using the
+"-DBOB_SHORT_DOCSTRINGS" compiler option, e.g. by adding it to the setup.py as
+follows (see also above):
+
+.. code-block:: python
+
+   ...
+   ext_modules=[
+     Extension("bob.myext._myext",
+       [
+         ...
+       ],
+       ...
+       define_macros = [('BOB_SHORT_DOCSTRINGS',1)],
+       ),
+   ],
+   ...
+
+or simply define an environment variable ``BOB_SHORT_DOCSTRINGS=1`` before
+invoking buildout.
+
+In any of these cases, only the short descriptions will be returned as the doc
+string.
 
 Document Generation and Unit Testing
 ------------------------------------
@@ -266,21 +459,22 @@ platforms and a great way to make sure all is OK. Test units are run with
 .. code-block:: sh
 
   $ ./bin/nosetests -v
-  test_version (xbob.example.test.MyTests) ... ok
+  test_version (bob.example.test.MyTests) ... ok
 
   ----------------------------------------------------------------------
   Ran 1 test in 0.001s
 
   OK
 
+
 Creating Database Satellite Packages
 ------------------------------------
 
 Database satellite packages are special satellite packages that can hook-in
-|project|'s database manager ``xbob_dbmanage.py``. Except for this detail, they
+|project|'s database manager ``bob_dbmanage.py``. Except for this detail, they
 should look exactly like a normal package.
 
-To allow the database to be hooked to the ``xbob_dbmanage.py`` you must
+To allow the database to be hooked to the ``bob_dbmanage.py`` you must
 implement a non-virtual python class that inherits from
 :py:class:`bob.db.driver.Interface`. Your concrete implementation should then
 be described at the ``setup.py`` file with a special ``bob.db`` entry point:
@@ -289,7 +483,7 @@ be described at the ``setup.py`` file with a special ``bob.db`` entry point:
 
     # bob database declaration
     'bob.db': [
-      'replay = xbob.db.replay.driver:Interface',
+      'replay = bob.db.replay.driver:Interface',
       ],
 
 At present, there is no formal design guide for databases. Nevertheless, it is
@@ -305,18 +499,18 @@ go well together. Python package namespaces are `explained in details here
 together with implementation details. Two basic namespaces are available when
 you are operating with |project| or add-ons, such as database access APIs
 (shipped separately): the ``bob`` namespace is reserved for utilities built and
-shiped with |project|. The namespace ``xbob`` (as for *external* |project|
+shiped with |project|. The namespace ``bob`` (as for *external* |project|
 packages) should be used for all other applications that are meant to be
 distributed and augment |project|'s features.
 
-The example package you downloaded creates package inside the ``xbob``
+The example package you downloaded creates package inside the ``bob``
 namespace called ``example``. Examine this example in details and understand
 how to distributed namespace'd packages in the URL above.
 
 In particular, if you are creating a database access API, please consider
 putting all of your package contents *inside* the namespace
-``xbob.db.<package>``, therefore declaring two namespaces: ``xbob`` and
-``xbob.db``. All standard database access APIs follow this strategy. Just look
+``bob.db.<package>``, therefore declaring two namespaces: ``bob`` and
+``bob.db``. All standard database access APIs follow this strategy. Just look
 at our currently existing database `satellite packages`_ for examples.
 
 Distributing Your Work

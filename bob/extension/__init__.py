@@ -81,16 +81,16 @@ def generate_self_macros(extname, version):
   s = extname.rsplit('.', 1)
 
   retval = [
-      ('XBOB_EXT_MODULE_PREFIX', '"%s"' % s[0]),
-      ('XBOB_EXT_MODULE_NAME', '"%s"' % s[1]),
+      ('BOB_EXT_MODULE_PREFIX', '"%s"' % s[0]),
+      ('BOB_EXT_MODULE_NAME', '"%s"' % s[1]),
       ]
 
   if sys.version_info[0] >= 3:
-    retval.append(('XBOB_EXT_ENTRY_NAME', 'PyInit_%s' % s[1]))
+    retval.append(('BOB_EXT_ENTRY_NAME', 'PyInit_%s' % s[1]))
   else:
-    retval.append(('XBOB_EXT_ENTRY_NAME', 'init%s' % s[1]))
+    retval.append(('BOB_EXT_ENTRY_NAME', 'init%s' % s[1]))
 
-  if version: retval.append(('XBOB_EXT_MODULE_VERSION', '"%s"' % version))
+  if version: retval.append(('BOB_EXT_MODULE_VERSION', '"%s"' % version))
 
   return retval
 

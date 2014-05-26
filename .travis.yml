@@ -13,8 +13,8 @@ install:
   - "python bootstrap.py"
   - "./bin/buildout"
 script:
-  - "./bin/python -c 'from xbob.extension import get_config; print(get_config())'"
-  - "./bin/coverage run --source=xbob.extension ./bin/nosetests -sv"
+  - "./bin/python -c 'from bob.extension import get_config; print(get_config())'"
+  - "./bin/coverage run --source=bob.extension ./bin/nosetests -sv"
   - "./bin/sphinx-build -b doctest doc sphinx"
   - "./bin/sphinx-build -b html doc sphinx"
 after_success:

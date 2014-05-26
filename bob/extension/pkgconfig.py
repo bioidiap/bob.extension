@@ -83,7 +83,7 @@ class pkgconfig:
   .. doctest::
      :options: +NORMALIZE_WHITESPACE +ELLIPSIS
 
-     >>> from xbob.extension import pkgconfig
+     >>> from bob.extension import pkgconfig
      >>> blitz = pkgconfig('blitz')
      >>> blitz.include_directories()
      [...]
@@ -349,7 +349,7 @@ class pkgconfig:
     .. doctest::
        :options: +NORMALIZE_WHITESPACE +ELLIPSIS
 
-       >>> from xbob.extension import pkgconfig
+       >>> from bob.extension import pkgconfig
        >>> blitz = pkgconfig('blitz')
        >>> blitz.package_macros()
        [('HAVE_BLITZ', '1'), ('BLITZ_VERSION', '"..."')]

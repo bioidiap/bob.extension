@@ -23,7 +23,7 @@ def find_file(name, subpaths=None, prefixes=None):
   This method will find all occurrences of a given name on the file system and
   will return them to the user.
 
-  If the environment variable ``XBOB_PREFIX_PATH`` is set, then it is
+  If the environment variable ``BOB_PREFIX_PATH`` is set, then it is
   considered a unix path list that is prepended to the list of prefixes to
   search for. The environment variable has the highest priority on the search
   order. The order on the variable for each path is respected.
@@ -51,8 +51,8 @@ def find_file(name, subpaths=None, prefixes=None):
   search = []
 
   # Priority 1
-  if 'XBOB_PREFIX_PATH' in os.environ:
-    search += os.environ['XBOB_PREFIX_PATH'].split(os.pathsep)
+  if 'BOB_PREFIX_PATH' in os.environ:
+    search += os.environ['BOB_PREFIX_PATH'].split(os.pathsep)
 
   # Priority 2
   if prefixes:
@@ -93,7 +93,7 @@ def find_header(name, subpaths=None, prefixes=None):
   This method will find all occurrences of a given name on the file system and
   will return them to the user.
 
-  If the environment variable ``XBOB_PREFIX_PATH`` is set, then it is
+  If the environment variable ``BOB_PREFIX_PATH`` is set, then it is
   considered a unix path list that is prepended to the list of prefixes to
   search for. The environment variable has the highest priority on the search
   order. The order on the variable for each path is respected.
@@ -132,7 +132,7 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
   This method will find all occurrences of a given name on the file system and
   will return them to the user.
 
-  If the environment variable ``XBOB_PREFIX_PATH`` is set, then it is
+  If the environment variable ``BOB_PREFIX_PATH`` is set, then it is
   considered a unix path list that is prepended to the list of prefixes to
   search for. The environment variable has the highest priority on the search
   order. The order on the variable for each path is respected.

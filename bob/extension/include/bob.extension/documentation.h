@@ -1,5 +1,5 @@
 /**
- * @file xbob/extension/include/xbob.extension/documentation.h
+ * @file bob/extension/include/bob.extension/documentation.h
  * @date Fri Feb 21 18:29:37 CET 2014
  * @author Manuel Guenther <manuel.guenther@idiap.ch>
  *
@@ -8,8 +8,8 @@
  * Copyright (C) 2011-2014 Idiap Research Institute, Martigny, Switzerland
  */
 
-#ifndef XBOB_EXTENSION_DOCUMENTATION_H_INCLUDED
-#define XBOB_EXTENSION_DOCUMENTATION_H_INCLUDED
+#ifndef BOB_EXTENSION_DOCUMENTATION_H_INCLUDED
+#define BOB_EXTENSION_DOCUMENTATION_H_INCLUDED
 
 #include <string>
 #include <vector>
@@ -17,7 +17,7 @@
 #include <stdexcept>
 #include <iostream>
 
-namespace xbob{
+namespace bob{
   namespace extension{
 
     /**
@@ -266,7 +266,7 @@ namespace xbob{
 // TODO: remove
 #include <iostream>
 
-#ifndef XBOB_SHORT_DOCSTRINGS
+#ifndef BOB_SHORT_DOCSTRINGS
 // removes leading and trailing spaces
 static std::string _strip(const std::string& str, const std::string& sep = " []()|"){
   unsigned first = 0, last = str.size();
@@ -410,20 +410,20 @@ static void _check(std::string& doc, const std::vector<std::string>& vars, const
   }
 }
 
-#endif // ! XBOB_SHORT_DOCSTRINGS
+#endif // ! BOB_SHORT_DOCSTRINGS
 
 
 /////////////////////////////////////////////////////////////
 /// FunctionDoc
 
-inline xbob::extension::FunctionDoc::FunctionDoc(
+inline bob::extension::FunctionDoc::FunctionDoc(
   const char* const function_name,
   const char* const short_description,
   const char* const long_description,
   bool is_member_function
 ) : function_name(function_name), function_description(short_description), is_member(is_member_function)
 {
-#ifndef XBOB_SHORT_DOCSTRINGS
+#ifndef BOB_SHORT_DOCSTRINGS
   if (long_description){
     function_description += "\n\n";
     function_description += long_description;
@@ -431,54 +431,54 @@ inline xbob::extension::FunctionDoc::FunctionDoc(
 #endif
 }
 
-inline xbob::extension::FunctionDoc& xbob::extension::FunctionDoc::add_prototype(
+inline bob::extension::FunctionDoc& bob::extension::FunctionDoc::add_prototype(
   const char* const variables,
   const char* const return_values
 ){
-#ifndef XBOB_SHORT_DOCSTRINGS
+#ifndef BOB_SHORT_DOCSTRINGS
   prototype_variables.push_back(variables);
   if (!return_values)
     prototype_returns.push_back("");
   else
     prototype_returns.push_back(return_values);
-#endif // XBOB_SHORT_DOCSTRINGS
+#endif // BOB_SHORT_DOCSTRINGS
   return *this;
 }
 
-inline xbob::extension::FunctionDoc& xbob::extension::FunctionDoc::add_parameter(
+inline bob::extension::FunctionDoc& bob::extension::FunctionDoc::add_parameter(
   const char* const parameter_name,
   const char* const parameter_type,
   const char* const parameter_description
 )
 {
-#ifndef XBOB_SHORT_DOCSTRINGS
+#ifndef BOB_SHORT_DOCSTRINGS
   parameter_names.push_back(parameter_name);
   parameter_types.push_back(parameter_type);
   parameter_descriptions.push_back(parameter_description);
-#endif // XBOB_SHORT_DOCSTRINGS
+#endif // BOB_SHORT_DOCSTRINGS
   return *this;
 }
 
-inline xbob::extension::FunctionDoc& xbob::extension::FunctionDoc::add_return(
+inline bob::extension::FunctionDoc& bob::extension::FunctionDoc::add_return(
   const char* const parameter_name,
   const char* const parameter_type,
   const char* const parameter_description
 )
 {
-#ifndef XBOB_SHORT_DOCSTRINGS
+#ifndef BOB_SHORT_DOCSTRINGS
   return_names.push_back(parameter_name);
   return_types.push_back(parameter_type);
   return_descriptions.push_back(parameter_description);
-#endif // XBOB_SHORT_DOCSTRINGS
+#endif // BOB_SHORT_DOCSTRINGS
   return *this;
 }
 
-inline const char* const xbob::extension::FunctionDoc::doc(
+inline const char* const bob::extension::FunctionDoc::doc(
   const unsigned alignment,
   const unsigned indent
 ) const
 {
-#ifdef XBOB_SHORT_DOCSTRINGS
+#ifdef BOB_SHORT_DOCSTRINGS
   return function_description.c_str();
 #else
   if (description.empty()){
@@ -529,12 +529,12 @@ inline const char* const xbob::extension::FunctionDoc::doc(
 
   // return the description
   return description.c_str();
-#endif // XBOB_SHORT_DOCSTRINGS
+#endif // BOB_SHORT_DOCSTRINGS
 }
 
-inline void xbob::extension::FunctionDoc::print_usage() const
+inline void bob::extension::FunctionDoc::print_usage() const
 {
-#ifdef XBOB_SHORT_DOCSTRINGS
+#ifdef BOB_SHORT_DOCSTRINGS
   return function_description.c_str();
 #else
   // in case of member functions, the alignment has to be decreased further since class member function are automatically indented by 4 further spaces.
@@ -553,7 +553,7 @@ inline void xbob::extension::FunctionDoc::print_usage() const
         std::cerr << _align(_usage(function_name, prototype_variables[n], prototype_returns[n]), 0, unsigned(-1)) << "\n";
   }
   std::cerr << std::endl;
-#endif // XBOB_SHORT_DOCSTRINGS
+#endif // BOB_SHORT_DOCSTRINGS
 }
 
 
@@ -561,25 +561,25 @@ inline void xbob::extension::FunctionDoc::print_usage() const
 /////////////////////////////////////////////////////////////
 /// ClassDoc
 
-inline xbob::extension::ClassDoc::ClassDoc(
+inline bob::extension::ClassDoc::ClassDoc(
   const char* const class_name,
   const char* const short_description,
   const char* const long_description
 ) : class_name(class_name), class_description(short_description)
 {
-#ifndef XBOB_SHORT_DOCSTRINGS
+#ifndef BOB_SHORT_DOCSTRINGS
   if (long_description){
     class_description += "\n\n";
     class_description += long_description;
   }
-#endif // ! XBOB_SHORT_DOCSTRINGS
+#endif // ! BOB_SHORT_DOCSTRINGS
 }
 
-inline xbob::extension::ClassDoc& xbob::extension::ClassDoc::add_constructor(
-  const xbob::extension::FunctionDoc& constructor_documentation
+inline bob::extension::ClassDoc& bob::extension::ClassDoc::add_constructor(
+  const bob::extension::FunctionDoc& constructor_documentation
 )
 {
-#ifndef XBOB_SHORT_DOCSTRINGS
+#ifndef BOB_SHORT_DOCSTRINGS
   if (!constructor.empty()){
     throw std::runtime_error("The class documentation can have only a single constructor documentation");
   }
@@ -587,36 +587,36 @@ inline xbob::extension::ClassDoc& xbob::extension::ClassDoc::add_constructor(
   // since we indent the constructor documentation ourselves, we don't need to consider it to be a member function.
   constructor.back().is_member = false;
   constructor.back().function_name = class_name;
-#endif // XBOB_SHORT_DOCSTRINGS
+#endif // BOB_SHORT_DOCSTRINGS
   return *this;
 }
 
-inline xbob::extension::ClassDoc& xbob::extension::ClassDoc::highlight(
-  const xbob::extension::FunctionDoc& function_documentation
+inline bob::extension::ClassDoc& bob::extension::ClassDoc::highlight(
+  const bob::extension::FunctionDoc& function_documentation
 )
 {
-#ifndef XBOB_SHORT_DOCSTRINGS
+#ifndef BOB_SHORT_DOCSTRINGS
   highlighted_functions.push_back(function_documentation);
-#endif // XBOB_SHORT_DOCSTRINGS
+#endif // BOB_SHORT_DOCSTRINGS
   return *this;
 }
 
-inline xbob::extension::ClassDoc& xbob::extension::ClassDoc::highlight(
-  const xbob::extension::VariableDoc& variable_documentation
+inline bob::extension::ClassDoc& bob::extension::ClassDoc::highlight(
+  const bob::extension::VariableDoc& variable_documentation
 )
 {
-#ifndef XBOB_SHORT_DOCSTRINGS
+#ifndef BOB_SHORT_DOCSTRINGS
   highlighted_variables.push_back(variable_documentation);
-#endif // XBOB_SHORT_DOCSTRINGS
+#endif // BOB_SHORT_DOCSTRINGS
   return *this;
 }
 
 
-inline char* xbob::extension::ClassDoc::doc(
+inline char* bob::extension::ClassDoc::doc(
   const unsigned alignment
 ) const
 {
-#ifdef XBOB_SHORT_DOCSTRINGS
+#ifdef BOB_SHORT_DOCSTRINGS
   return const_cast<char*>(class_description.c_str());
 #else
   if (description.empty()){
@@ -642,32 +642,32 @@ inline char* xbob::extension::ClassDoc::doc(
     }
   }
   return const_cast<char*>(description.c_str());
-#endif // XBOB_SHORT_DOCSTRINGS
+#endif // BOB_SHORT_DOCSTRINGS
 }
 
 /////////////////////////////////////////////////////////////
 /// VariableDoc
 
-inline xbob::extension::VariableDoc::VariableDoc(
+inline bob::extension::VariableDoc::VariableDoc(
   const char* const variable_name,
   const char* const variable_type,
   const char* const short_description,
   const char* const long_description
 ) : variable_name(variable_name), variable_type(variable_type), variable_description(short_description)
 {
-#ifndef XBOB_SHORT_DOCSTRINGS
+#ifndef BOB_SHORT_DOCSTRINGS
   if (long_description){
     variable_description += "\n\n";
     variable_description += long_description;
   }
-#endif // ! XBOB_SHORT_DOCSTRINGS
+#endif // ! BOB_SHORT_DOCSTRINGS
 }
 
-inline char* xbob::extension::VariableDoc::doc(
+inline char* bob::extension::VariableDoc::doc(
   const unsigned alignment
 ) const
 {
-#ifdef XBOB_SHORT_DOCSTRINGS
+#ifdef BOB_SHORT_DOCSTRINGS
   return const_cast<char*>(variable_description.c_str());
 #else
   if (description.empty()){
@@ -678,8 +678,8 @@ inline char* xbob::extension::VariableDoc::doc(
       description = _align("*" + variable_type + "*  <-- " + variable_description, 0, alignment);
   }
   return const_cast<char*>(description.c_str());
-#endif // XBOB_SHORT_DOCSTRINGS
+#endif // BOB_SHORT_DOCSTRINGS
 }
 
-#endif // XBOB_EXTENSION_DOCUMENTATION_H_INCLUDED
+#endif // BOB_EXTENSION_DOCUMENTATION_H_INCLUDED
 

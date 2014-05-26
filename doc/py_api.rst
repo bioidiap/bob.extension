@@ -3,10 +3,10 @@
 .. Sat 16 Nov 20:52:58 2013
 
 ================================
- Python API to `xbob.extension`
+ Python API to `bob.extension`
 ================================
 
 This section includes information for using the Python API of
-``xbob.extension``.
+``bob.extension``.
 
-.. automodule:: xbob.extension
+.. automodule:: bob.extension

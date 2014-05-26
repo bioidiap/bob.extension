@@ -10,10 +10,10 @@ from setuptools import setup, find_packages
 
 setup(
 
-    name="xbob.extension",
+    name="bob.extension",
     version="0.3.0a0",
     description="Helps projects building Python/C++ extensions for Bob",
-    url='http://github.com/bioidiap/xbob.extension',
+    url='http://github.com/bioidiap/bob.extension',
     license="BSD",
     author='Andre Anjos',
     author_email='andre.anjos@idiap.ch',
@@ -23,7 +23,7 @@ setup(
     zip_safe=True,
 
     namespace_packages=[
-      "xbob",
+      "bob",
       ],
 
     install_requires=[
