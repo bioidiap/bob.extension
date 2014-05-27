@@ -19,15 +19,16 @@ codename=$(basename ${TRAVIS_REPO_SLUG})-${TRAVIS_COMMIT}
 server=https://${DOCUSER}:${DOCPASS}@www.idiap.ch/software/bob/docs-upload/
 
 # annotate
-echo -e "repo=${TRAVIS_REPO_SLUG}\n"   >> ${info}
-echo -e "branch=${TRAVIS_BRANCH}\n"    >> ${info}
-echo -e "tag=${TRAVIS_TAG}\n"          >> ${info}
-echo -e "build=${TRAVIS_JOB_NUMBER}\n" >> ${info}
-echo -e "commit=${TRAVIS_COMMIT}\n"    >> ${info}
-echo -e "os=${TRAVIS_OS_NAME}\n"       >> ${info}
+echo "repo=${TRAVIS_REPO_SLUG}"   >> ${info}
+echo "branch=${TRAVIS_BRANCH}"    >> ${info}
+echo "tag=${TRAVIS_TAG}"          >> ${info}
+echo "build=${TRAVIS_JOB_NUMBER}" >> ${info}
+echo "commit=${TRAVIS_COMMIT}"    >> ${info}
+echo "os=${TRAVIS_OS_NAME}"       >> ${info}
 
 # compress
 tar cfj ${codename}.tar.bz2 sphinx
 
 # send
+echo "Uploading ${codename} into webdav server..."
 curl -k -T ${codename}.tar.bz2 ${server}

@@ -5,8 +5,9 @@ python:
   - '3.2'
   - '3.3'
 env:
-  secure: S6DJMVHh6RCPSyYEEcN4B4BfD2wIn7AeDAy7Ev57Up6dtt6SdCmYFEUkxhwNOdnKXu5Rw1Kg1jOGtWCykNTv0z5042uQnHDM9QT8vwEPlrCAwEQe+VJk9aAoANQmoo6HuYXc10+9AgJSB0FaGUDoWw1jkfzBXPlmsHbFjsTeIPw=
-  secure: MkdNBK26DXTkOY41Eew3MvxLg/nSIduDlWWOe2SO20IrgPGFeptTUXXskcP9hDnJj/abuC3JDOYX1WKBy3U9MHc89+tWSQggezecety43uCcG2QQEchu3tktcBPayMxkrzSAZzjmhGKLn8CKlpFXZ1biVgjaR9o6jE9/Rvgc9iU=
+  global:
+    - secure: S6DJMVHh6RCPSyYEEcN4B4BfD2wIn7AeDAy7Ev57Up6dtt6SdCmYFEUkxhwNOdnKXu5Rw1Kg1jOGtWCykNTv0z5042uQnHDM9QT8vwEPlrCAwEQe+VJk9aAoANQmoo6HuYXc10+9AgJSB0FaGUDoWw1jkfzBXPlmsHbFjsTeIPw=
+    - secure: MkdNBK26DXTkOY41Eew3MvxLg/nSIduDlWWOe2SO20IrgPGFeptTUXXskcP9hDnJj/abuC3JDOYX1WKBy3U9MHc89+tWSQggezecety43uCcG2QQEchu3tktcBPayMxkrzSAZzjmhGKLn8CKlpFXZ1biVgjaR9o6jE9/Rvgc9iU=
 before_install:
   - sudo add-apt-repository -y ppa:biometrics/bob
   - sudo apt-get update -qq
