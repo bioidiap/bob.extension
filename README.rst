@@ -2,10 +2,10 @@
 .. Andre Anjos <andre.anjos@idiap.ch>
 .. Thu 30 Jan 08:46:53 2014 CET
 
-.. image:: https://travis-ci.org/bioidiap/bob.extension.svg?branch=prototype
+.. image:: https://travis-ci.org/bioidiap/bob.extension.svg?branch=master
    :target: https://travis-ci.org/bioidiap/bob.extension
-.. image:: https://coveralls.io/repos/bioidiap/bob.extension/badge.png?branch=prototype
-   :target: https://coveralls.io/r/bioidiap/bob.extension?branch=prototype
+.. image:: https://coveralls.io/repos/bioidiap/bob.extension/badge.png
+   :target: https://coveralls.io/r/bioidiap/bob.extension
 .. image:: http://img.shields.io/github/tag/bioidiap/bob.extension.png
    :target: https://github.com/bioidiap/bob.extension
 .. image:: http://img.shields.io/pypi/v/bob.extension.png
