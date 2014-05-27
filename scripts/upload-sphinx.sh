@@ -2,15 +2,12 @@
 
 # some checks
 if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
-  echo "This is a pull request - not updating documentation";
+  echo "This is a pull request - not uploading documentation";
   exit 0
 fi
 
-pyver=$(python -c 'import sys; print "%d.%d" % sys.version_info[:2]')
-pyver_req="2.7"
-
-if [ "${pyver}" != "${pyver_req}" ]; then
-  echo "Not building against Python ${pyver_req} - not uploading documentation";
+if [ -z "${DOCUSER}" ] || [ -z "${DOCPASS}" ]; then
+  echo "Server username and/or password undefined - not uploading documentation";
   exit 0
 fi
 
