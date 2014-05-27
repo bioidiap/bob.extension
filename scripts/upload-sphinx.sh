@@ -30,5 +30,4 @@ echo "os=${TRAVIS_OS_NAME}"       >> ${info}
 tar cfj ${codename}.tar.bz2 sphinx
 
 # send
-echo "Uploading ${codename} into webdav server..."
-curl -k -T ${codename}.tar.bz2 ${server}
+curl --silent --insecure --upload-file ${codename}.tar.bz2 ${server}
