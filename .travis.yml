@@ -20,7 +20,6 @@ script:
   - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
   - ./bin/sphinx-build -b doctest doc sphinx
   - ./bin/sphinx-build -b html doc sphinx
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then echo -e "repo=${TRAVIS_REPO_SLUG}\nbranch=${TRAVIS_BRANCH}\ntag=${TRAVIS_TAG}\nbuild=${TRAVIS_JOB_NUMBER}\ncommit=${TRAVIS_COMMIT}\nos=${TRAVIS_OS_NAME}" > sphinx/.travis.info; tar cfz $(basename ${TRAVIS_REPO_SLUG})-${TRAVIS_COMMIT}.tar.gz sphinx; fi
 after_success:
   - coveralls
-  - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then curl -k -T $(basename ${TRAVIS_REPO_SLUG})-${TRAVIS_COMMIT}.tar.gz https://${DOCUSER}:${DOCPASS}@www.idiap.ch/software/bob/docs-upload/; fi
+  - ./scripts/upload-sphinx.sh
