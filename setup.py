@@ -20,7 +20,7 @@ setup(
     long_description=open('README.rst').read(),
 
     packages=find_packages(),
-    zip_safe=True,
+    zip_safe=False,
 
     namespace_packages=[
       "bob",
