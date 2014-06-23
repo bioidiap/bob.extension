@@ -4,6 +4,8 @@
 
 .. image:: https://travis-ci.org/bioidiap/bob.extension.svg?branch=master
    :target: https://travis-ci.org/bioidiap/bob.extension
+.. image:: http://img.shields.io/badge/docs-latest-orange.png
+   :target: https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master/index.html
 .. image:: https://coveralls.io/repos/bioidiap/bob.extension/badge.png
    :target: https://coveralls.io/r/bioidiap/bob.extension
 .. image:: http://img.shields.io/github/tag/bioidiap/bob.extension.png
@@ -24,6 +26,8 @@ it in your ``setup.py`` file.
 Building with ``zc.buildout`` is possible using the ``develop`` recipe in
 `bob.buildout <http://pypi.python.org/pypi/bob.buildout>`_. Follow the
 instructions described on that package for this recipe.
+
+Further documentation on this package can be found `here <https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master/index.html>`_.
 
 Preparing for C++ Compilation
 -----------------------------
