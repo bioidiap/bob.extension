@@ -117,11 +117,20 @@ def find_header(name, subpaths=None, prefixes=None):
   description.
   """
 
+  headerpaths = ['include']
+
+  if platform.architecture()[0] == '32bit':
+    headerpaths.append(os.path.join('include', 'i386-linux-gnu'))
+  else:
+    headerpaths.append(os.path.join('include', 'x86_64-linux-gnu'))
+
   # Exhaustive combination of paths and subpaths
   if subpaths:
-    my_subpaths = [os.path.join('include', k) for k in subpaths]
+    my_subpaths = []
+    for hp in headerpaths:
+      my_subpaths += [os.path.join(hp, k) for k in subpaths]
   else:
-    my_subpaths = ['include']
+    my_subpaths = headerpaths
 
   return find_file(name, my_subpaths, prefixes)
 
