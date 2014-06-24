@@ -298,13 +298,26 @@ static std::string _align(std::string str, unsigned indent, unsigned alignment){
 
   std::string aligned;
   unsigned current_indent = indent;
-  unsigned auto_indent = indent;
   bool first_line = true;
   // now, split each line
   for (auto line_it = lines.begin(); line_it != lines.end(); ++line_it){
     auto words = _split(*line_it);
     // fill in one line
     unsigned len = 0;
+    unsigned new_indent = indent;
+    if (!line_it->empty()){
+      // increase indent?
+      const std::string& w = _strip(words[0], " ");
+      if ((w.size() == 2 && w[0] == '.' && w[1] == '.') ||
+          (w.size() >= 1 && '0' <= w[0] && '9' >= w[0]) ||
+          (w.size() == 1 && '*' == w[0]) ){
+        new_indent += w.size() + 1;
+      }
+      size_t first_word_indent = line_it->find_first_not_of(' ');
+      if (first_word_indent != std::string::npos && first_word_indent != 0){
+        new_indent += first_word_indent;
+      }
+    }
     for (auto word_it = words.begin(); word_it != words.end(); ++word_it){
       if (aligned.empty() || len + word_it->size() >= alignment || !first_line){
         // line reached alignment
@@ -316,25 +329,13 @@ static std::string _align(std::string str, unsigned indent, unsigned alignment){
         len = current_indent;
         first_line = true;
       }
-      // increase indent?
-      const std::string& w = words[0];
-      if ((w.size() == 2 && w[0] == '.' && w[1] == '.') ||
-          (w.size() >= 1 && '0' <= w[0] && '9' >= w[0]) ||
-          (w.size() == 1 && '*' == w[0]) ){
-        auto_indent = indent + 3;
-      }
-      size_t first_word_indent = line_it->find_first_not_of(' ');
-      if (first_word_indent != std::string::npos && first_word_indent != 0){
-        current_indent = auto_indent + first_word_indent;
-      } else {
-        current_indent = auto_indent;
-      }
+      // set new indent
+      current_indent = new_indent;
       // add word
       aligned += *word_it + " ";
       len += word_it->size() + 1;
     }
     current_indent = indent;
-    auto_indent = indent;
     first_line = false;
   }
 
