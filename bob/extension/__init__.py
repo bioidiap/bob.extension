@@ -10,7 +10,9 @@ import sys
 import os
 import platform
 import pkg_resources
-from distutils.extension import Extension as DistutilsExtension
+from setuptools.extension import Extension as DistutilsExtension
+from setuptools.command.build_ext import build_ext as _build_ext
+
 from pkg_resources import resource_filename
 
 from .pkgconfig import pkgconfig
@@ -162,6 +164,7 @@ def normalize_requirements(requirements):
 
   return leftovers
 
+
 class Extension(DistutilsExtension):
   """Extension building with pkg-config packages.
 
@@ -169,13 +172,13 @@ class Extension(DistutilsExtension):
   details on input parameters.
   """
 
-  def __init__(self, *args, **kwargs):
+  def __init__(self, name, sources, **kwargs):
     """Initialize the extension with parameters.
 
-    External package extensions (mostly comming from pkg-config), adds a single
+    External package extensions (mostly coming from pkg-config), adds a single
     parameter to the standard arguments of the constructor:
 
-    packages : [list]
+    packages : [string]
 
       This should be a list of strings indicating the name of the bob
       (pkg-config) modules you would like to have linked to your extension
@@ -184,6 +187,13 @@ class Extension(DistutilsExtension):
 
       For convenience, you can also specify "opencv" or other 'pkg-config'
       registered packages as a dependencies.
+
+    internal_libraries : {package_directory: [string]}
+
+      A list of libraries that is build inside the given ``package_directory``,
+      which this Extension depends on. For bob packages, this is usually the
+      libraries containing the pure C++ code.
+
     """
 
     packages = []
@@ -195,6 +205,13 @@ class Extension(DistutilsExtension):
         packages.extend(kwargs['packages'])
 
     if 'packages' in kwargs: del kwargs['packages']
+
+    # check if we have to link against internal libraries
+    if 'internal_libraries' in kwargs and kwargs['internal_libraries']:
+      self.internal_libraries = kwargs['internal_libraries']
+      del kwargs['internal_libraries']
+    else:
+      self.internal_libraries = None
 
     # uniformize packages
     packages = normalize_requirements([k.strip().lower() for k in packages])
@@ -226,7 +243,7 @@ class Extension(DistutilsExtension):
 
     # Mixing
     parameters = {
-        'define_macros': generate_self_macros(args[0], version),
+        'define_macros': generate_self_macros(name, version),
         'extra_compile_args': ['-std=c++0x'], #synomym for c++11?
         'library_dirs': [],
         'libraries': [],
@@ -294,6 +311,11 @@ class Extension(DistutilsExtension):
 
       parameters['libraries'] += libs
 
+    # add internal libraries
+    if self.internal_libraries:
+      for v in self.internal_libraries.values():
+        parameters['libraries'] += v
+
     # Filter and make unique
     for key in parameters.keys():
 
@@ -324,10 +346,12 @@ class Extension(DistutilsExtension):
     if platform.system() == 'Linux':
       kwargs.setdefault('runtime_library_dirs', [])
       kwargs['runtime_library_dirs'] += kwargs['library_dirs']
+      if self.internal_libraries:
+        kwargs['runtime_library_dirs'] += [k for k in self.internal_libraries]
       kwargs['runtime_library_dirs'] = uniq(kwargs['runtime_library_dirs'])
 
     # Run the constructor for the base class
-    DistutilsExtension.__init__(self, *args, **kwargs)
+    DistutilsExtension.__init__(self, name, sources, **kwargs)
 
     # post-process the options since
     # there is an erroneous '-Wstrict-prototypes' in the environment options
@@ -336,6 +360,33 @@ class Extension(DistutilsExtension):
     import distutils.sysconfig
     opt = distutils.sysconfig.get_config_var('OPT')
     os.environ['OPT'] = " ".join(flag for flag in opt.split() if flag != '-Wstrict-prototypes')
+
+
+class build_ext(_build_ext):
+  """Compile the C++ Extensions by adding information about the build path, if
+  required.
+
+  See the documentation for :py:class:`distutils.command.build_ext` for more
+  information.
+  """
+
+  def run(self):
+    """Iterates through the list of packages and adapts the linker path, if
+    internal packages are linked."""
+    # TODO: run external build (e.g. with cmake) before running this
+
+    # set the build path for linking, if required
+    for ext in self.extensions:
+      if isinstance(ext, Extension):
+        if ext.internal_libraries:
+          lib_dir = os.path.join(self.build_lib, os.sep.join(ext.name.split('.')[:-1]))
+          if not ext.library_dirs: ext.library_dirs = []
+          ext.library_dirs += [lib_dir]
+
+    # call the base class function
+    return _build_ext.run(self)
+
+
 
 def get_config():
   """Returns a string containing the configuration information.
