@@ -12,6 +12,7 @@ import platform
 import pkg_resources
 from setuptools.extension import Extension as DistutilsExtension
 from setuptools.command.build_ext import build_ext as _build_ext
+from distutils.file_util import copy_file
 
 from pkg_resources import resource_filename
 
@@ -194,6 +195,14 @@ class Extension(DistutilsExtension):
       which this Extension depends on. For bob packages, this is usually the
       libraries containing the pure C++ code.
 
+    internal_library_builder : {package_name : func(build_directory) -> libraries}
+
+      A set of functions to compile the ``internal_libraries`` given above.
+      This function takes as parameter the temporary build directory. It must
+      return the list of generated libraries including full paths.
+      If ``internal_library_builder`` is not specified, it is assumed that a
+      normal ``Extension`` is used for this.
+
     """
 
     packages = []
@@ -212,6 +221,12 @@ class Extension(DistutilsExtension):
       del kwargs['internal_libraries']
     else:
       self.internal_libraries = None
+
+    if 'internal_library_builder' in kwargs:
+      self.internal_library_builder = kwargs['internal_library_builder']
+      del kwargs['internal_library_builder']
+    else:
+      self.internal_library_builder = None
 
     # uniformize packages
     packages = normalize_requirements([k.strip().lower() for k in packages])
@@ -371,17 +386,40 @@ class build_ext(_build_ext):
   """
 
   def run(self):
-    """Iterates through the list of packages and adapts the linker path, if
-    internal packages are linked."""
-    # TODO: run external build (e.g. with cmake) before running this
+    """Iterates through the list of Extension packages and:
 
-    # set the build path for linking, if required
+    * compiles the code using an external function, if provided
+    * copies generated libraries to the package directory
+    * adapts the linker path, if internal packages are linked
+    """
+    # iterate through the extensions
     for ext in self.extensions:
-      if isinstance(ext, Extension):
-        if ext.internal_libraries:
-          lib_dir = os.path.join(self.build_lib, os.sep.join(ext.name.split('.')[:-1]))
-          if not ext.library_dirs: ext.library_dirs = []
-          ext.library_dirs += [lib_dir]
+      # check if it is our type of extension
+      if isinstance(ext, Extension) and ext.internal_libraries:
+
+        lib_dirs = []
+        if ext.internal_library_builder is not None:
+          # build libraries using the provided functions
+          for name, builder_function in ext.internal_library_builder.items():
+            build_dir = os.path.join(self.build_lib, name)
+            if not os.path.exists(build_dir): os.makedirs(build_dir)
+            libraries = builder_function(build_dir)
+
+            # copy libraries to place
+            fullname = self.get_ext_fullname(ext.name)
+            package = '.'.join(fullname.split('.')[:-1])
+            build_py = self.get_finalized_command('build_py')
+            package_dir = build_py.get_package_dir(package)
+
+            for lib in libraries: copy_file(lib, package_dir)
+            lib_dirs.append(package_dir)
+
+        else:
+          lib_dirs = [os.path.join(self.build_lib, os.sep.join(ext.name.split('.')[:-1]))]
+
+        # add library path so that the extension is found during linking
+        if not ext.library_dirs: ext.library_dirs = []
+        ext.library_dirs += lib_dirs
 
     # call the base class function
     return _build_ext.run(self)
