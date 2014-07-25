@@ -203,6 +203,11 @@ class Extension(DistutilsExtension):
       If ``internal_library_builder`` is not specified, it is assumed that a
       normal ``Extension`` is used for this.
 
+    is_pure_cpp : bool
+
+      Set this to True if the library is a pure C++ library, i.e., without
+      python bindings.
+
     """
 
     packages = []
@@ -227,6 +232,12 @@ class Extension(DistutilsExtension):
       del kwargs['internal_library_builder']
     else:
       self.internal_library_builder = None
+
+    if 'is_pure_cpp' in kwargs:
+      self.is_pure_cpp = kwargs['is_pure_cpp']
+      del kwargs['is_pure_cpp']
+    else:
+      self.is_pure_cpp = False
 
     # uniformize packages
     packages = normalize_requirements([k.strip().lower() for k in packages])
@@ -424,6 +435,23 @@ class build_ext(_build_ext):
     # call the base class function
     return _build_ext.run(self)
 
+
+  def get_ext_filename(self, fullname):
+    """!!HACK!! required since python 3 adds a '.cpython-vv' version to the libs.
+    If we have pure C++ code, these libraries are not found when linked in by the normal linker.
+    Hence, here we remove again the '.cpython-vv' for pure C++ code that is compiled as a normal extension"""
+    # call base class
+    lib_name = _build_ext.get_ext_filename(self, fullname)
+    # get the extension
+    if fullname in self.ext_map:
+      ext = self.ext_map[fullname]
+      # check if it our extension
+      if isinstance(ext, Extension) and ext.is_pure_cpp:
+        # remove the .cpython-vv from the build if it is pure C++
+        if "cpython-" in lib_name:
+          splits = lib_name.split('.')
+          lib_name = '.'.join([s for s in splits if 'cpython-' not in s])
+    return lib_name
 
 
 def get_config():
