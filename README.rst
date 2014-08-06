@@ -61,7 +61,6 @@ so that you include the following::
         ],
         packages = [ #pkg-config modules to append
           'blitz>=0.10',
-          'bob-core',
           ],
         include_dirs = [ #optionally, include directories
           "bob/myext/ext/headers/",
