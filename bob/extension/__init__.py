@@ -12,13 +12,13 @@ import platform
 import pkg_resources
 from setuptools.extension import Extension as DistutilsExtension
 from setuptools.command.build_ext import build_ext as _build_ext
-from distutils.file_util import copy_file
 
 from pkg_resources import resource_filename
 
 from .pkgconfig import pkgconfig
 from .boost import boost
-from .utils import uniq
+from .utils import uniq, find_executable, find_library
+from .cmake import CMakeListsGenerator
 
 __version__ = pkg_resources.require(__name__)[0].version
 
@@ -80,6 +80,9 @@ def check_packages(packages):
 
 def generate_self_macros(extname, version):
   """Generates standard macros with library, module names and prefix"""
+
+  if version is None:
+    return []
 
   s = extname.rsplit('.', 1)
 
@@ -166,6 +169,31 @@ def normalize_requirements(requirements):
   return leftovers
 
 
+def get_bob_libraries(bob_packages):
+  """Returns a list of include directories, libraries and library directories
+  for the given bob libraries."""
+  includes = []
+  libraries = []
+  library_directories = []
+  # iterate through the list of bob packages
+  if bob_packages is not None:
+    # TODO: need to handle versions?
+    bob_packages = normalize_requirements([k.strip().lower() for k in bob_packages])
+    for package in bob_packages:
+      includes.append(resource_filename(package, 'include'))
+
+      lib_name = package.replace('.', '_')
+      libs = find_library(lib_name, prefixes=[resource_filename(package, '.')])
+      # add the FIRST lib that we found, if any
+      if len(libs):
+        libraries.append(lib_name)
+        library_directories.append(os.path.dirname(libs[0]))
+
+  return includes, libraries, library_directories
+
+
+
+
 class Extension(DistutilsExtension):
   """Extension building with pkg-config packages.
 
@@ -189,24 +217,10 @@ class Extension(DistutilsExtension):
       For convenience, you can also specify "opencv" or other 'pkg-config'
       registered packages as a dependencies.
 
-    internal_libraries : {package_directory: [string]}
+    bob_packages: [string]
 
-      A list of libraries that is build inside the given ``package_directory``,
-      which this Extension depends on. For bob packages, this is usually the
-      libraries containing the pure C++ code.
-
-    internal_library_builder : {package_name : func(build_directory) -> libraries}
-
-      A set of functions to compile the ``internal_libraries`` given above.
-      This function takes as parameter the temporary build directory. It must
-      return the list of generated libraries including full paths.
-      If ``internal_library_builder`` is not specified, it is assumed that a
-      normal ``Extension`` is used for this.
-
-    is_pure_cpp : bool
-
-      Set this to True if the library is a pure C++ library, i.e., without
-      python bindings.
+      A list of bob libraries (such as ``'bob.core'``) containing C++ code
+      that should be included and linked
 
     """
 
@@ -217,30 +231,19 @@ class Extension(DistutilsExtension):
         packages.append(kwargs['packages'])
       else:
         packages.extend(kwargs['packages'])
-
     if 'packages' in kwargs: del kwargs['packages']
-
-    # check if we have to link against internal libraries
-    if 'internal_libraries' in kwargs and kwargs['internal_libraries']:
-      self.internal_libraries = kwargs['internal_libraries']
-      del kwargs['internal_libraries']
-    else:
-      self.internal_libraries = None
-
-    if 'internal_library_builder' in kwargs:
-      self.internal_library_builder = kwargs['internal_library_builder']
-      del kwargs['internal_library_builder']
-    else:
-      self.internal_library_builder = None
-
-    if 'is_pure_cpp' in kwargs:
-      self.is_pure_cpp = kwargs['is_pure_cpp']
-      del kwargs['is_pure_cpp']
-    else:
-      self.is_pure_cpp = False
 
     # uniformize packages
     packages = normalize_requirements([k.strip().lower() for k in packages])
+
+    # check if we have bob libraries to link against
+    if 'bob_packages' in kwargs and kwargs['bob_packages']:
+      self.bob_packages = kwargs['bob_packages']
+      del kwargs['bob_packages']
+    else:
+      self.bob_packages = None
+
+    bob_includes, bob_libraries, bob_library_dirs = get_bob_libraries(self.bob_packages)
 
     # Boost requires a special treatment
     boost_req = ''
@@ -271,8 +274,8 @@ class Extension(DistutilsExtension):
     parameters = {
         'define_macros': generate_self_macros(name, version),
         'extra_compile_args': ['-std=c++0x'], #synomym for c++11?
-        'library_dirs': [],
-        'libraries': [],
+        'library_dirs': bob_library_dirs,
+        'libraries': bob_libraries,
         }
 
     # Compilation options
@@ -337,11 +340,6 @@ class Extension(DistutilsExtension):
 
       parameters['libraries'] += libs
 
-    # add internal libraries
-    if self.internal_libraries:
-      for v in self.internal_libraries.values():
-        parameters['libraries'] += v
-
     # Filter and make unique
     for key in parameters.keys():
 
@@ -358,6 +356,7 @@ class Extension(DistutilsExtension):
     # add our include dir by default
     self_include_dir = resource_filename(__name__, 'include')
     kwargs.setdefault('include_dirs', []).append(self_include_dir)
+    kwargs['include_dirs'] = user_includes + bob_includes + kwargs['include_dirs']
 
     # Uniq'fy parameters that are not on our parameter list
     kwargs['include_dirs'] = uniq(kwargs['include_dirs'])
@@ -372,8 +371,6 @@ class Extension(DistutilsExtension):
     if platform.system() == 'Linux':
       kwargs.setdefault('runtime_library_dirs', [])
       kwargs['runtime_library_dirs'] += kwargs['library_dirs']
-      if self.internal_libraries:
-        kwargs['runtime_library_dirs'] += [k for k in self.internal_libraries]
       kwargs['runtime_library_dirs'] = uniq(kwargs['runtime_library_dirs'])
 
     # Run the constructor for the base class
@@ -388,9 +385,67 @@ class Extension(DistutilsExtension):
     os.environ['OPT'] = " ".join(flag for flag in opt.split() if flag != '-Wstrict-prototypes')
 
 
+class Library (Extension):
+  """A class to compile a pure C++ code library used within and outside an extension using CMake."""
+
+  def __init__(self, name, sources, package_directory, target_directory, version, include_dirs = [], libraries = [], library_dirs = [], define_macros = [], bob_packages = []):
+    """TODO: document"""
+    self.name = name
+    self.package_directory = package_directory
+    self.target_directory = target_directory
+    self.sources = sources
+    self.version = version
+    self.include_directories = [os.path.join(target_directory, 'include')] + include_dirs
+    self.libraries = libraries[:]
+    self.library_directories = library_dirs[:]
+    self.define_macros = define_macros[:]
+
+    # add includes and libs for bob packages
+    bob_includes, bob_libraries, bob_library_dirs = get_bob_libraries(bob_packages)
+    self.include_directories.extend(bob_includes)
+    self.libraries.extend(bob_libraries)
+    self.library_directories.extend(bob_library_dirs)
+
+    # find the cmake executable
+    cmake = find_executable("cmake")
+    if not cmake:
+      raise IOError("The Library class needs CMake version >= 2.8 to be installed, but CMake cannot be found")
+    self.cmake = cmake[0]
+
+    # call base class constructor
+    Extension.__init__(self, name, sources)
+
+
+  def compile(self, build_directory, build_type = "RELEASE", compiler = None):
+    """TODO: document"""
+    # generate CMakeLists.txt makefile
+    generator = CMakeListsGenerator(
+      name = self.name,
+      sources = self.sources,
+      target_directory = self.target_directory,
+      version = self.version,
+      include_directories = self.include_directories,
+      libraries = self.libraries,
+      library_directories = self.library_directories,
+      macros = self.define_macros
+    )
+    generator.generate(self.package_directory)
+
+    # compile in the build directory
+    import subprocess
+    env = {'VERBOSE' : '1'}
+    env.update(os.environ)
+    if compiler is not None:
+      env['CXX'] = compiler
+    # configure cmake
+    command = [self.cmake, self.package_directory, '-DCMAKE_BUILD_TYPE=%s' % build_type]
+    subprocess.call(command, cwd=build_directory, env=env)
+    # run make
+    subprocess.call(['make'], cwd=build_directory, env=env)
+
+
 class build_ext(_build_ext):
-  """Compile the C++ Extensions by adding information about the build path, if
-  required.
+  """Compile the C++ Extensions using CMake, and the python extensions afterwards
 
   See the documentation for :py:class:`distutils.command.build_ext` for more
   information.
@@ -403,55 +458,33 @@ class build_ext(_build_ext):
     * copies generated libraries to the package directory
     * adapts the linker path, if internal packages are linked
     """
+
+    lib_dirs = []
+    include_dirs = []
     # iterate through the extensions
     for ext in self.extensions:
       # check if it is our type of extension
-      if isinstance(ext, Extension) and ext.internal_libraries:
+      if isinstance(ext, Library):
+        # TODO: get compiler and add it to the compiler
+        # build libraries using the provided functions
+        build_dir = os.path.join(self.build_lib, ext.name)
+        if not os.path.exists(build_dir): os.makedirs(build_dir)
+        # compile
+        ext.compile(build_dir)
+        lib_dirs.append(ext.target_directory)
+        include_dirs.append(os.path.join(ext.target_directory, 'include'))
 
-        lib_dirs = []
-        if ext.internal_library_builder is not None:
-          # build libraries using the provided functions
-          for name, builder_function in ext.internal_library_builder.items():
-            build_dir = os.path.join(self.build_lib, name)
-            if not os.path.exists(build_dir): os.makedirs(build_dir)
-            libraries = builder_function(build_dir)
+    # now, we keep only the extensions that are python extensions
+    self.extensions = [ext for ext in self.extensions if not isinstance(ext, Library)]
 
-            # copy libraries to place
-            fullname = self.get_ext_fullname(ext.name)
-            package = '.'.join(fullname.split('.')[:-1])
-            build_py = self.get_finalized_command('build_py')
-            package_dir = build_py.get_package_dir(package)
-
-            for lib in libraries: copy_file(lib, package_dir)
-            lib_dirs.append(package_dir)
-
-        else:
-          lib_dirs = [os.path.join(self.build_lib, os.sep.join(ext.name.split('.')[:-1]))]
-
-        # add library path so that the extension is found during linking
-        if not ext.library_dirs: ext.library_dirs = []
-        ext.library_dirs += lib_dirs
+    # set the DEFAULT library path and include path for all other extensions
+    for ext in self.extensions:
+      ext.library_dirs = lib_dirs + (ext.library_dirs if ext.library_dirs else [])
+      ext.runtime_library_dirs = lib_dirs + (ext.runtime_library_dirs if ext.runtime_library_dirs else [])
+      ext.include_dirs = include_dirs + (ext.include_dirs if ext.include_dirs else [])
 
     # call the base class function
     return _build_ext.run(self)
-
-
-  def get_ext_filename(self, fullname):
-    """!!HACK!! required since python 3 adds a '.cpython-vv' version to the libs.
-    If we have pure C++ code, these libraries are not found when linked in by the normal linker.
-    Hence, here we remove again the '.cpython-vv' for pure C++ code that is compiled as a normal extension"""
-    # call base class
-    lib_name = _build_ext.get_ext_filename(self, fullname)
-    # get the extension
-    if fullname in self.ext_map:
-      ext = self.ext_map[fullname]
-      # check if it our extension
-      if isinstance(ext, Extension) and ext.is_pure_cpp:
-        # remove the .cpython-vv from the build if it is pure C++
-        if "cpython-" in lib_name:
-          splits = lib_name.split('.')
-          lib_name = '.'.join([s for s in splits if 'cpython-' not in s])
-    return lib_name
 
 
 def get_config():

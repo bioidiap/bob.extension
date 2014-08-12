@@ -166,9 +166,9 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
     A list of prefixes that will be searched prioritarily to the
     ``DEFAULT_PREFIXES`` defined in this module.
 
-    static (bool)
-      A boolean, indicating if we should try only to search for static versions
-      of the libraries. If not set, any would do.
+  static (bool)
+    A boolean, indicating if we should try only to search for static versions
+    of the libraries. If not set, any would do.
 
   Returns a list of filenames that exist on the filesystem, matching your
   description.
@@ -222,6 +222,61 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
     retval += find_file(libname, my_subpaths, prefixes)
 
   return retval
+
+def find_executable(name, subpaths=None, prefixes=None):
+  """Finds an executable on the file system. Returns all candidates.
+
+  This method will find all occurrences of a given name on the file system and
+  will return them to the user.
+
+  If the environment variable ``BOB_PREFIX_PATH`` is set, then it is
+  considered a unix path list that is prepended to the list of prefixes to
+  search for. The environment variable has the highest priority on the search
+  order. The order on the variable for each path is respected.
+
+  Parameters:
+
+  name, str
+    The name of the executable to be found.
+
+  subpaths, str list
+    A list of subpaths to be appended to each prefix for the search. For
+    example, if you specificy ``['foo', 'bar']`` for this parameter, then
+    search on ``os.path.join(prefixes[0], 'foo')``, ``os.path.join(prefixes[0],
+    'bar')``, and so on.
+
+  prefixes, str list
+    A list of prefixes that will be searched prioritarily to the
+    ``DEFAULT_PREFIXES`` defined in this module.
+
+  Returns a list of filenames that exist on the filesystem, matching your
+  description.
+  """
+
+  binpaths = ['bin']
+
+  if platform.architecture()[0] == '32bit':
+    binpaths += [
+        os.path.join('bin', 'i386-linux-gnu'),
+        os.path.join('bin32'),
+        ]
+  else:
+    binpaths += [
+        os.path.join('bin', 'x86_64-linux-gnu'),
+        os.path.join('bin64'),
+        ]
+
+  # Exhaustive combination of paths and subpaths
+  if subpaths:
+    my_subpaths = []
+    for lp in binpaths:
+      my_subpaths += [os.path.join(lp, k) for k in subpaths]
+  else:
+    my_subpaths = binpaths
+
+  # The module names can be set with or without version number
+  return find_file(name, my_subpaths, prefixes)
+
 
 def uniq(seq):
   """Uniqu-fy preserving order"""
