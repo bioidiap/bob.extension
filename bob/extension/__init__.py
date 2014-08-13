@@ -217,6 +217,9 @@ class Extension(DistutilsExtension):
       For convenience, you can also specify "opencv" or other 'pkg-config'
       registered packages as a dependencies.
 
+    boost_modules : [string]
+      A list of boost modules that we need to link against.
+
     bob_packages: [string]
 
       A list of bob libraries (such as ``'bob.core'``) containing C++ code
@@ -350,10 +353,9 @@ class Extension(DistutilsExtension):
     # Filter and make unique
     for key in parameters.keys():
 
-      # Tune input parameters if they were set
+      # Tune input parameters if they were set, but assure that our parameters come first
       if key in kwargs:
-        kwargs[key] = list(kwargs[key]) #deep copy
-        kwargs[key].extend(parameters[key])
+        kwargs[key] = parameters[key] + kwargs[key]
       else: kwargs[key] = parameters[key]
 
       if key in ('extra_compile_args'): continue
@@ -387,7 +389,7 @@ class Extension(DistutilsExtension):
 class Library (Extension):
   """A class to compile a pure C++ code library used within and outside an extension using CMake."""
 
-  def __init__(self, name, sources, package_directory, target_directory, version, bob_packages = [], packages = [], include_dirs = [], libraries = [], library_dirs = [], define_macros = []):
+  def __init__(self, name, sources, package_directory, target_directory, version, bob_packages = [], packages = [], boost_modules=[], include_dirs = [], libraries = [], library_dirs = [], define_macros = []):
     """Initializes a pure C++ library that will be compiled with CMake.
 
     By default, the include directory of this package is automatically added to the ``include_dirs``.
@@ -431,6 +433,9 @@ class Library (Extension):
       A list of pkg-config based packages, see :py:class:`Extension`.
       Macros, libraries and include directories of these packages will be automatically added.
 
+    boost_modules : [string]
+      A list of boost modules that we need to link against.
+
     include_dirs : [string]
       An additional list of include directories that is not covered by ``bob_packages`` and ``packages``
 
@@ -443,36 +448,36 @@ class Library (Extension):
     define_macros : [(string, string)]
       An additional list of preprocessor definitions that is not covered by ``packages``
     """
-    self.name = name
-    self.package_directory = package_directory
-    self.target_directory = target_directory
-    self.sources = sources
-    self.version = version
-    self.include_directories = [os.path.join(target_directory, 'include')] + include_dirs
-    self.libraries = libraries[:]
-    self.library_directories = library_dirs[:]
-    self.define_macros = define_macros[:]
+    self.c_name = name
+    self.c_package_directory = package_directory
+    self.c_target_directory = target_directory
+    self.c_sources = sources
+    self.c_version = version
+    self.c_include_directories = [os.path.join(target_directory, 'include')] + include_dirs
+    self.c_libraries = libraries[:]
+    self.c_library_directories = library_dirs[:]
+    self.c_define_macros = define_macros[:]
 
-    # add includes and libs for bob packages
+    # add includes and libs for bob packages as the PREFERRED path (i.e., in front)
     bob_includes, bob_libraries, bob_library_dirs = get_bob_libraries(bob_packages)
-    self.include_directories.extend(bob_includes)
-    self.libraries.extend(bob_libraries)
-    self.library_directories.extend(bob_library_dirs)
+    self.c_include_directories = bob_includes + self.c_include_directories
+    self.c_libraries = bob_libraries + self.c_libraries
+    self.c_library_directories = bob_library_dirs + self.c_library_directories
 
     # find the cmake executable
     cmake = find_executable("cmake")
     if not cmake:
       raise IOError("The Library class needs CMake version >= 2.8 to be installed, but CMake cannot be found")
-    self.cmake = cmake[0]
+    self.c_cmake = cmake[0]
 
     # call base class constructor, i.e., to handle the packages
-    Extension.__init__(self, name, sources, packages=packages)
+    Extension.__init__(self, name, sources, packages=packages, boost_modules=boost_modules)
 
     # add the include directories for the packages as well
-    self.include_directories.extend(self.pkg_includes)
-    self.libraries.extend(self.pkg_libraries)
-    self.library_directories.extend(self.pkg_library_directories)
-    self.define_macros.extend(self.pkg_macros)
+    self.c_include_directories.extend(self.pkg_includes)
+    self.c_libraries.extend(self.pkg_libraries)
+    self.c_library_directories.extend(self.pkg_library_directories)
+    self.c_define_macros.extend(self.pkg_macros)
 
 
   def compile(self, build_directory, build_type = "RELEASE", compiler = None):
@@ -483,16 +488,16 @@ class Library (Extension):
     """
     # generate CMakeLists.txt makefile
     generator = CMakeListsGenerator(
-      name = self.name,
-      sources = self.sources,
-      target_directory = self.target_directory,
-      version = self.version,
-      include_directories = uniq(self.include_directories),
-      libraries = uniq(self.libraries),
-      library_directories = uniq(self.library_directories),
-      macros = uniq(self.define_macros)
+      name = self.c_name,
+      sources = self.c_sources,
+      target_directory = self.c_target_directory,
+      version = self.c_version,
+      include_directories = uniq(self.c_include_directories),
+      libraries = uniq(self.c_libraries),
+      library_directories = uniq(self.c_library_directories),
+      macros = uniq(self.c_define_macros)
     )
-    generator.generate(self.package_directory)
+    generator.generate(self.c_package_directory)
 
     # compile in the build directory
     import subprocess
@@ -501,7 +506,7 @@ class Library (Extension):
     if compiler is not None:
       env['CXX'] = compiler
     # configure cmake
-    command = [self.cmake, self.package_directory, '-DCMAKE_BUILD_TYPE=%s' % build_type]
+    command = [self.c_cmake, self.c_package_directory, '-DCMAKE_BUILD_TYPE=%s' % build_type]
     subprocess.call(command, cwd=build_directory, env=env)
     # run make
     subprocess.call(['make'], cwd=build_directory, env=env)
@@ -540,8 +545,8 @@ class build_ext(_build_ext):
         if not os.path.exists(build_dir): os.makedirs(build_dir)
         # compile
         ext.compile(build_dir)
-        lib_dirs.append(ext.target_directory)
-        include_dirs.append(os.path.join(ext.target_directory, 'include'))
+        lib_dirs.append(ext.c_target_directory)
+        include_dirs.append(os.path.join(ext.c_target_directory, 'include'))
 
     # now, we keep only the extensions that are python extensions
     self.extensions = [ext for ext in self.extensions if not isinstance(ext, Library)]

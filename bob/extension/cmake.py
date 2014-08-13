@@ -98,6 +98,9 @@ class CMakeListsGenerator:
       # add include directories
       for directory in self.includes:
         f.write('include_directories(SYSTEM %s)\n' % directory)
+      # add link directories
+      for directory in self.library_directories:
+        f.write('link_directories(%s)\n' % directory)
       # add defines
       for macro in self.macros:
         f.write('add_definitions(-D%s=%s)\n' % macro)
@@ -106,8 +109,6 @@ class CMakeListsGenerator:
       f.write('set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE SOVERSION "%s" VERSION "%s")\n\n' % (self.version.split('.')[0], '.'.join(self.version.split('.')[:2])))
       f.write('set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY %s)\n' % self.target_directory)
       # link libraries
-      for directory in self.library_directories:
-        f.write('link_directories(%s)\n' % directory)
       if self.libraries:
         f.write('target_link_libraries(${PROJECT_NAME} %s)\n\n' % " ".join(self.libraries))
 
