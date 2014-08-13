@@ -109,5 +109,5 @@ class CMakeListsGenerator:
       for directory in self.library_directories:
         f.write('link_directories(%s)\n' % directory)
       if self.libraries:
-        f.write('target_link_libraries(${PROJECT_NAME} %s\n\n' % " ".join(self.libraries))
+        f.write('target_link_libraries(${PROJECT_NAME} %s)\n\n' % " ".join(self.libraries))
 

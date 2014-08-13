@@ -71,7 +71,8 @@ class boost:
     found = False
 
     if not requirement:
-      self.include_directory = os.path.dirname(candidates[0])
+      # since we use boost headers **including the boost/ directory**, we need to go one level lower
+      self.include_directory = os.path.dirname(os.path.dirname(candidates[0]))
       self.version = boost_version(candidates[0])
       found = True
 

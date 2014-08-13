@@ -283,7 +283,10 @@ class Extension(DistutilsExtension):
       parameters['extra_compile_args'] += ['-Wno-#warnings']
 
     user_includes = kwargs.get('include_dirs', [])
-    pkg_includes = []
+    self.pkg_includes = []
+    self.pkg_libraries = []
+    self.pkg_library_directories = []
+    self.pkg_macros = []
 
     # Updates for boost
     if boost_req:
@@ -298,13 +301,15 @@ class Extension(DistutilsExtension):
         parameters['extra_compile_args'].extend([
           '-isystem', boost_pkg.include_directory
           ])
-        pkg_includes.append(boost_pkg.include_directory)
+        self.pkg_includes.append(boost_pkg.include_directory)
 
       # Adds specific boost libraries requested by the user
       if boost_modules:
         boost_libdirs, boost_libraries = boost_pkg.libconfig(boost_modules)
         parameters['library_dirs'].extend(boost_libdirs)
+        self.pkg_library_directories.extend(boost_libdirs)
         parameters['libraries'].extend(boost_libraries)
+        self.pkg_libraries.extend(boost_libraries)
 
     # Checks all other pkg-config requirements
     pkgs = check_packages(packages)
@@ -313,15 +318,16 @@ class Extension(DistutilsExtension):
 
       # Adds parameters for each package, in order
       parameters['define_macros'] += pkg.package_macros()
+      self.pkg_macros += pkg.package_macros()
 
       # Include directories are added with a special path
       for k in pkg.include_directories():
-        if k in user_includes or k in pkg_includes: continue
+        if k in user_includes or k in self.pkg_includes: continue
         parameters['extra_compile_args'].extend(['-isystem', k])
-        pkg_includes.append(k)
+        self.pkg_includes.append(k)
 
-      parameters['define_macros'] += pkg.package_macros()
       parameters['library_dirs'] += pkg.library_directories()
+      self.pkg_library_directories += pkg.library_directories()
 
       if pkg.name.find('bob-') == 0: # one of bob's packages
 
@@ -339,6 +345,7 @@ class Extension(DistutilsExtension):
         libs = pkg.libraries()
 
       parameters['libraries'] += libs
+      self.pkg_libraries += libs
 
     # Filter and make unique
     for key in parameters.keys():
@@ -376,20 +383,66 @@ class Extension(DistutilsExtension):
     # Run the constructor for the base class
     DistutilsExtension.__init__(self, name, sources, **kwargs)
 
-    # post-process the options since
-    # there is an erroneous '-Wstrict-prototypes' in the environment options
-    # see http://stackoverflow.com/questions/8106258/cc1plus-warning-command-line-option-wstrict-prototypes-is-valid-for-ada-c-o
-    # note: this seems to work for python 2 only; for python 3, we still get the warnings...
-    import distutils.sysconfig
-    opt = distutils.sysconfig.get_config_var('OPT')
-    os.environ['OPT'] = " ".join(flag for flag in opt.split() if flag != '-Wstrict-prototypes')
-
 
 class Library (Extension):
   """A class to compile a pure C++ code library used within and outside an extension using CMake."""
 
-  def __init__(self, name, sources, package_directory, target_directory, version, include_dirs = [], libraries = [], library_dirs = [], define_macros = [], bob_packages = []):
-    """TODO: document"""
+  def __init__(self, name, sources, package_directory, target_directory, version, bob_packages = [], packages = [], include_dirs = [], libraries = [], library_dirs = [], define_macros = []):
+    """Initializes a pure C++ library that will be compiled with CMake.
+
+    By default, the include directory of this package is automatically added to the ``include_dirs``.
+    It is expected to be ``target_directory + '/include'``.
+
+    .. note::
+      This directory is also automatically added to **all other** :py:class:`Extension`'s that are compiled within this package.
+
+    .. warning::
+      IMPORTANT! To compile this library with CMake, the :py:class:`build_ext` class provided in this module is required.
+      Please include::
+
+        cmdclass = {
+          'build_ext': build_ext
+        },
+
+      as a parameter to the ``setup`` function in your setup.py.
+
+    Keyword parameters:
+
+    name : string
+      The name of the library to generate, e.g., ``'bob_core'``
+
+    sources : [string]
+      A list of files (relative to the base directory) that should be compiled and linked by CMake
+
+    package_directory : string
+      The directory of the package, where the source files can be found
+
+    target_directory : string
+      The directory where the generated library should be placed
+
+    version : string
+      The version of the library, which is usually identical to the version of the package
+
+    bob_packages : [string]
+      A list of bob packages that the pure C++ code relies on.
+      Libraries and include directories of these packages will be automatically added.
+
+    packages : [string]
+      A list of pkg-config based packages, see :py:class:`Extension`.
+      Macros, libraries and include directories of these packages will be automatically added.
+
+    include_dirs : [string]
+      An additional list of include directories that is not covered by ``bob_packages`` and ``packages``
+
+    libraries : [string]
+      An additional list of libraries that is not covered by ``bob_packages`` and ``packages``
+
+    library_dirs : [string]
+      An additional list of library directories that is not covered by ``bob_packages`` and ``packages``
+
+    define_macros : [(string, string)]
+      An additional list of preprocessor definitions that is not covered by ``packages``
+    """
     self.name = name
     self.package_directory = package_directory
     self.target_directory = target_directory
@@ -412,22 +465,32 @@ class Library (Extension):
       raise IOError("The Library class needs CMake version >= 2.8 to be installed, but CMake cannot be found")
     self.cmake = cmake[0]
 
-    # call base class constructor
-    Extension.__init__(self, name, sources)
+    # call base class constructor, i.e., to handle the packages
+    Extension.__init__(self, name, sources, packages=packages)
+
+    # add the include directories for the packages as well
+    self.include_directories.extend(self.pkg_includes)
+    self.libraries.extend(self.pkg_libraries)
+    self.library_directories.extend(self.pkg_library_directories)
+    self.define_macros.extend(self.pkg_macros)
 
 
   def compile(self, build_directory, build_type = "RELEASE", compiler = None):
-    """TODO: document"""
+    """This function will automatically create a CMakeLists.txt file in the ``package_directory`` including the required information.
+    Afterwards, the library is built using CMake in the given ``build_directory``.
+    By default, the build type is RELEASE, and the compiler is the default CMake compiler.
+    To change this, use the ``build_type`` and ``compiler`` parameters.
+    """
     # generate CMakeLists.txt makefile
     generator = CMakeListsGenerator(
       name = self.name,
       sources = self.sources,
       target_directory = self.target_directory,
       version = self.version,
-      include_directories = self.include_directories,
-      libraries = self.libraries,
-      library_directories = self.library_directories,
-      macros = self.define_macros
+      include_directories = uniq(self.include_directories),
+      libraries = uniq(self.libraries),
+      library_directories = uniq(self.library_directories),
+      macros = uniq(self.define_macros)
     )
     generator.generate(self.package_directory)
 
@@ -445,7 +508,7 @@ class Library (Extension):
 
 
 class build_ext(_build_ext):
-  """Compile the C++ Extensions using CMake, and the python extensions afterwards
+  """Compile the C++ :py:class`Library`'s using CMake, and the python extensions afterwards
 
   See the documentation for :py:class:`distutils.command.build_ext` for more
   information.
@@ -454,11 +517,16 @@ class build_ext(_build_ext):
   def run(self):
     """Iterates through the list of Extension packages and:
 
-    * compiles the code using an external function, if provided
-    * copies generated libraries to the package directory
-    * adapts the linker path, if internal packages are linked
-    """
+    1. compiles all pure C++ :py:class:`Library`'s
+    2. adds the according include and library directories so that other Extensions can find the newly generated libs
 
+       .. note::
+         This function **does not** add the library itself.
+         To link the generated library into another Extension, add this lib in the list of ``libraries``.
+
+    3. compiles the remaining extensions using the default extension mechanism
+
+    """
     lib_dirs = []
     include_dirs = []
     # iterate through the extensions
@@ -466,6 +534,7 @@ class build_ext(_build_ext):
       # check if it is our type of extension
       if isinstance(ext, Library):
         # TODO: get compiler and add it to the compiler
+        # TODO: get the debug status and add the build_type parameter
         # build libraries using the provided functions
         build_dir = os.path.join(self.build_lib, ext.name)
         if not os.path.exists(build_dir): os.makedirs(build_dir)
