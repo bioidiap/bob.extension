@@ -10,6 +10,7 @@ import os
 import sys
 import shutil
 import nose.tools
+import platform
 
 import bob.extension
 import pkg_resources
@@ -82,11 +83,14 @@ def test_library():
   library.compile(compile_dir)
 
   # check that the library was generated sucessfully
-  lib_name = 'libbob_cmake_test.so'
-  # TODO: change lib name for MacOS
-  assert os.path.exists(os.path.join(target_dir, lib_name))
-  assert os.path.exists(os.path.join(target_dir, lib_name + ".3"))
-  assert os.path.exists(os.path.join(target_dir, lib_name + ".3.2"))
+  if platform.system() == 'Darwin':
+    lib_name = 'libbob_cmake_test.%sdylib'
+  else:
+    lib_name = 'libbob_cmake_test.so%s'
+
+  assert os.path.exists(os.path.join(target_dir, lib_name % ""))
+  assert os.path.exists(os.path.join(target_dir, lib_name % ".3"))
+  assert os.path.exists(os.path.join(target_dir, lib_name % ".3.2"))
 
   # TODO: compile a test executable to actually link the library
 
