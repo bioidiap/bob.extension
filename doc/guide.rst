@@ -42,7 +42,7 @@ Anatomy of a buildout Python package
 ------------------------------------
 
 The best way to create your package is to download a `skeleton from the Idiap
-github website <https://github.com/idiap/bob.project.example>`_ and build on
+GitHub website <https://github.com/idiap/bob.project.example>`_ and build on
 it, modifying what you need. Fire-up a shell window and than do this:
 
 .. code-block:: sh
@@ -162,7 +162,7 @@ Everything is now setup for you to continue the development of this package.
 Modify all required files to setup your own package name, description and
 dependencies. Start adding files to your library (or libraries) and, if you
 wish, make this package available in a place with public access to make your
-research public. We recommend using Github. Optionally, `drop-us a message
+research public. We recommend using GitHub. Optionally, `drop-us a message
 <https://groups.google.com/d/forum/bob-devel>`_ talking about the availability
 of this package so we can add it to the growing list of `Satellite Packages`_.
 
@@ -175,7 +175,7 @@ so that you include the following:
 .. code-block:: python
 
   from setuptools import setup, find_packages, dist
-  dist.Distribution(dict(setup_requires=['bob.blitz']))
+  dist.Distribution(dict(setup_requires=['bob.blitz', 'bob.core', 'bob.math']))
   from bob.blitz.extension import Extension
   ...
 
@@ -200,23 +200,107 @@ so that you include the following:
           "bob/myext/ext/file2.cpp",
           "bob/myext/ext/main.cpp",
         ],
-        packages = [ #other c/c++ api dependences
-          'bob-math',
-          'bob-sp',
-          ]
-        ),
+        bob_packages = [ #packages of bob to compile and link against
+          'bob.core',
+          'bob.math',
+        ],
+        packages = [ #other c/c++ api dependencies
+          'boost',
+        ],
+        boost_modules = [ # list of boost modules that should be linked
+          'filesystem'
+        ]
+      ),
       ... #add more extensions if you wish
     ],
 
     ...
-    )
+  )
 
-These modifications will allow you to compile extensions that are linked
-against our core Python-C++ bridge ``bob.blitz``. You can specify any
-``pkg-config`` module and that will be linked in (for example, ``bob-ip`` or
-``opencv``) using the ``packages`` setting as shown above.  Other modules and
-options can be set manually using `the standard options for python extensions
-<http://docs.python.org/2/extending/building.html>`_.
+These modifications will allow you to compile extensions that are linked against our core Python-C++ bridge ``bob.blitz`` (be default), as well as ``bob.core`` and ``bob.math``.
+You can specify any other ``pkg-config`` module and that will be linked in (for example, ``boost`` or ``opencv``) using the ``packages`` setting as shown above.
+Other modules and options can be set manually using `the standard options for python extensions <http://docs.python.org/2/extending/building.html>`_.
+
+Most of the bob packages come with pure C++ code and python bindings.
+When your library compiles and links against the pure C++ code, you can simply use the ``bob_packages`` as above.
+This will automatically add the desired include and library directories, as well as the libraries and the required preprocessor options.
+
+.. note::
+  All ``bob_packages`` that you list have to be listed in the ``setup_requires`` line as in the second line of the above example.
+
+
+Pure C++ Libraries Inside your Package
+======================================
+
+If you want to provide a library with pure C++ code in your package as well, you can use the :py:class:`bob.extension.Library` class.
+It will automatically compile your C++ code using `CMake <http://www.cmake.org>`_ into a shared library that you can import in your own C++/Python bindings, as well as in other packages.
+
+To generate a Library, simply add it in the list of ``ext_modules``:
+
+
+.. code-block:: python
+
+  from setuptools import setup, find_packages, dist
+  dist.Distribution(dict(setup_requires=['bob.blitz', 'bob.core', 'bob.math']))
+  from bob.blitz.extension import Extension, Library, build_ext
+  ...
+
+  setup(
+
+    name="bob.myext",
+    version="1.0.0",
+    ...
+    install_requires=[
+      'setuptools',
+      'bob.blitz',
+    ],
+    ...
+    namespace_packages=[
+      'bob',
+    ],
+    ...
+    ext_modules=[
+      Library("bob_myext",
+        [
+          "bob/myext/cpp/pure_cpp_file1.cpp",
+          "bob/myext/cpp/pure_cpp_file2.cpp",
+        ],
+        package_directory = os.path.dirname(os.path.realpath(__file__)),
+        target_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'bob', 'myext'),
+        version = "1.0.0",
+        bob_packages = [...],
+        packages = [...],
+      ),
+
+      Extension("bob.myext._myext",
+        ...
+        libraries = ['bob_myext']
+      ),
+      ... #add more extensions if you wish
+    ],
+
+    cmdclass = {
+      'build_ext': build_ext
+    },
+
+    ...
+  )
+
+
+The :py:class:`bob.extension.Library` class has mostly the same parameters as the :py:class:`bob.extension.Extension` class, but additionally two directories have to be specified:
+
+* ``package_directory`` : The directory of **this** package. Here, the ``CMakeLists.txt`` file will be generated. The ``sources`` files should be relative to this directory.
+* ``target_directory`` : The directory, where the generated libraries should be put. Usually it is selected to be in the topmost package directory, i.e., ``bob/myext/`` in the example above.
+
+To avoid later complications, you should follow two guidelines for bob packages:
+
+1. The name of the C++ library need to be identical to the name of your package (replacing the '.' by '_'). In this way it is assured that the libraries are found by the ``bob_packages`` parameter (see above).
+2. All header files that your C++ library should export need to be placed in the directory ``bob/myext/include/bob.myext``. Again, this is the default directory, where the ``bob_packages`` expect the includes to be.
+
+.. note::
+  Please note that we import both the :py:class:`bob.extension.Library` and the :py:class:`bob.extension.build_ext` classes from ``bob.extension``.
+  When a :py:class:`bob.extension.Library` is inside the list of ``ext_modules``, the ``cmd_class = {'build_ext': build_ext}`` parameter to the ``setup.py`` is required to be added.
+
 
 Documenting your C/C++ Python Extension
 =======================================
@@ -417,7 +501,7 @@ Document Generation and Unit Testing
 If you intend to distribute your newly created package, please consider
 carefully documenting and creating unit tests for your package. Documentation
 is a great starting point for users and unit tests can be used to check
-funcionality in unexpected circumstances such as variations in package
+functionality in unexpected circumstances such as variations in package
 versions.
 
 Documentation
@@ -454,7 +538,7 @@ Unit Tests
 
 Writing unit tests is an important asset on code that needs to run in different
 platforms and a great way to make sure all is OK. Test units are run with
-`nose`_. To run the test unitson your package:
+`nose`_. To run the test units on your package:
 
 .. code-block:: sh
 
