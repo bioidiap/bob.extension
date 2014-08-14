@@ -37,7 +37,7 @@ so that you include the following::
 
   from setuptools import dist
   dist.Distribution(dict(setup_requires=['bob.extension']))
-  from bob.extension import Extension
+  from bob.extension import Extension, Library, build_ext
 
   ...
 
@@ -61,23 +61,74 @@ so that you include the following::
         ],
         packages = [ #pkg-config modules to append
           'blitz>=0.10',
-          ],
+        ],
+        bob_packages = [ #optionally, bob C++ modules to import
+          "bob.core"
+        ],
         include_dirs = [ #optionally, include directories
           "bob/myext/ext/headers/",
-          ],
-        ),
+        ],
+      ),
       ... #add more extensions if you wish
     ],
 
+    cmdclass = {
+      'build_ext': build_ext
+    },
+
     ...
-    )
+  )
 
 These modifications will allow you to compile extensions that are linked
 against the named ``pkg-config`` modules. Other modules and options can be set
 manually using `the standard options for python extensions
-<http://docs.python.org/2/extending/building.html>`_. To hook-in the building
-on the package through ``zc.buildout``, add the following section to your
-``buildout.cfg``::
+<http://docs.python.org/2/extending/building.html>`_.
+
+Adding pure C++ libraries
+-------------------------
+
+Most of the bob packages will include pure C++ code that can be used in other packages.
+When your package should export a library with pure C++ code as well, you can build it with the ``Library`` extension.
+You can simply add this ``Library`` to the list of ``ext_modules`` as follows::
+
+  setup(
+    ...
+    ext_modules=[
+      Library("bob_myext",
+        [
+          "bob/myext/ext/cpp/cppfile1.cpp",
+          "bob/myext/ext/cpp/cppfile2.cpp",
+        ],
+        package_directory = os.path.dirname(os.path.realpath(__file__)),
+        target_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'bob', 'myext'),
+        version = "1.0.0",
+        bob_packages = [...],
+        packages = [...],
+        ...
+      ),
+      Extension("bob.my_ext._myext",
+        ...
+        libraries = ["bob_myext",...]
+      )
+    ],
+
+    cmdclass = {
+      'build_ext': build_ext
+    },
+
+    ...
+  )
+
+This will compile the given source files of the library using `CMake <http://www.cmake.org>`_.
+Please assure that the name of the library ``bob_myext`` is compatible with your package name so that the library can be imported in other packages using the ``bob_packages`` list.
+
+Also, it is assumed that **all** header files that are exported by the C++ library are listed in the *bob/myext/include* directory.
+This directory is automatically added to the list of include directories -- in your own package and in all other packages that use the ``bob_packages`` list.
+
+Compiling the module
+--------------------
+
+To hook-in the building on the package through ``zc.buildout``, add the following section to your ``buildout.cfg``::
 
   [bob.myext]
   recipe = bob.buildout:develop

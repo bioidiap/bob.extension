@@ -467,7 +467,7 @@ class Library (Extension):
     # find the cmake executable
     cmake = find_executable("cmake")
     if not cmake:
-      raise IOError("The Library class needs CMake version >= 2.8 to be installed, but CMake cannot be found")
+      raise OSError("The Library class needs CMake version >= 2.8 to be installed, but CMake cannot be found")
     self.c_cmake = cmake[0]
 
     # call base class constructor, i.e., to handle the packages
@@ -507,9 +507,11 @@ class Library (Extension):
       env['CXX'] = compiler
     # configure cmake
     command = [self.c_cmake, self.c_package_directory, '-DCMAKE_BUILD_TYPE=%s' % build_type]
-    subprocess.call(command, cwd=build_directory, env=env)
+    if subprocess.call(command, cwd=build_directory, env=env) != 0:
+      raise OSError("Could not generate makefiles with CMake")
     # run make
-    subprocess.call(['make'], cwd=build_directory, env=env)
+    if subprocess.call(['make'], cwd=build_directory, env=env) != 0:
+      raise OSError("CMake compilation stopped with an error; stopping ...")
 
 
 class build_ext(_build_ext):

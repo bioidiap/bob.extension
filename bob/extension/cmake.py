@@ -70,11 +70,30 @@ class CMakeListsGenerator:
 
     Keyword parameters:
 
-    name
+    name : string
       The name of the library to generate
+
+    sources : [string]
+      The list of source files that should be compiled with CMake
+
+    target_directory : [string]
+      The directory where the final library should be placed
 
     version
       The version of the library, major.minor.patch
+
+    include_directories : [string]
+      A list of include directories required to compile the ``sources``
+
+    libraries : [string]
+      A list of libraries to be linked into the generated library
+
+    library_directories : [string]
+      A list of directories, where the ``libraries`` can be found.
+      Note that the order of this list might be important.
+
+    macros : [(string, string)]
+      A list of preprocessor defines ``name=value`` that will be added to the compilation
     """
 
     self.name = name
@@ -106,8 +125,8 @@ class CMakeListsGenerator:
         f.write('add_definitions(-D%s=%s)\n' % macro)
       # compile this library
       f.write('\nadd_library(${PROJECT_NAME} \n\t' + "\n\t".join(self.sources) + '\n)\n')
-      f.write('set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE SOVERSION "%s" VERSION "%s")\n\n' % (self.version.split('.')[0], '.'.join(self.version.split('.')[:2])))
-      f.write('set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY %s)\n' % self.target_directory)
+      f.write('set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE SOVERSION "%s" VERSION "%s")\n' % (self.version.split('.')[0], '.'.join(self.version.split('.')[:2])))
+      f.write('set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY %s)\n\n' % self.target_directory)
       # link libraries
       if self.libraries:
         f.write('target_link_libraries(${PROJECT_NAME} %s)\n\n' % " ".join(self.libraries))
