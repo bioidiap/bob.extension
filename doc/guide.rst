@@ -237,7 +237,6 @@ It will automatically compile your C++ code using `CMake <http://www.cmake.org>`
 
 To generate a Library, simply add it in the list of ``ext_modules``:
 
-
 .. code-block:: python
 
   from setuptools import setup, find_packages, dist
@@ -260,23 +259,16 @@ To generate a Library, simply add it in the list of ``ext_modules``:
     ],
     ...
     ext_modules=[
-      Library("bob_myext",
+      Library("bob.myext.bob_myext",
         [
           "bob/myext/cpp/pure_cpp_file1.cpp",
           "bob/myext/cpp/pure_cpp_file2.cpp",
         ],
-        package_directory = os.path.dirname(os.path.realpath(__file__)),
-        target_directory = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'bob', 'myext'),
         version = "1.0.0",
         bob_packages = [...],
         packages = [...],
       ),
-
-      Extension("bob.myext._myext",
-        ...
-        libraries = ['bob_myext']
-      ),
-      ... #add more extensions if you wish
+      ... #add more Extensions if you wish
     ],
 
     cmdclass = {
@@ -287,19 +279,23 @@ To generate a Library, simply add it in the list of ``ext_modules``:
   )
 
 
-The :py:class:`bob.extension.Library` class has mostly the same parameters as the :py:class:`bob.extension.Extension` class, but additionally two directories have to be specified:
-
-* ``package_directory`` : The directory of **this** package. Here, the ``CMakeLists.txt`` file will be generated. The ``sources`` files should be relative to this directory.
-* ``target_directory`` : The directory, where the generated libraries should be put. Usually it is selected to be in the topmost package directory, i.e., ``bob/myext/`` in the example above.
-
+The :py:class:`bob.extension.Library` class has mostly the same parameters as the :py:class:`bob.extension.Extension` class.
 To avoid later complications, you should follow two guidelines for bob packages:
 
-1. The name of the C++ library need to be identical to the name of your package (replacing the '.' by '_'). In this way it is assured that the libraries are found by the ``bob_packages`` parameter (see above).
-2. All header files that your C++ library should export need to be placed in the directory ``bob/myext/include/bob.myext``. Again, this is the default directory, where the ``bob_packages`` expect the includes to be.
+1. The name of the C++ library need to be identical to the name of your package (replacing the '.' by '_').
+   Also, the package name need to be part of it.
+   For example, to create a library for the ``bob.core`` package, it should be called ``bob.core.bob_core``.
+   In this way it is assured that the libraries are found by the ``bob_packages`` parameter (see above).
+
+2. All header files that your C++ library should export need to be placed in the directory ``bob/myext/include/bob.myext``.
+   Again, this is the default directory, where the ``bob_packages`` expect the includes to be.
 
 .. note::
   Please note that we import both the :py:class:`bob.extension.Library` and the :py:class:`bob.extension.build_ext` classes from ``bob.extension``.
   When a :py:class:`bob.extension.Library` is inside the list of ``ext_modules``, the ``cmd_class = {'build_ext': build_ext}`` parameter to the ``setup.py`` is required to be added.
+
+The newly generated Library will be automatically linked to **all other** Extensions in the package.
+No worries, if the library is not used in the extension, the linker should be able to figure that out...
 
 
 Documenting your C/C++ Python Extension

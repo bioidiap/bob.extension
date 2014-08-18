@@ -208,7 +208,6 @@ class Extension(DistutilsExtension):
     parameter to the standard arguments of the constructor:
 
     packages : [string]
-
       This should be a list of strings indicating the name of the bob
       (pkg-config) modules you would like to have linked to your extension
       **additionally** to ``bob-python``. Candidates are module names like
@@ -220,10 +219,13 @@ class Extension(DistutilsExtension):
     boost_modules : [string]
       A list of boost modules that we need to link against.
 
-    bob_packages: [string]
-
+    bob_packages : [string]
       A list of bob libraries (such as ``'bob.core'``) containing C++ code
       that should be included and linked
+
+    system_include_dirs : [string]
+      A list of include directories that are not in one of our packages,
+      and which should be included with the -isystem compiler option
 
     """
 
@@ -247,6 +249,13 @@ class Extension(DistutilsExtension):
       self.bob_packages = None
 
     bob_includes, bob_libraries, bob_library_dirs = get_bob_libraries(self.bob_packages)
+
+    # system include directories
+    if 'system_include_dirs' in kwargs and kwargs['system_include_dirs']:
+      system_includes = kwargs['system_include_dirs']
+      del kwargs['system_include_dirs']
+    else:
+      system_includes = []
 
     # Boost requires a special treatment
     boost_req = ''
@@ -301,9 +310,7 @@ class Extension(DistutilsExtension):
 
       # Adds the include directory (enough for using just the template library)
       if boost_pkg.include_directory not in user_includes:
-        parameters['extra_compile_args'].extend([
-          '-isystem', boost_pkg.include_directory
-          ])
+        system_includes.append(boost_pkg.include_directory)
         self.pkg_includes.append(boost_pkg.include_directory)
 
       # Adds specific boost libraries requested by the user
@@ -326,7 +333,7 @@ class Extension(DistutilsExtension):
       # Include directories are added with a special path
       for k in pkg.include_directories():
         if k in user_includes or k in self.pkg_includes: continue
-        parameters['extra_compile_args'].extend(['-isystem', k])
+        system_includes.append(k)
         self.pkg_includes.append(k)
 
       parameters['library_dirs'] += pkg.library_directories()
@@ -349,6 +356,10 @@ class Extension(DistutilsExtension):
 
       parameters['libraries'] += libs
       self.pkg_libraries += libs
+
+    # add the -isystem to all system include dirs
+    for k in system_includes:
+      parameters['extra_compile_args'].extend(['-isystem', k])
 
     # Filter and make unique
     for key in parameters.keys():
@@ -389,14 +400,14 @@ class Extension(DistutilsExtension):
 class Library (Extension):
   """A class to compile a pure C++ code library used within and outside an extension using CMake."""
 
-  def __init__(self, name, sources, package_directory, target_directory, version, bob_packages = [], packages = [], boost_modules=[], include_dirs = [], libraries = [], library_dirs = [], define_macros = []):
+  def __init__(self, name, sources, version, bob_packages = [], packages = [], boost_modules=[], include_dirs = [], system_include_dirs = [], libraries = [], library_dirs = [], define_macros = []):
     """Initializes a pure C++ library that will be compiled with CMake.
 
     By default, the include directory of this package is automatically added to the ``include_dirs``.
-    It is expected to be ``target_directory + '/include'``.
+    It is expected to be in the `include`` directory in the main package directory (which, e.g., is ``bob/core`` for package ``bob.core``).
 
     .. note::
-      This directory is also automatically added to **all other** :py:class:`Extension`'s that are compiled within this package.
+      This library, including the library and include directories, is also automatically added to **all other** :py:class:`Extension`'s that are compiled within this package.
 
     .. warning::
       IMPORTANT! To compile this library with CMake, the :py:class:`build_ext` class provided in this module is required.
@@ -411,16 +422,10 @@ class Library (Extension):
     Keyword parameters:
 
     name : string
-      The name of the library to generate, e.g., ``'bob_core'``
+      The name of the library to generate, e.g., ``'bob.core.bob_core'``
 
     sources : [string]
       A list of files (relative to the base directory) that should be compiled and linked by CMake
-
-    package_directory : string
-      The directory of the package, where the source files can be found
-
-    target_directory : string
-      The directory where the generated library should be placed
 
     version : string
       The version of the library, which is usually identical to the version of the package
@@ -439,6 +444,10 @@ class Library (Extension):
     include_dirs : [string]
       An additional list of include directories that is not covered by ``bob_packages`` and ``packages``
 
+    system_include_dirs : [string]
+      A list of include directories that are not in one of our packages,
+      and which should be included with the SYSTEM option
+
     libraries : [string]
       An additional list of libraries that is not covered by ``bob_packages`` and ``packages``
 
@@ -448,12 +457,16 @@ class Library (Extension):
     define_macros : [(string, string)]
       An additional list of preprocessor definitions that is not covered by ``packages``
     """
-    self.c_name = name
-    self.c_package_directory = package_directory
-    self.c_target_directory = target_directory
+    name_split = name.split('.')
+    if len(name_split) <= 1:
+      raise ValueError("The name of the library must contain the package name, e.g., bob.core.bob_core")
+    self.c_name = name_split[-1]
+    self.c_package_directory = os.path.realpath('.')
+    self.c_target_directory = os.path.join(self.c_package_directory, os.path.join(*(name_split[:-1])))
     self.c_sources = sources
     self.c_version = version
-    self.c_include_directories = [os.path.join(target_directory, 'include')] + include_dirs
+    self.c_include_directories = [os.path.join(self.c_target_directory, 'include')] + include_dirs
+    self.c_system_include_directories = system_include_dirs
     self.c_libraries = libraries[:]
     self.c_library_directories = library_dirs[:]
     self.c_define_macros = define_macros[:]
@@ -480,11 +493,11 @@ class Library (Extension):
     self.c_define_macros.extend(self.pkg_macros)
 
 
-  def compile(self, build_directory, build_type = "RELEASE", compiler = None):
+  def compile(self, build_directory, compiler = None):
     """This function will automatically create a CMakeLists.txt file in the ``package_directory`` including the required information.
     Afterwards, the library is built using CMake in the given ``build_directory``.
-    By default, the build type is RELEASE, and the compiler is the default CMake compiler.
-    To change this, use the ``build_type`` and ``compiler`` parameters.
+    The build type is automatically taken from the debug option in the buildout.cfg.
+    To change the compiler, use the ``compiler`` parameter.
     """
     # generate CMakeLists.txt makefile
     generator = CMakeListsGenerator(
@@ -493,6 +506,7 @@ class Library (Extension):
       target_directory = self.c_target_directory,
       version = self.c_version,
       include_directories = uniq(self.c_include_directories),
+      system_include_directories = uniq(self.c_system_include_directories),
       libraries = uniq(self.c_libraries),
       library_directories = uniq(self.c_library_directories),
       macros = uniq(self.c_define_macros)
@@ -506,7 +520,7 @@ class Library (Extension):
     if compiler is not None:
       env['CXX'] = compiler
     # configure cmake
-    command = [self.c_cmake, self.c_package_directory, '-DCMAKE_BUILD_TYPE=%s' % build_type]
+    command = [self.c_cmake, self.c_package_directory]
     if subprocess.call(command, cwd=build_directory, env=env) != 0:
       raise OSError("Could not generate makefiles with CMake")
     # run make
@@ -534,6 +548,7 @@ class build_ext(_build_ext):
     3. compiles the remaining extensions using the default extension mechanism
 
     """
+    libs = []
     lib_dirs = []
     include_dirs = []
     # iterate through the extensions
@@ -547,6 +562,7 @@ class build_ext(_build_ext):
         if not os.path.exists(build_dir): os.makedirs(build_dir)
         # compile
         ext.compile(build_dir)
+        libs.append(ext.c_name)
         lib_dirs.append(ext.c_target_directory)
         include_dirs.append(os.path.join(ext.c_target_directory, 'include'))
 
@@ -555,6 +571,7 @@ class build_ext(_build_ext):
 
     # set the DEFAULT library path and include path for all other extensions
     for ext in self.extensions:
+      ext.libraries = libs + (ext.libraries if ext.libraries else [])
       ext.library_dirs = lib_dirs + (ext.library_dirs if ext.library_dirs else [])
       ext.runtime_library_dirs = lib_dirs + (ext.runtime_library_dirs if ext.runtime_library_dirs else [])
       ext.include_dirs = include_dirs + (ext.include_dirs if ext.include_dirs else [])

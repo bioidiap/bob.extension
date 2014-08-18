@@ -38,25 +38,9 @@ HEADER = (
   '  set(COMMON_C_FLAGS "-std=c99")\n'
   'endif()\n'
   '\n'
-  '# For specific builds\n'
-  'set(COMMON_RELEASE_FLAGS "-O2 -mtune=generic -DNDEBUG")\n'
-  '\n'
-  '# Note: CLang does not work well with BZ_DEBUG\n'
-  'set(COMMON_DEBUG_FLAGS "-g -DBOB_DEBUG")\n'
-  '\n'
-  'if(NOT APPLE OR CMAKE_COMPILER_IS_GNUCC) #linux builds or apple+gcc4.2\n'
-  '  set(COMMON_DEBUG_FLAGS "${COMMON_DEBUG_FLAGS} -DBZ_DEBUG")\n'
-  'endif()\n'
-  '\n'
   '# These are used in type checks for cmake, be aware and don\'t change those\n'
-  'set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} ${COMMON_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)\n'
-  'set(CMAKE_C_FLAGS "${COMMON_C_FLAGS} ${COMMON_FLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)\n'
-  '\n'
-  '# Cache into CMake\n'
-  'set(CMAKE_CXX_FLAGS_RELEASE "${COMMON_RELEASE_FLAGS}" CACHE STRING "Flags used by the C++ compiler during release builds" FORCE)\n'
-  'set(CMAKE_C_FLAGS_RELEASE "${COMMON_RELEASE_FLAGS}" CACHE STRING "Flags used by the C compiler during release builds" FORCE)\n'
-  'set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_DEBUG_FLAGS}" CACHE STRING "Flags used by the C++ compiler during debug builds" FORCE)\n'
-  'set(CMAKE_C_FLAGS_DEBUG "${COMMON_DEBUG_FLAGS}" CACHE STRING "Flags used by the compiler C during debug builds" FORCE)\n'
+  'set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} ${COMMON_FLAGS} $ENV{CXXFLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)\n'
+  'set(CMAKE_C_FLAGS "${COMMON_C_FLAGS} ${COMMON_FLAGS} $ENV{CFLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)\n'
   '\n'
   'set(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build shared libs")\n\n'
 )
@@ -65,7 +49,7 @@ HEADER = (
 class CMakeListsGenerator:
   """Generates a CMakeLists.txt file for the given sources, include directories and libraries."""
 
-  def __init__(self, name, sources, target_directory, version = '1.0.0', include_directories = [], libraries = [], library_directories = [], macros = []):
+  def __init__(self, name, sources, target_directory, version = '1.0.0', include_directories = [], system_include_directories=[], libraries = [], library_directories = [], macros = []):
     """Initializes the CMakeLists generator.
 
     Keyword parameters:
@@ -85,6 +69,9 @@ class CMakeListsGenerator:
     include_directories : [string]
       A list of include directories required to compile the ``sources``
 
+    system_include_directories : [string]
+      A list of include directories required to compile the ``sources``, which will be added as SYSTEM includes
+
     libraries : [string]
       A list of libraries to be linked into the generated library
 
@@ -101,6 +88,7 @@ class CMakeListsGenerator:
     self.target_directory = target_directory
     self.version = version
     self.includes = include_directories
+    self.system_includes = system_include_directories
     self.libraries = libraries
     self.library_directories = library_directories
     self.macros = macros
@@ -116,6 +104,8 @@ class CMakeListsGenerator:
       f.write(HEADER)
       # add include directories
       for directory in self.includes:
+        f.write('include_directories(%s)\n' % directory)
+      for directory in self.system_includes:
         f.write('include_directories(SYSTEM %s)\n' % directory)
       # add link directories
       for directory in self.library_directories:
