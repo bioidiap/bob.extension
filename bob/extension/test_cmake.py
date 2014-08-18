@@ -32,6 +32,7 @@ def test_cmake_list():
     target_directory = "test_target",
     version = '3.2.1',
     include_directories = ["/usr/include/test"],
+    system_include_directories = ["/usr/include/test_system"],
     libraries = ['some_library'],
     library_directories = ["/usr/include/test"],
     macros = [("TEST", "MACRO")]
@@ -46,7 +47,8 @@ def test_cmake_list():
 
   # check that all elements are properly written in the file
   assert lines[_find(lines, 'project')] == 'project(bob_cmake_test)'
-  assert lines[_find(lines, 'include')] == 'include_directories(SYSTEM /usr/include/test)'
+  assert lines[_find(lines, 'include')] == 'include_directories(/usr/include/test)'
+  assert lines[_find(lines, 'include_directories(SYSTEM')] == 'include_directories(SYSTEM /usr/include/test_system)'
   assert lines[_find(lines, 'link')] == 'link_directories(/usr/include/test)'
   assert lines[_find(lines, 'add')] == 'add_definitions(-DTEST=MACRO)'
 
@@ -66,13 +68,13 @@ def test_cmake_list():
 def test_library():
   temp_dir = tempfile.mkdtemp(prefix="bob_extension_test_")
   target_dir = os.path.join(temp_dir, 'target')
-  os.makedirs(target_dir)
+  # copy test file to temp directory
+  shutil.copyfile(pkg_resources.resource_filename(__name__, 'test_documentation.cpp'), os.path.join(temp_dir, 'test_documentation.cpp'))
+  os.chdir(temp_dir)
   # check that the library compiles and links properly
   library = bob.extension.Library(
-    name = 'bob_cmake_test',
-    sources = [pkg_resources.resource_filename(__name__, 'test_documentation.cpp')],
-    package_directory = temp_dir,
-    target_directory = target_dir,
+    name = 'target.bob_cmake_test',
+    sources = ['test_documentation.cpp'],
     include_dirs = [pkg_resources.resource_filename(__name__, 'include')],
     version = '3.2.1'
   )
