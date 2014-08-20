@@ -16,7 +16,7 @@ HEADER = (
   '\n'
   '# Force __LP64__ scheme on Mac OSX\n'
   'if(APPLE)\n'
-  '  set(CMAKE_MACOSX_RPATH FALSE CACHE BOOL "Enables the MACOS_RPATH feature for MacOSX builds" FORCE)\n'  
+  '  set(CMAKE_MACOSX_RPATH FALSE CACHE BOOL "Enables the MACOS_RPATH feature for MacOSX builds" FORCE)\n'
   '  set(COMMON_FLAGS "${COMMON_FLAGS} -m64")\n'
   'endif(APPLE)\n'
   '\n'
@@ -106,6 +106,7 @@ class CMakeListsGenerator:
       for directory in self.system_includes:
         f.write('include_directories(SYSTEM %s)\n' % directory)
       # add link directories
+      # TODO: handle RPATH and Non-RPATH differently (don't know, how, though)
       for directory in self.library_directories:
         f.write('link_directories(%s)\n' % directory)
       # add defines

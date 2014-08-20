@@ -285,7 +285,7 @@ class Extension(DistutilsExtension):
     parameters = {
         'define_macros': generate_self_macros(name, version),
         'extra_compile_args': ['-std=c++0x'], #synonym for c++11?
-        'library_dirs': bob_library_dirs,
+        'library_dirs': [],
         'libraries': bob_libraries,
         }
 
@@ -391,6 +391,9 @@ class Extension(DistutilsExtension):
       kwargs.setdefault('runtime_library_dirs', [])
       kwargs['runtime_library_dirs'] += kwargs['library_dirs']
       kwargs['runtime_library_dirs'] = uniq(kwargs['runtime_library_dirs'])
+
+    # .. except for the bob libraries
+    kwargs['library_dirs'] += bob_library_dirs
 
     # Run the constructor for the base class
     DistutilsExtension.__init__(self, name, sources, **kwargs)
@@ -541,7 +544,7 @@ class build_ext(_build_ext):
     2. adds the according include and library directories so that other Extensions can find the newly generated libs
 
        .. note::
-         This function **does not** add the library itself.
+         This function also adds the library itself.
          To link the generated library into another Extension, add this lib in the list of ``libraries``.
 
     3. compiles the remaining extensions using the default extension mechanism
@@ -572,7 +575,6 @@ class build_ext(_build_ext):
     for ext in self.extensions:
       ext.libraries = libs + (ext.libraries if ext.libraries else [])
       ext.library_dirs = lib_dirs + (ext.library_dirs if ext.library_dirs else [])
-      ext.runtime_library_dirs = lib_dirs + (ext.runtime_library_dirs if ext.runtime_library_dirs else [])
       ext.include_dirs = include_dirs + (ext.include_dirs if ext.include_dirs else [])
 
     # call the base class function
