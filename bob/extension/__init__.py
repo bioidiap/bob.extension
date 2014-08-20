@@ -231,18 +231,18 @@ class Extension(DistutilsExtension):
 
     packages = []
 
-    if 'packages' in kwargs and kwargs['packages']:
+    if 'packages' in kwargs:
       if isinstance(kwargs['packages'], str):
         packages.append(kwargs['packages'])
       else:
         packages.extend(kwargs['packages'])
-    if 'packages' in kwargs: del kwargs['packages']
+      del kwargs['packages']
 
     # uniformize packages
     packages = normalize_requirements([k.strip().lower() for k in packages])
 
     # check if we have bob libraries to link against
-    if 'bob_packages' in kwargs and kwargs['bob_packages']:
+    if 'bob_packages' in kwargs:
       self.bob_packages = kwargs['bob_packages']
       del kwargs['bob_packages']
     else:
@@ -251,7 +251,7 @@ class Extension(DistutilsExtension):
     bob_includes, bob_libraries, bob_library_dirs = get_bob_libraries(self.bob_packages)
 
     # system include directories
-    if 'system_include_dirs' in kwargs and kwargs['system_include_dirs']:
+    if 'system_include_dirs' in kwargs:
       system_includes = kwargs['system_include_dirs']
       del kwargs['system_include_dirs']
     else:
@@ -266,13 +266,12 @@ class Extension(DistutilsExtension):
 
     # We still look for the keyword 'boost_modules'
     boost_modules = []
-    if 'boost_modules' in kwargs and kwargs['boost_modules']:
+    if 'boost_modules' in kwargs:
       if isinstance(kwargs['boost_modules'], str):
         boost_modules.append(kwargs['boost_modules'])
       else:
         boost_modules.extend(kwargs['boost_modules'])
-
-    if 'boost_modules' in kwargs: del kwargs['boost_modules']
+      del kwargs['boost_modules']
 
     if boost_modules and not boost_req: boost_req = 'boost >= 1.0'
 
