@@ -191,7 +191,36 @@ def get_bob_libraries(bob_packages):
 
   return includes, libraries, library_directories
 
+def load_bob_library(name, _file_, version=None):
+  """Loads the bob Library for the given package name in the given version (if given).
+  The _file_ parameter is expected to be the ``__file__`` member of the main ``__init__.py`` of the package.
+  It is used to determine the directory, where the library should be loaded from.
 
+  Keyword parameters
+
+  name : string
+    The name of the bob package to load the library from, e.g. ``bob.core``
+
+  _file_ : string
+    The ``__file__`` member of the ``__init__.py`` file in which the library is loaded.
+
+  version : string
+    The version of the library to load. Can be usually omitted.
+  """
+
+  libname = 'lib' + name.replace('.', '_')
+  if sys.platform == 'darwin':
+    libname += ('.' + version if version is not None else '') + '.dylib'
+  elif sys.platform == 'win32':
+    libname += '.dll' + ('.' + version if version is not None else '')
+  else: # linux like
+    libname += '.so' + ('.' + version if version is not None else '')
+
+  full_libname = os.path.join(os.path.dirname(_file_), libname)
+
+  import ctypes
+  print "loading library", full_libname
+  ctypes.cdll.LoadLibrary(full_libname)
 
 
 class Extension(DistutilsExtension):
