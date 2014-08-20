@@ -219,7 +219,6 @@ def load_bob_library(name, _file_, version=None):
   full_libname = os.path.join(os.path.dirname(_file_), libname)
 
   import ctypes
-  print "loading library", full_libname
   ctypes.cdll.LoadLibrary(full_libname)
 
 
