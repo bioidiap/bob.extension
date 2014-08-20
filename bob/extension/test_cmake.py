@@ -66,6 +66,7 @@ def test_cmake_list():
 
 
 def test_library():
+  old_dir = os.getcwd()
   temp_dir = tempfile.mkdtemp(prefix="bob_extension_test_")
   target_dir = os.path.join(temp_dir, 'target')
   # copy test file to temp directory
@@ -93,6 +94,8 @@ def test_library():
   assert os.path.exists(os.path.join(target_dir, lib_name % ""))
   assert os.path.exists(os.path.join(target_dir, lib_name % ".3"))
   assert os.path.exists(os.path.join(target_dir, lib_name % ".3.2"))
+
+  os.chdir(old_dir)
 
   # TODO: compile a test executable to actually link the library
 
