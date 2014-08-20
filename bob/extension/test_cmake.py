@@ -86,7 +86,7 @@ def test_library():
 
   # check that the library was generated sucessfully
   if platform.system() == 'Darwin':
-    lib_name = 'libbob_cmake_test.%sdylib'
+    lib_name = 'libbob_cmake_test%s.dylib'
   else:
     lib_name = 'libbob_cmake_test.so%s'
 
