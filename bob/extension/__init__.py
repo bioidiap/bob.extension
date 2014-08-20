@@ -285,7 +285,7 @@ class Extension(DistutilsExtension):
     # Mixing
     parameters = {
         'define_macros': generate_self_macros(name, version),
-        'extra_compile_args': ['-std=c++0x'], #synomym for c++11?
+        'extra_compile_args': ['-std=c++0x'], #synonym for c++11?
         'library_dirs': bob_library_dirs,
         'libraries': bob_libraries,
         }
@@ -487,7 +487,7 @@ class Library (Extension):
     Extension.__init__(self, name, sources, packages=packages, boost_modules=boost_modules)
 
     # add the include directories for the packages as well
-    self.c_include_directories.extend(self.pkg_includes)
+    self.c_system_include_directories.extend(self.pkg_includes)
     self.c_libraries.extend(self.pkg_libraries)
     self.c_library_directories.extend(self.pkg_library_directories)
     self.c_define_macros.extend(self.pkg_macros)
