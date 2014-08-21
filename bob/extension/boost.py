@@ -156,7 +156,7 @@ class boost:
     """
 
     # make the include header prefix preferential
-    prefix = os.path.dirname(os.path.dirname(self.include_directory))
+    prefix = os.path.dirname(self.include_directory)
 
     py = 'py%d%d' % sys.version_info[:2]
 
@@ -173,8 +173,13 @@ class boost:
       if not candidates:
         raise RuntimeError("cannot find required boost module `%s' - make sure boost is installed on `%s' and that this module is named %s on the filesystem" % (module, prefix, ' or '.join(modnames)))
 
-      # take only the first choice (supposed to be the best choice!)
-      filenames.append(candidates[0])
+      # take the first choice that includes the prefix (or the absolute first choice otherwise)
+      index = 0
+      for i, candidate in enumerate(candidates):
+        if candidate.find(prefix) == 0:
+          index = i
+          break
+      filenames.append(candidates[index])
 
     # libraries
     libraries = []
