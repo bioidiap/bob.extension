@@ -7,7 +7,7 @@ import os
 import sys
 import subprocess
 import logging
-from .utils import uniq_paths
+from .utils import uniq, uniq_paths
 
 def call_pkgconfig(cmd, paths=None):
   """Runs a command as a subprocess and raises if that does not work
