@@ -24,10 +24,12 @@ def call_pkgconfig(cmd, paths=None):
   bob_prefix = os.environ.get('BOB_PREFIX_PATH', False)
   if bob_prefix:
     bob_prefix = bob_prefix.split(os.pathsep)
-    pkg_path += [os.path.join(k, 'lib', 'pkgconfig') for k in bob_prefix]
+    pkg_path = [os.path.join(k, 'lib', 'pkgconfig') for k in bob_prefix]
+  else:
+    pkg_path = []
 
   # 2. user path
-  pkg_path = paths if paths else []
+  if paths: pkg_path += paths
 
   # 3. adds the current python executable prefix
   pkg_path.append(os.path.join(os.path.dirname(os.path.dirname(sys.executable)), 'lib', 'pkgconfig'))
