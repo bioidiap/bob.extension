@@ -12,9 +12,9 @@ import glob
 import platform
 
 DEFAULT_PREFIXES = [
-    "/usr",
-    "/usr/local",
     "/opt/local",
+    "/usr/local",
+    "/usr",
     ]
 
 def find_file(name, subpaths=None, prefixes=None):
@@ -50,19 +50,22 @@ def find_file(name, subpaths=None, prefixes=None):
 
   search = []
 
-  # Priority 1
+  # Priority 1: the environment
   if 'BOB_PREFIX_PATH' in os.environ:
     search += os.environ['BOB_PREFIX_PATH'].split(os.pathsep)
 
-  # Priority 2
+  # Priority 2: user passed paths
   if prefixes:
     search += prefixes
 
-  # Priority 3
+  # Priority 3: the current system executable
+  search.append(os.path.dirname(os.path.dirname(sys.executable)))
+
+  # Priority 4: the default search prefixes
   search += DEFAULT_PREFIXES
 
   # Make unique to avoid searching twice
-  search = uniq(search)
+  search = uniq_paths(search)
 
   # Exhaustive combination of paths and subpaths
   if subpaths:
@@ -277,13 +280,27 @@ def find_executable(name, subpaths=None, prefixes=None):
   # The module names can be set with or without version number
   return find_file(name, my_subpaths, prefixes)
 
+def uniq(seq, idfun=None):
+  """Very fast, order preserving uniq function"""
 
-def uniq(seq):
-  """Uniqu-fy preserving order"""
+  # order preserving
+  if idfun is None:
+      def idfun(x): return x
+  seen = {}
+  result = []
+  for item in seq:
+      marker = idfun(item)
+      # in old Python versions:
+      # if seen.has_key(marker)
+      # but in new ones:
+      if marker in seen: continue
+      seen[marker] = 1
+      result.append(item)
+  return result
 
-  seen = set()
-  seen_add = seen.add
-  return [x for x in seq if x not in seen and not seen_add(x)]
+def uniq_paths(seq):
+  """Uniq'fy a list of paths taking into consideration their real paths"""
+  return uniq([os.path.realpath(k) for k in seq if os.path.exists(k)])
 
 def egrep(filename, expression):
   """Runs grep for a given expression on each line of the file

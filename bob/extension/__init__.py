@@ -6,8 +6,8 @@
 """A custom build class for Pkg-config based extensions
 """
 
-import sys
 import os
+import sys
 import platform
 import pkg_resources
 from setuptools.extension import Extension as DistutilsExtension
@@ -17,7 +17,7 @@ from pkg_resources import resource_filename
 
 from .pkgconfig import pkgconfig
 from .boost import boost
-from .utils import uniq, find_executable, find_library
+from .utils import uniq, uniq_paths, find_executable, find_library
 from .cmake import CMakeListsGenerator
 
 __version__ = pkg_resources.require(__name__)[0].version
@@ -118,7 +118,7 @@ def reorganize_isystem(args):
     else:
       remainder.append(args[i])
 
-  includes = uniq(includes[::-1])[::-1]
+  includes = uniq_paths(includes[::-1])[::-1]
 
   # sort includes so that the shortest system includes go last
   # this algorithm will ensure '/usr/include' comes after other
@@ -406,7 +406,7 @@ class Extension(DistutilsExtension):
     kwargs['include_dirs'] = user_includes + bob_includes + kwargs['include_dirs']
 
     # Uniq'fy parameters that are not on our parameter list
-    kwargs['include_dirs'] = uniq(kwargs['include_dirs'])
+    kwargs['include_dirs'] = uniq_paths(kwargs['include_dirs'])
 
     # Stream-line '-isystem' includes
     kwargs['extra_compile_args'] = reorganize_isystem(kwargs['extra_compile_args'])
@@ -418,10 +418,13 @@ class Extension(DistutilsExtension):
     if platform.system() == 'Linux':
       kwargs.setdefault('runtime_library_dirs', [])
       kwargs['runtime_library_dirs'] += kwargs['library_dirs']
-      kwargs['runtime_library_dirs'] = uniq(kwargs['runtime_library_dirs'])
+      kwargs['runtime_library_dirs'] = uniq_paths(kwargs['runtime_library_dirs'])
 
     # .. except for the bob libraries
     kwargs['library_dirs'] += bob_library_dirs
+
+    # Uniq'fy library directories
+    kwargs['library_dirs'] = uniq_paths(kwargs['library_dirs'])
 
     # Run the constructor for the base class
     DistutilsExtension.__init__(self, name, sources, **kwargs)
@@ -535,10 +538,10 @@ class Library (Extension):
       sources = self.c_sources,
       target_directory = self.c_target_directory,
       version = self.c_version,
-      include_directories = uniq(self.c_include_directories),
-      system_include_directories = uniq(self.c_system_include_directories),
+      include_directories = uniq_paths(self.c_include_directories),
+      system_include_directories = uniq_paths(self.c_system_include_directories),
       libraries = uniq(self.c_libraries),
-      library_directories = uniq(self.c_library_directories),
+      library_directories = uniq_paths(self.c_library_directories),
       macros = uniq(self.c_define_macros)
     )
     generator.generate(self.c_package_directory)

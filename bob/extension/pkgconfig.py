@@ -4,26 +4,10 @@
 # Wed 16 Oct 10:08:42 2013 CEST
 
 import os
+import sys
 import subprocess
 import logging
-
-def uniq(seq, idfun=None):
-  """Very fast, order preserving uniq function"""
-
-  # order preserving
-  if idfun is None:
-      def idfun(x): return x
-  seen = {}
-  result = []
-  for item in seq:
-      marker = idfun(item)
-      # in old Python versions:
-      # if seen.has_key(marker)
-      # but in new ones:
-      if marker in seen: continue
-      seen[marker] = 1
-      result.append(item)
-  return result
+from .utils import uniq_paths
 
 def call_pkgconfig(cmd, paths=None):
   """Runs a command as a subprocess and raises if that does not work
@@ -31,15 +15,32 @@ def call_pkgconfig(cmd, paths=None):
   Returns the exit status, stdout and stderr.
   """
 
-  # if the user has passed their own paths, add it to the environment
-  env = os.environ
-  if paths is not None:
-    env = os.environ.copy()
-    var = os.pathsep.join(paths)
-    old = env.get('PKG_CONFIG_PATH', False)
-    env['PKG_CONFIG_PATH'] = os.pathsep.join([var, old]) if old else var
+  # sets the PKG_CONFIG_PATH taking into consideration:
+  # 1. BOB_PREFIX_PATH, if set
+  # 2. the paths set by the user
+  # 3. the current python executable prefix
 
-  # calls the lua creation script using the parameters
+  # 1. BOB_PREFIX_PATH
+  bob_prefix = os.environ.get('BOB_PREFIX_PATH', False)
+  if bob_prefix:
+    bob_prefix = bob_prefix.split(os.pathsep)
+    pkg_path += [os.path.join(k, 'lib', 'pkgconfig') for k in bob_prefix]
+
+  # 2. user path
+  pkg_path = paths if paths else []
+
+  # 3. adds the current python executable prefix
+  pkg_path.append(os.path.join(os.path.dirname(os.path.dirname(sys.executable)), 'lib', 'pkgconfig'))
+
+  # Make unique to avoid searching twice
+  pkg_path = uniq_paths(pkg_path)
+
+  env = os.environ.copy()
+  var = os.pathsep.join(pkg_path)
+  old = env.get('PKG_CONFIG_PATH', False)
+  env['PKG_CONFIG_PATH'] = os.pathsep.join([var, old]) if old else var
+
+  # calls the program
   cmd = ['pkg-config'] + [str(k) for k in cmd]
   subproc = subprocess.Popen(
       cmd,
@@ -105,7 +106,7 @@ class pkgconfig:
       The name of the package of interest, as you would pass on the command
       line
 
-    extra_paths
+    paths
       Search paths to be added to the environment's PKG_CONFIG_PATH to search
       for packages.
 
