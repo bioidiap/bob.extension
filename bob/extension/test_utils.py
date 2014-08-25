@@ -23,8 +23,6 @@ def test_find_file():
 
   assert f
 
-  nose.tools.eq_(len(f), 1)
-
   nose.tools.eq_(os.path.basename(f[0]), 'array.h')
 
 def test_find_header():
@@ -33,13 +31,9 @@ def test_find_header():
 
   assert f1
 
-  nose.tools.eq_(len(f1), 1)
-
   nose.tools.eq_(os.path.basename(f1[0]), 'array.h')
 
   f2 = find_header(os.path.join('blitz', 'array.h'))
-
-  nose.tools.eq_(len(f2), 1)
 
   nose.tools.eq_(os.path.basename(f2[0]), 'array.h')
 
@@ -64,8 +58,6 @@ def test_egrep():
 
   assert f
 
-  nose.tools.eq_(len(f), 1)
-
   matches = egrep(f[0], r"^#\s*define\s+BOOST_VERSION\s+(\d+)\s*$")
 
   nose.tools.eq_(len(matches), 1)
@@ -75,8 +67,6 @@ def test_find_versioned_library():
   f = find_header('version.hpp', subpaths=['boost', 'boost?*'])
 
   assert f
-
-  nose.tools.eq_(len(f), 1)
 
   matches = egrep(f[0], r"^#\s*define\s+BOOST_VERSION\s+(\d+)\s*$")
 
