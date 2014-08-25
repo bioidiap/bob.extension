@@ -261,6 +261,24 @@ class pkgconfig:
 
     return uniq(retval)
 
+  def other_libraries(self):
+    """Returns a pre-processed list containing libraries to link against
+
+    Equivalent command line version:
+
+    .. code-block:: sh
+
+       $ PKG_CONFIG_PATH=<paths> pkg-config --libs-only-other <name>
+
+    """
+
+    status, stdout, stderr = self.__xcall__(['--libs-only-other'])
+
+    if status != 0:
+      raise RuntimeError("error querying --libs-only-other for package `%s': %s" % (self.name, stderr))
+
+    return uniq(stdout.split())
+
   def library_directories(self):
     """Returns a pre-processed list containing library directories.
 

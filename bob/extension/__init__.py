@@ -313,6 +313,7 @@ class Extension(DistutilsExtension):
     parameters = {
         'define_macros': generate_self_macros(name, version),
         'extra_compile_args': ['-std=c++0x'], #synonym for c++11?
+        'extra_link_args': [],
         'library_dirs': [],
         'libraries': bob_libraries,
         }
@@ -383,6 +384,8 @@ class Extension(DistutilsExtension):
 
       parameters['libraries'] += libs
       self.pkg_libraries += libs
+
+      parameters['extra_link_args'] += pkg.other_libraries()
 
     # add the -isystem to all system include dirs
     for k in system_includes:
