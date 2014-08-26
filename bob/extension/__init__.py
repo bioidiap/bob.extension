@@ -506,7 +506,8 @@ class Library (Extension):
     self.c_sub_directory = os.path.join(*(name_split[:-1]))
     self.c_sources = sources
     self.c_version = version
-    self.c_include_directories = [os.path.join(self.c_package_directory, self.c_sub_directory, 'include')] + include_dirs
+    self.c_self_include_directory = os.path.join(self.c_package_directory, self.c_sub_directory, 'include')
+    self.c_include_directories = [self.c_self_include_directory] + include_dirs
     self.c_system_include_directories = system_include_dirs
     self.c_libraries = libraries[:]
     self.c_library_directories = library_dirs[:]
@@ -609,7 +610,7 @@ class build_ext(_build_ext):
       ext.compile(self.build_lib)
       libs = [ext.c_name]
       lib_dirs = [ext.c_target_directory]
-      include_dirs = [ext.c_include_directories[0]]
+      include_dirs = [ext.c_self_include_directory]
 
       # set the DEFAULT library path and include path for all other extensions
       for other_ext in self.extensions:

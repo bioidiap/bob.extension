@@ -56,7 +56,6 @@ def test_cmake_list():
   assert lines[index+1].find('cmake_test.cpp') >= 0
 
   index = _find(lines, 'set_target_properties')
-  assert lines[index].find('3.2') >= 0
   assert lines[index+1].find('test_target') >= 0
 
   assert lines[_find(lines, 'target_link_libraries')].find('some_library') >= 0
@@ -68,7 +67,7 @@ def test_cmake_list():
 def test_library():
   old_dir = os.getcwd()
   temp_dir = tempfile.mkdtemp(prefix="bob_extension_test_")
-  target_dir = os.path.join(temp_dir, 'target')
+  target_dir = os.path.join(temp_dir, 'build', 'lib', 'target')
   # copy test file to temp directory
   shutil.copyfile(pkg_resources.resource_filename(__name__, 'test_documentation.cpp'), os.path.join(temp_dir, 'test_documentation.cpp'))
   os.chdir(temp_dir)
@@ -81,19 +80,18 @@ def test_library():
   )
 
   # compile
-  compile_dir = os.path.join(temp_dir, 'build')
+  compile_dir = os.path.join(temp_dir, 'build', 'lib')
   os.makedirs(compile_dir)
+  os.makedirs(target_dir)
   library.compile(compile_dir)
 
   # check that the library was generated sucessfully
   if platform.system() == 'Darwin':
-    lib_name = 'libbob_cmake_test%s.dylib'
+    lib_name = 'libbob_cmake_test.dylib'
   else:
-    lib_name = 'libbob_cmake_test.so%s'
+    lib_name = 'libbob_cmake_test.so'
 
-  assert os.path.exists(os.path.join(target_dir, lib_name % ""))
-  assert os.path.exists(os.path.join(target_dir, lib_name % ".3"))
-  assert os.path.exists(os.path.join(target_dir, lib_name % ".3.2"))
+  assert os.path.exists(os.path.join(target_dir, lib_name))
 
   os.chdir(old_dir)
 
