@@ -542,7 +542,6 @@ class Library (Extension):
     To change the compiler, use the ``compiler`` parameter.
     """
     self.c_target_directory = os.path.join(os.path.realpath(build_directory), self.c_sub_directory)
-    print self.c_target_directory
     if not os.path.exists(self.c_target_directory):
       os.makedirs(self.c_target_directory)
     # generate CMakeLists.txt makefile
