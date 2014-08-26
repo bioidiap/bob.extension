@@ -114,7 +114,7 @@ class CMakeListsGenerator:
         f.write('add_definitions(-D%s=%s)\n' % macro)
       # compile this library
       f.write('\nadd_library(${PROJECT_NAME} \n\t' + "\n\t".join(self.sources) + '\n)\n')
-      f.write('set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE SOVERSION "%s" VERSION "%s")\n' % (self.version.split('.')[0], '.'.join(self.version.split('.')[:2])))
+      f.write('set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE)\n')
       f.write('set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY %s)\n\n' % self.target_directory)
       # link libraries
       if self.libraries:

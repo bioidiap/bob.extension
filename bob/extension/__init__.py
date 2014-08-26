@@ -191,7 +191,24 @@ def get_bob_libraries(bob_packages):
 
   return includes, libraries, library_directories
 
-def load_bob_library(name, _file_, version=None):
+
+def get_full_libname(name, path=None, version=None):
+  """Generates the name of the library from the given name, path and version."""
+  libname = 'lib' + name.replace('.', '_')
+  if sys.platform == 'darwin':
+    libname += ('.' + version if version is not None else '') + '.dylib'
+  elif sys.platform == 'win32':
+    libname += '.dll' + ('.' + version if version is not None else '')
+  else: # linux like
+    libname += '.so' + ('.' + version if version is not None else '')
+
+  if path is not None:
+    return os.path.join(path, libname)
+  else:
+    return libname
+
+
+def load_bob_library(name, _file_):
   """Loads the bob Library for the given package name in the given version (if given).
   The _file_ parameter is expected to be the ``__file__`` member of the main ``__init__.py`` of the package.
   It is used to determine the directory, where the library should be loaded from.
@@ -203,21 +220,9 @@ def load_bob_library(name, _file_, version=None):
 
   _file_ : string
     The ``__file__`` member of the ``__init__.py`` file in which the library is loaded.
-
-  version : string
-    The version of the library to load. Can be usually omitted.
   """
 
-  libname = 'lib' + name.replace('.', '_')
-  if sys.platform == 'darwin':
-    libname += ('.' + version if version is not None else '') + '.dylib'
-  elif sys.platform == 'win32':
-    libname += '.dll' + ('.' + version if version is not None else '')
-  else: # linux like
-    libname += '.so' + ('.' + version if version is not None else '')
-
-  full_libname = os.path.join(os.path.dirname(_file_), libname)
-
+  full_libname = get_full_libname(name, os.path.dirname(_file_))
   import ctypes
   ctypes.cdll.LoadLibrary(full_libname)
 
@@ -498,10 +503,10 @@ class Library (Extension):
       raise ValueError("The name of the library must contain the package name, e.g., bob.core.bob_core")
     self.c_name = name_split[-1]
     self.c_package_directory = os.path.realpath('.')
-    self.c_target_directory = os.path.join(self.c_package_directory, os.path.join(*(name_split[:-1])))
+    self.c_sub_directory = os.path.join(*(name_split[:-1]))
     self.c_sources = sources
     self.c_version = version
-    self.c_include_directories = [os.path.join(self.c_target_directory, 'include')] + include_dirs
+    self.c_include_directories = [os.path.join(self.c_package_directory, self.c_sub_directory, 'include')] + include_dirs
     self.c_system_include_directories = system_include_dirs
     self.c_libraries = libraries[:]
     self.c_library_directories = library_dirs[:]
@@ -535,6 +540,10 @@ class Library (Extension):
     The build type is automatically taken from the debug option in the buildout.cfg.
     To change the compiler, use the ``compiler`` parameter.
     """
+    self.c_target_directory = os.path.join(os.path.realpath(build_directory), self.c_sub_directory)
+    print self.c_target_directory
+    if not os.path.exists(self.c_target_directory):
+      os.makedirs(self.c_target_directory)
     # generate CMakeLists.txt makefile
     generator = CMakeListsGenerator(
       name = self.c_name,
@@ -549,6 +558,10 @@ class Library (Extension):
     )
     generator.generate(self.c_package_directory)
 
+    # compile our stuff in a different directory
+    final_build_dir = os.path.join(os.path.dirname(os.path.realpath(build_directory)), 'build_cmake', self.c_name)
+    if not os.path.exists(final_build_dir):
+      os.makedirs(final_build_dir)
     # compile in the build directory
     import subprocess
     env = {'VERBOSE' : '1'}
@@ -557,10 +570,10 @@ class Library (Extension):
       env['CXX'] = compiler
     # configure cmake
     command = [self.c_cmake, self.c_package_directory]
-    if subprocess.call(command, cwd=build_directory, env=env) != 0:
+    if subprocess.call(command, cwd=final_build_dir, env=env) != 0:
       raise OSError("Could not generate makefiles with CMake")
     # run make
-    if subprocess.call(['make'], cwd=build_directory, env=env) != 0:
+    if subprocess.call(['make'], cwd=final_build_dir, env=env) != 0:
       raise OSError("CMake compilation stopped with an error; stopping ...")
 
 
@@ -572,47 +585,52 @@ class build_ext(_build_ext):
   """
 
   def run(self):
-    """Iterates through the list of Extension packages and:
-
-    1. compiles all pure C++ :py:class:`Library`'s
-    2. adds the according include and library directories so that other Extensions can find the newly generated libs
-
-       .. note::
-         This function also adds the library itself.
-         To link the generated library into another Extension, add this lib in the list of ``libraries``.
-
-    3. compiles the remaining extensions using the default extension mechanism
-
+    """Iterates through the list of Extension packages and reorders them, so that the Library's come first
     """
-    libs = []
-    lib_dirs = []
-    include_dirs = []
-    # iterate through the extensions
-    for ext in self.extensions:
-      # check if it is our type of extension
-      if isinstance(ext, Library):
-        # TODO: get compiler and add it to the compiler
-        # TODO: get the debug status and add the build_type parameter
-        # build libraries using the provided functions
-        build_dir = os.path.join(self.build_lib, ext.name)
-        if not os.path.exists(build_dir): os.makedirs(build_dir)
-        # compile
-        ext.compile(build_dir)
-        libs.append(ext.c_name)
-        lib_dirs.append(ext.c_target_directory)
-        include_dirs.append(os.path.join(ext.c_target_directory, 'include'))
-
-    # now, we keep only the extensions that are python extensions
-    self.extensions = [ext for ext in self.extensions if not isinstance(ext, Library)]
-
-    # set the DEFAULT library path and include path for all other extensions
-    for ext in self.extensions:
-      ext.libraries = libs + (ext.libraries if ext.libraries else [])
-      ext.library_dirs = lib_dirs + (ext.library_dirs if ext.library_dirs else [])
-      ext.include_dirs = include_dirs + (ext.include_dirs if ext.include_dirs else [])
-
+    # here, we simply re-order the extensions such that we get the Library first
+    self.extensions = [ext for ext in self.extensions if isinstance(ext, Library)] + [ext for ext in self.extensions if not isinstance(ext, Library)]
     # call the base class function
     return _build_ext.run(self)
+
+
+  def build_extension(self, ext):
+    """Builds the given extension.
+
+    When the extension is of type Library, it compiles the library with CMake, otherwise the default compilation mechanism is used.
+    Afterwards, it adds the according library, and the include and library directories of the Library's, so that other Extensions can find the newly generated lib.
+    """
+
+    # check if it is our type of extension
+    if isinstance(ext, Library):
+      # TODO: get compiler and add it to the compiler
+      # TODO: get the debug status and add the build_type parameter
+      # build libraries using the provided functions
+      # compile
+      ext.compile(self.build_lib)
+      libs = [ext.c_name]
+      lib_dirs = [ext.c_target_directory]
+      include_dirs = [ext.c_include_directories[0]]
+
+      # set the DEFAULT library path and include path for all other extensions
+      for other_ext in self.extensions:
+        if other_ext != ext:
+          other_ext.libraries = libs + (other_ext.libraries if other_ext.libraries else [])
+          other_ext.library_dirs = lib_dirs + (other_ext.library_dirs if other_ext.library_dirs else [])
+          other_ext.include_dirs = include_dirs + (other_ext.include_dirs if other_ext.include_dirs else [])
+    else:
+      # all other libs are build with the default command
+      _build_ext.build_extension(self, ext)
+
+
+  def get_ext_filename(self, fullname):
+    """Returns the library path for the given name"""
+    filename = _build_ext.get_ext_filename(self, fullname)
+    if fullname in self.ext_map:
+      ext = self.ext_map[fullname]
+      if isinstance(ext, Library):
+        return get_full_libname(os.path.splitext(os.path.basename(filename))[0], os.path.dirname(filename))
+      else:
+        return _build_ext.get_ext_filename(self, fullname)
 
 
 def get_config():
