@@ -12,6 +12,7 @@ import platform
 import pkg_resources
 from setuptools.extension import Extension as DistutilsExtension
 from setuptools.command.build_ext import build_ext as _build_ext
+import distutils.sysconfig
 
 from pkg_resources import resource_filename
 
@@ -628,7 +629,9 @@ class build_ext(_build_ext):
     if fullname in self.ext_map:
       ext = self.ext_map[fullname]
       if isinstance(ext, Library):
-        return get_full_libname(os.path.splitext(os.path.basename(filename))[0], os.path.dirname(filename))
+        # remove any extension that was artificially added by python
+        basename = filename.replace(distutils.sysconfig.get_config_var("SO"), "")
+        return get_full_libname(os.path.basename(basename), os.path.dirname(basename))
       else:
         return _build_ext.get_ext_filename(self, fullname)
 
