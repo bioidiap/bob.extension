@@ -16,7 +16,7 @@ HEADER = (
   '\n'
   '# Force __LP64__ scheme on Mac OSX\n'
   'if(APPLE)\n'
-  '  set(CMAKE_MACOSX_RPATH FALSE CACHE BOOL "Enables the MACOS_RPATH feature for MacOSX builds" FORCE)\n'
+  '  set(CMAKE_MACOSX_RPATH TRUE CACHE BOOL "Enables the MACOS_RPATH feature for MacOSX builds" FORCE)\n'
   '  set(COMMON_FLAGS "${COMMON_FLAGS} -m64")\n'
   'endif(APPLE)\n'
   '\n'
