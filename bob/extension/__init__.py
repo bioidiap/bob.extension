@@ -601,6 +601,14 @@ class build_ext(_build_ext):
     Afterwards, it adds the according library, and the include and library directories of the Library's, so that other Extensions can find the newly generated lib.
     """
 
+    # HACK: remove the "-Wstrict-prototypes" option keyword
+    self.compiler.compiler = [c for c in self.compiler.compiler if c != "-Wstrict-prototypes"]
+    self.compiler.compiler_so = [c for c in self.compiler.compiler_so if c != "-Wstrict-prototypes"]
+    if "-Wno-strict-aliasing" not in self.compiler.compiler:
+      self.compiler.compiler.append("-Wno-strict-aliasing")
+    if "-Wno-strict-aliasing" not in self.compiler.compiler_so:
+      self.compiler.compiler_so.append("-Wno-strict-aliasing")
+
     # check if it is our type of extension
     if isinstance(ext, Library):
       # TODO: get compiler and add it to the compiler
