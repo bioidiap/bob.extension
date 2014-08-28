@@ -612,11 +612,6 @@ class build_ext(_build_ext):
       lib_dirs = [ext.c_target_directory]
       include_dirs = [ext.c_self_include_directory]
 
-      # DEBUG: print self and ext
-      print (self, self.__dict__)
-      print(_build_ext.__file__)
-      print (ext.__dict__)
-
       # set the DEFAULT library path and include path for all other extensions
       for other_ext in self.extensions:
         if other_ext != ext:
@@ -634,12 +629,13 @@ class build_ext(_build_ext):
     if fullname in self.ext_map:
       ext = self.ext_map[fullname]
       if isinstance(ext, Library):
-        print (self.__dict__)
-        print (ext.__dict__)
-        print (distutils.sysconfig.get_config_var("SO"))
         # remove any extension that was artificially added by python
         basename = filename.replace(distutils.sysconfig.get_config_var("SO"), "")
-        print (filename, basename, get_full_libname(os.path.basename(basename), os.path.dirname(basename)))
+        # HACK: (for some python versions the above code doesn't seem to work)
+        index = basename.find("cpython-")
+        if index > 0:
+          basename = basename[:index-1]
+
         return get_full_libname(os.path.basename(basename), os.path.dirname(basename))
       else:
         return _build_ext.get_ext_filename(self, fullname)
