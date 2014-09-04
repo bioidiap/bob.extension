@@ -3,7 +3,7 @@ import os
 HEADER = (
   '\n'
   '# For both C and C++\n'
-  'set(COMMON_FLAGS "-pedantic -Wall")\n'
+  'set(COMMON_FLAGS "-pedantic -Wall $ENV{CFLAGS}")\n'
   'if (WIN32)\n'
   '  set(COMMON_FLAGS "-D_WIN32_WINNT=0x501") # Set min. Windows version to XP\n'
   'else(WIN32)\n'
