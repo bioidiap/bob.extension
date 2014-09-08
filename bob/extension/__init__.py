@@ -585,6 +585,14 @@ class build_ext(_build_ext):
   information.
   """
 
+  def finalize_options(self):
+    # check if the "BOB_BUILD_DIRECTORY" environment variable is set
+    _build_ext.finalize_options(self)
+    env = os.environ
+    if 'BOB_BUILD_DIRECTORY' in env:
+      self.build_temp = os.path.join(env['BOB_BUILD_DIRECTORY'], 'build_temp')
+      self.build_lib = os.path.join(env['BOB_BUILD_DIRECTORY'], 'build_lib')
+
   def run(self):
     """Iterates through the list of Extension packages and reorders them, so that the Library's come first
     """

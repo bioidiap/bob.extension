@@ -141,6 +141,16 @@ your ``buildout.cfg``. This includes, possibly, dependent projects. Currently,
 The recipe above creates a new interpreter that hooks that package in and
 builds the project considering variables like ``prefixes`` into consideration.
 
+By default, the extension code is compiled into a local directory called ``build``.
+This directory, after compilation, can be removed without issues, the resulting libraries will be copied into the package directories.
+To change the build directory of your package, and all other bob packages, you can define the ``BOB_BUILD_DIRECTORY`` environment variable, e.g.,::
+
+  $ python bootstrap.py
+  $ BOB_BUILD_DIRECTORY=/tmp/bob_build_dir ./bin/buildout
+
+Again, after successful compilation, this directory can be removed safely.
+
+
 Python API to pkg-config and Boost
 ----------------------------------
 

@@ -297,6 +297,38 @@ To avoid later complications, you should follow two guidelines for bob packages:
 The newly generated Library will be automatically linked to **all other** Extensions in the package.
 No worries, if the library is not used in the extension, the linker should be able to figure that out...
 
+.. note:
+  The clang linker seems not to be smart enough to detect unused libraries...
+
+
+Compiling your Library and Extension
+====================================
+
+To compile your C++ Python bindings and the pure C++ libraries, you can follow the same instructions as shown above:
+
+.. code-block:: sh
+
+  $ python bootstrap.py
+  ...
+  $ ./bin/buildout
+  ...
+
+This will automatically check out all required ``bob_packages`` and compile them locally.
+Afterwards, the C++ code from this package will be compiled, using a newly created ``build`` directory for temporary output.
+After compilation, this directory can be safely removed (re-compiling will re-create it).
+
+To get the source code compiled using another build directory, you can define a ``BOB_BUILD_DIRECTORY`` environment variable, e.g.:
+
+.. code-block:: sh
+
+  $ python bootstrap.py
+  ...
+  $ BOB_BUILD_DIRECTORY=/tmp/build_bob ./bin/buildout
+  ...
+
+The C++ code of this package, **and the code of all other** ``bob_packages`` will be compiled using the selected directory.
+Again, after compilation this directory can be safely removed.
+
 
 Documenting your C/C++ Python Extension
 =======================================
