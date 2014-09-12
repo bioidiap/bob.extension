@@ -91,7 +91,10 @@ def test_find_versioned_library():
 
 def test_requirement_readout():
 
-  from StringIO import StringIO as stringio
+  if sys.version_info[0] == 3:
+    from io import StringIO as stringio
+  else:
+    from cStringIO import StringIO as stringio
 
   f = """ # this is my requirements file
 package-a >= 0.42
