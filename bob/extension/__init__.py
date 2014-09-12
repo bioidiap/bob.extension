@@ -181,7 +181,9 @@ def get_bob_libraries(bob_packages):
     # TODO: need to handle versions?
     bob_packages = normalize_requirements([k.strip().lower() for k in bob_packages])
     for package in bob_packages:
-      includes.append(resource_filename(package, 'include'))
+      location = pkg_resources.require(package)[0].location
+      include_path = [location] + package.split('.') + ['include']
+      includes.append(os.path.join(*include_path))
 
       lib_name = package.replace('.', '_')
       libs = find_library(lib_name, prefixes=[resource_filename(package, '.')])
