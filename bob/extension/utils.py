@@ -325,3 +325,13 @@ def egrep(filename, expression):
       if p: retval.append(p)
 
   return retval
+
+def load_requirements(f=None):
+  """Loads the contents of requirements.txt on the given path.
+
+  Defaults to "./requirements.txt"
+  """
+
+  f = f if f is not None else open("requirements.txt", 'rt')
+  retval = [k.strip() for k in f]
+  return [k for k in retval if k and k[0] != '#']

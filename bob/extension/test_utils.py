@@ -9,7 +9,8 @@
 import os
 import sys
 import nose.tools
-from .utils import uniq, egrep, find_file, find_header, find_library
+from .utils import uniq, egrep, find_file, find_header, find_library, \
+    load_requirements
 
 def test_uniq():
 
@@ -87,3 +88,20 @@ def test_find_versioned_library():
 
   for k in lib:
     assert k.find('boost_system') >= 0
+
+def test_requirement_readout():
+
+  from StringIO import StringIO as stringio
+
+  f = """ # this is my requirements file
+package-a >= 0.42
+package-b
+package-c
+#package-e #not to be included
+
+package-z
+"""
+
+  result = load_requirements(stringio(f))
+  expected = ['package-a >= 0.42', 'package-b', 'package-c', 'package-z']
+  nose.tools.eq_(result, expected)
