@@ -329,6 +329,11 @@ To get the source code compiled using another build directory, you can define a 
 The C++ code of this package, **and the code of all other** ``bob_packages`` will be compiled using the selected directory.
 Again, after compilation this directory can be safely removed.
 
+Another environment variable enables parallel compilation of C or C++ code.
+Use ``BOB_BUILD_PARALLEL=X`` (where x is the number of parallel processes you want) to enable parallel building.
+
+.. warning:: This option is BETA and might not work on your system.
+
 
 Documenting your C/C++ Python Extension
 =======================================

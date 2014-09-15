@@ -576,7 +576,9 @@ class Library (Extension):
     if subprocess.call(command, cwd=final_build_dir, env=env) != 0:
       raise OSError("Could not generate makefiles with CMake")
     # run make
-    if subprocess.call(['make'], cwd=final_build_dir, env=env) != 0:
+    make_call = ['make']
+    if  "BOB_BUILD_PARALLEL" in os.environ: make_call += ['-j%s' % os.environ["BOB_BUILD_PARALLEL"]]
+    if subprocess.call(make_call, cwd=final_build_dir, env=env) != 0:
       raise OSError("CMake compilation stopped with an error; stopping ...")
 
 
@@ -589,11 +591,13 @@ class build_ext(_build_ext):
 
   def finalize_options(self):
     # check if the "BOB_BUILD_DIRECTORY" environment variable is set
-    _build_ext.finalize_options(self)
     env = os.environ
-    if 'BOB_BUILD_DIRECTORY' in env:
-      self.build_temp = os.path.join(env['BOB_BUILD_DIRECTORY'], 'build_temp')
-      self.build_lib = os.path.join(env['BOB_BUILD_DIRECTORY'], 'build_lib')
+    if 'BOB_BUILD_DIRECTORY' in env and env['BOB_BUILD_DIRECTORY']:
+      # HACKISH: check if we are currently developed by inspecting the way we got called
+      if 'develop' in sys.argv:
+        self.build_temp = os.path.join(env['BOB_BUILD_DIRECTORY'], 'build_temp')
+        self.build_lib = os.path.join(env['BOB_BUILD_DIRECTORY'], 'build_lib')
+    _build_ext.finalize_options(self)
 
   def run(self):
     """Iterates through the list of Extension packages and reorders them, so that the Library's come first
@@ -657,6 +661,29 @@ class build_ext(_build_ext):
         return get_full_libname(os.path.basename(basename), os.path.dirname(basename))
       else:
         return _build_ext.get_ext_filename(self, fullname)
+
+
+
+## Compile in parallel, when BOB_BUILD_PARALLEL is given
+# see http://stackoverflow.com/questions/11013851/speeding-up-build-process-with-distutils
+if "BOB_BUILD_PARALLEL" in os.environ:
+  # monkey-patch for parallel compilation
+  def parallelCCompile(self, sources, output_dir=None, macros=None, include_dirs=None, debug=0, extra_preargs=None, extra_postargs=None, depends=None):
+      # those lines are copied from distutils.ccompiler.CCompiler directly
+      macros, objects, extra_postargs, pp_opts, build = self._setup_compile(output_dir, macros, include_dirs, sources, depends, extra_postargs)
+      cc_args = self._get_cc_args(pp_opts, debug, extra_preargs)
+      # parallel code
+      N=int(os.environ["BOB_BUILD_PARALLEL"]) # number of parallel compilations
+      import multiprocessing.pool
+      def _single_compile(obj):
+          try: src, ext = build[obj]
+          except KeyError: return
+          self._compile(obj, src, ext, cc_args, extra_postargs, pp_opts)
+      # convert to list, imap is evaluated on-demand
+      list(multiprocessing.pool.ThreadPool(N).imap(_single_compile,objects))
+      return objects
+  import distutils.ccompiler
+  distutils.ccompiler.CCompiler.compile=parallelCCompile
 
 
 def get_config():
