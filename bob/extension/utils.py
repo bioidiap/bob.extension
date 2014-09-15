@@ -332,6 +332,12 @@ def load_requirements(f=None):
   Defaults to "./requirements.txt"
   """
 
-  f = f if f is not None else open("requirements.txt", 'rt')
-  retval = [k.strip() for k in f]
-  return [k for k in retval if k and k[0] != '#']
+  def readlines(f):
+    retval = [str(k.strip()) for k in f]
+    return [k for k in retval if k and k[0] != '#']
+
+  if f: return readlines(f)
+
+  # otherwise, just open requirements.txt and read all contents
+  with open('requirements.txt', 'rt') as f:
+    return readlines(f)
