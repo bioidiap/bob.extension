@@ -3,7 +3,7 @@ import os
 HEADER = (
   '\n'
   '# For both C and C++\n'
-  'set(COMMON_FLAGS "-pedantic -Wall $ENV{CFLAGS}")\n'
+  'set(COMMON_FLAGS "-pedantic -Wall")\n'
   'if (WIN32)\n'
   '  set(COMMON_FLAGS "-D_WIN32_WINNT=0x501") # Set min. Windows version to XP\n'
   'else(WIN32)\n'
@@ -93,6 +93,12 @@ class CMakeListsGenerator:
 
   def generate(self, directory):
     """Generates the CMakeLists.txt file in the given directory."""
+
+    # check if CFLAGS or CXXFLAGS are set, and set them if not
+    if 'CFLAGS' not in os.environ:
+      os.environ['CFLAGS'] = '-O3 -g0 -DNDEBUG -mtune=generic'
+    if 'CXXFLAGS' not in os.environ:
+      os.environ['CXXFLAGS'] = '-O3 -g0 -DNDEBUG -mtune=generic'
 
     filename = os.path.join(directory, "CMakeLists.txt")
     with open(filename, 'w') as f:
