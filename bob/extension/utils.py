@@ -334,7 +334,7 @@ def load_requirements(f=None):
 
   def readlines(f):
     retval = [str(k.strip()) for k in f]
-    return [k for k in retval if k and k[0] != '#']
+    return [k for k in retval if k and k[0] not in ('#', '-')]
 
   if f: return readlines(f)
 

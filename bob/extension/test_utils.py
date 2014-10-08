@@ -103,6 +103,8 @@ package-c
 #package-e #not to be included
 
 package-z
+--no-index
+-e http://example.com/mypackage-1.0.4.zip
 """
 
   result = load_requirements(stringio(f))
