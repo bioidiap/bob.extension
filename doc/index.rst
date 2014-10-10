@@ -20,6 +20,7 @@ Documentation
    :maxdepth: 2
 
    guide
+   cpp_api
    py_api
 
 Indices and tables

@@ -5,6 +5,7 @@
 .. Copyright (C) 2011-2014 Idiap Research Institute, Martigny, Switzerland
 
 .. _bob's website: https://www.idiap.ch/software/bob
+.. _bob: https://www.idiap.ch/software/bob
 .. _c++: http://www2.research.att.com/~bs/C++.html
 .. _distutils: http://docs.python.org/distutils/
 .. _git: http://git-scm.com/

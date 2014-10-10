@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 setup(
 
     name="bob.extension",
-    version="0.3.0a0",
+    version="2.0.0a0",
     description="Helps projects building Python/C++ extensions for Bob",
     url='http://github.com/bioidiap/bob.extension',
     license="BSD",
@@ -32,6 +32,7 @@ setup(
       ],
 
     classifiers = [
+      'Framework :: Bob',
       'Development Status :: 3 - Alpha',
       'Intended Audience :: Developers',
       'License :: OSI Approved :: BSD License',
