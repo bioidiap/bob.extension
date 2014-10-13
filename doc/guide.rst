@@ -22,7 +22,7 @@ This is a great way to release code for laboratory exercises or for a particular
 .. note::
   The core of our strategy is based on standard tools for *defining* and *deploying* Python packages.
   If you are not familiar with Python's ``setuptools``, ``distutils`` or PyPI, it can be beneficial to `learn about those <http://guide.python-distribute.org/>`_ before you start.
-  Python's `Setuptools`_ and `Distutils`_ are mechanisms to *define and distribute* python code in a packaged format, optionally through `PyPI`_, a web-based Python package index and distribution portal.
+  Python's `Setuptools`_ and `Distutils`_ are mechanisms to *define and distribute* Python code in a packaged format, optionally through `PyPI`_, a web-based Python package index and distribution portal.
 
   `zc.buildout`_ is a tool to *deploy* Python packages locally, automatically  setting up and encapsulating your work environment.
 
@@ -47,7 +47,7 @@ The anatomy of a minimal package should look like the following:
 .. code-block:: sh
 
   .
-  +-- MANIFEST.in       # extras to be installed, besides the python files
+  +-- MANIFEST.in       # extras to be installed, besides the Python files
   +-- README.rst        # a description of the package, in reStructuredText format
   +-- bootstrap.py      # stock script downloaded from zc.buildout's website
   +-- buildout.cfg      # buildout configuration
@@ -55,7 +55,7 @@ The anatomy of a minimal package should look like the following:
   +-- doc               # documentation directory
   |   +-- conf.py       # Sphinx configuration
   |   +-- index.rst     # Documentation starting point for Sphinx
-  +-- bob               # python package (a.k.a. "the code")
+  +-- bob               # Python package (a.k.a. "the code")
   |   +-- example
   |   |   +-- project
   |   |   |   +-- script
@@ -194,7 +194,7 @@ Creating Database Satellite Packages
 Database satellite packages are special satellite packages that can hook-in |project|'s database manager ``bob_dbmanage.py``.
 Except for this detail, they should look exactly like a normal package.
 
-To allow the database to be hooked to the ``bob_dbmanage.py`` you must implement a non-virtual python class that inherits from :py:class:`bob.db.driver.Interface`.
+To allow the database to be hooked to the ``bob_dbmanage.py`` you must implement a non-virtual Python class that inherits from :py:class:`bob.db.driver.Interface`.
 Your concrete implementation should then be described at the ``setup.py`` file with a special ``bob.db`` entry point:
 
 .. code-block:: python
@@ -301,9 +301,9 @@ By default, when using boost you should at least add the ``system`` module, i.e.
     ...
   )
 
-Other modules and options can be set manually using `the standard options for python extensions <http://docs.python.org/2/extending/building.html>`_.
+Other modules and options can be set manually using `the standard options for Python extensions <http://docs.python.org/2/extending/building.html>`_.
 
-Most of the bob packages come with pure C++ code and python bindings.
+Most of the bob packages come with pure C++ code and Python bindings, where we commonly use the `Python C-API <https://docs.python.org/2/extending/index.html>`_ for the bindings.
 When your library compiles and links against the pure C++ code, you can simply use the ``bob_packages`` as above.
 This will automatically add the desired include and library directories, as well as the libraries and the required preprocessor options.
 
@@ -491,7 +491,7 @@ Use ``BOB_BUILD_PARALLEL=X`` (where x is the number of parallel processes you wa
 Documenting your C/C++ Python Extension
 =======================================
 
-One part of this package are some functions that makes it easy to generate a proper python documentation for your bound C/C++ functions.
+One part of this package are some functions that makes it easy to generate a proper Python documentation for your bound C/C++ functions.
 This documentation can be used after:
 
 .. code-block:: c++
@@ -515,7 +515,7 @@ To generate a properly aligned function documentation, you can use:
 .. note::
 
    If you want to document a member function of a class, you should use set fourth boolean option to true.
-   This is required since the default python class member documentation is indented four more spaces, which we need to balance:
+   This is required since the default Python class member documentation is indented four more spaces, which we need to balance:
 
    .. code-block:: c++
 
@@ -528,7 +528,7 @@ To generate a properly aligned function documentation, you can use:
 
 Using this object, you can add several parts of the function that need documentation:
 
-1. ``description.add_prototype("variable1, variable2", "return1, return2");`` can be used to add function definitions (i.e., ways how to use yourfunction).
+1. ``description.add_prototype("variable1, variable2", "return1, return2");`` can be used to add function definitions (i.e., ways how to use your function).
    This function needs to be called at least once.
    If the function does not define a return value, it can be left out (in which case the default ``"None"`` is used).
 
@@ -717,7 +717,7 @@ You may use version number extenders for alpha, beta, and candidate releases wit
 The value of ``N`` should be an integer starting at zero.
 Python's setuptools package will correctly classifier package versions following this simple scheme.
 For more information on package numbers, consult Python's `PEP 386`_.
-Here are lists of valid python version numbers following this scheme::
+Here are lists of valid Python version numbers following this scheme::
 
   0.0.1
   0.1.0a35
