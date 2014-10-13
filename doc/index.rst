@@ -20,6 +20,7 @@ Documentation
    :maxdepth: 2
 
    guide
+   extension
    cpp_api
    py_api
 
