@@ -673,15 +673,22 @@ if "BOB_BUILD_PARALLEL" in os.environ:
       macros, objects, extra_postargs, pp_opts, build = self._setup_compile(output_dir, macros, include_dirs, sources, depends, extra_postargs)
       cc_args = self._get_cc_args(pp_opts, debug, extra_preargs)
       # parallel code
-      N=int(os.environ["BOB_BUILD_PARALLEL"]) # number of parallel compilations
+      N = min(int(os.environ["BOB_BUILD_PARALLEL"]), len(objects)) # number of parallel compilations
       import multiprocessing.pool
       def _single_compile(obj):
           try: src, ext = build[obj]
           except KeyError: return
           self._compile(obj, src, ext, cc_args, extra_postargs, pp_opts)
-      # convert to list, imap is evaluated on-demand
-      list(multiprocessing.pool.ThreadPool(N).imap(_single_compile,objects))
+      # create process pool
+      pool = multiprocessing.pool.ThreadPool(N)
+      # execute each compilation in a separate process
+      pool.map(_single_compile, objects)
+      # wait until all processes finished
+      pool.close()
+      pool.join()
+
       return objects
+
   import distutils.ccompiler
   distutils.ccompiler.CCompiler.compile=parallelCCompile
 
