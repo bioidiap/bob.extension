@@ -559,12 +559,13 @@ class Library (Extension):
       library_directories = uniq_paths(self.c_library_directories),
       macros = uniq(self.c_define_macros)
     )
-    generator.generate(self.c_package_directory)
 
     # compile our stuff in a different directory
     final_build_dir = os.path.join(os.path.dirname(os.path.realpath(build_directory)), 'build_cmake', self.c_name)
     if not os.path.exists(final_build_dir):
       os.makedirs(final_build_dir)
+    generator.generate(self.c_package_directory, final_build_dir)
+
     # compile in the build directory
     import subprocess
     env = {'VERBOSE' : '1'}
@@ -572,7 +573,7 @@ class Library (Extension):
     if compiler is not None:
       env['CXX'] = compiler
     # configure cmake
-    command = [self.c_cmake, self.c_package_directory]
+    command = [self.c_cmake, final_build_dir]
     if subprocess.call(command, cwd=final_build_dir, env=env) != 0:
       raise OSError("Could not generate makefiles with CMake")
     # run make
