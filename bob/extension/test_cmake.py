@@ -40,7 +40,7 @@ def test_cmake_list():
 
   temp_dir = tempfile.mkdtemp(prefix="bob_extension_test_")
 
-  generator.generate(temp_dir)
+  generator.generate(temp_dir, temp_dir)
 
   # read created file
   lines = [line.rstrip() for line in open(os.path.join(temp_dir, "CMakeLists.txt"))]
