@@ -430,42 +430,25 @@ Upload Additional Documentation to PythonHosted.org
 In case you have written additional sphinx documentation in your satellite package that you want to share with the world, there is an easy way to push the documentation to `PythonHosted.org <http://pythonhosted.org>`_.
 More detailed information are given `here <http://pythonhosted.org/an_example_pypi_project/buildanduploadsphinx.html>`__, which translates roughly into:
 
-1. Edit your setup.py and add the required package ``sphinx-pypi-upload``:
+1. Edit your ``buildout.cfg`` and add the required package ``sphinx-pypi-upload``:
 
   .. code-block:: python
 
-    setup(
-      ...
-
-      setup_requires=[
-        ...
-        'sphinx-pypi-upload',
-      ],
-
-      ...
-    )
+    eggs = ...
+           sphinx-pypi-upload
 
   And re-run ``buildout``::
 
     $ ./bin/buildout
 
-2. Create or edit the file ``setup.cfg`` in the root directory of your package.
-   The content should be something like:
+  .. note::
+     When you are using our ``bob.buildout:scripts`` recipe in your ``buildout.cfg`` (the default), you can skip this step since ``sphinx-pypi-upload`` is enabled by default.
 
-  .. code-block:: ini
 
-    [build_sphinx]
-    source-dir = docs
-    build-dir  = sphinx
-    all_files  = 1
+2. Create and upload the documentation, following the instructions `here <https://pypi.python.org/pypi/Sphinx-PyPI-upload>`__::
 
-    [upload_sphinx]
-    upload-dir = sphinx/html
-
-3. Create and upload the documentation::
-
-    $ ./bin/python setup.py build_sphinx
-    $ ./bin/python setup.py upload_sphinx
+    $ ./bin/python setup.py build_sphinx --source-dir=doc --build-dir=build/doc --all-files
+    $ ./bin/python setup.py upload_sphinx --upload-dir=build/doc/html
 
 The link to the documentation will automatically be added to the PyPI page of your package.
 Usually it is a good idea to check the documentation after building and before uploading.

@@ -336,8 +336,61 @@ def load_requirements(f=None):
     retval = [str(k.strip()) for k in f]
     return [k for k in retval if k and k[0] not in ('#', '-')]
 
-  if f: return readlines(f)
+  # if f is None, use the default ('requirements.txt')
+  if f is None:
+    f = 'requirements.txt'
+  if isinstance(f, str):
+    f = open(f, 'rt')
+  # read the contents
+  return readlines(f)
 
-  # otherwise, just open requirements.txt and read all contents
-  with open('requirements.txt', 'rt') as f:
-    return readlines(f)
+
+def link_documentation(additional_packages = [], requirements_file = "../requirements.txt", server = "https://pythonhosted.org"):
+  """Generates a list of documented packages on pythonhosted.org for the packages read from the "requirements.txt" file and the given list of additional packages.
+
+  Parameters:
+
+  additional_packages : [str]
+    A list of additional bob packages for which the documentation urls are added
+
+  requirements_file : str of file-like
+    The file (relative to the documentation directory), where to read the requirements from.
+    If None, it will be skipped.
+
+  server : str
+    The url to the server which provides the documentation.
+
+  """
+  if sys.version_info[0] <= 2:
+    import urllib2 as urllib
+    from urllib2 import HTTPError
+    import urlparse
+  else:
+    import urllib.request as urllib
+    import urllib.parse as urlparse
+    import urllib.error as error
+    HTTPError = error.HTTPError
+
+
+  # collect packages
+  packages = load_requirements(requirements_file) if requirements_file is not None else []
+  packages += additional_packages
+
+  dictionary = {}
+  # check if the packages have documentation on pythonhosted.org
+  for p in packages:
+    # generate URL
+    url = urlparse.urljoin(server, p.split()[0])
+
+    try:
+      # request url
+      f = urllib.urlopen(urllib.Request(url))
+      print ("Found documentation on %s; adding intersphinx source" % url)
+      dictionary[url] = None
+    except HTTPError as exc:
+      if exc.code != 404:
+        # url request failed with a something else than 404 Error
+        print ("Requesting URL %s returned error %s" % (url, exc))
+
+  return dictionary
+

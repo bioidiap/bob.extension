@@ -10,7 +10,7 @@ import os
 import sys
 import nose.tools
 from .utils import uniq, egrep, find_file, find_header, find_library, \
-    load_requirements
+    load_requirements, link_documentation
 
 def test_uniq():
 
@@ -110,3 +110,28 @@ package-z
   result = load_requirements(stringio(f))
   expected = ['package-a >= 0.42', 'package-b', 'package-c', 'package-z']
   nose.tools.eq_(result, expected)
+
+
+def test_documentation_generation():
+  if sys.version_info[0] == 3:
+    from io import StringIO as stringio
+  else:
+    from cStringIO import StringIO as stringio
+
+  f = """ # this is my requirements file
+package-a >= 0.42
+package-b
+package-c
+#package-e #not to be included
+setuptools
+
+package-z
+--no-index
+-e http://example.com/mypackage-1.0.4.zip
+"""
+  additional_packages = ['bob.extension', 'other.bob.package']
+
+  result = link_documentation(additional_packages, stringio(f))
+  expected = {'https://pythonhosted.org/setuptools' : None, 'https://pythonhosted.org/bob.extension' : None}
+  nose.tools.eq_(result, expected)
+
