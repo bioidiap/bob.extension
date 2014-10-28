@@ -135,3 +135,8 @@ package-z
   expected = {'https://pythonhosted.org/setuptools' : None, 'https://pythonhosted.org/bob.extension' : None}
   nose.tools.eq_(result, expected)
 
+  os.environ["BOB_DOCUMENTATION_SERVER"] = "https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
+  result = link_documentation(additional_packages, stringio(f))
+  expected = {'https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master' : None}
+  nose.tools.eq_(result, expected)
+

@@ -345,7 +345,7 @@ def load_requirements(f=None):
   return readlines(f)
 
 
-def link_documentation(additional_packages = [], requirements_file = "../requirements.txt", server = "https://pythonhosted.org"):
+def link_documentation(additional_packages = [], requirements_file = "../requirements.txt", server = None):
   """Generates a list of documented packages on pythonhosted.org for the packages read from the "requirements.txt" file and the given list of additional packages.
 
   Parameters:
@@ -353,34 +353,43 @@ def link_documentation(additional_packages = [], requirements_file = "../require
   additional_packages : [str]
     A list of additional bob packages for which the documentation urls are added
 
-  requirements_file : str of file-like
+  requirements_file : str or file-like
     The file (relative to the documentation directory), where to read the requirements from.
-    If None, it will be skipped.
+    If ``None``, it will be skipped.
 
-  server : str
+  server : str or None
     The url to the server which provides the documentation.
+    If ``None`` (the default), the ``BOB_DOCUMENTATION_SERVER`` environment variable is taken if existent.
+    If neither ``server`` is specified, nor a ``BOB_DOCUMENTATION_SERVER`` environment variable is set, the default ``"https://pythonhosted.org/%s"`` is used.
 
   """
   if sys.version_info[0] <= 2:
     import urllib2 as urllib
     from urllib2 import HTTPError
-    import urlparse
   else:
     import urllib.request as urllib
-    import urllib.parse as urlparse
     import urllib.error as error
     HTTPError = error.HTTPError
 
+  # get the server
+  if server is None:
+    if "BOB_DOCUMENTATION_SERVER" in os.environ:
+      server = os.environ["BOB_DOCUMENTATION_SERVER"]
+    else:
+      server = "https://pythonhosted.org/%s"
 
   # collect packages
-  packages = load_requirements(requirements_file) if requirements_file is not None else []
+  packages = []
+  if requirements_file is not None:
+    if not isinstance(requirements_file, str) or os.path.exists(requirements_file):
+      packages += load_requirements(requirements_file)
   packages += additional_packages
 
   dictionary = {}
   # check if the packages have documentation on pythonhosted.org
   for p in packages:
     # generate URL
-    url = urlparse.urljoin(server, p.split()[0])
+    url = server % p.split()[0]
 
     try:
       # request url
