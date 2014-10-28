@@ -135,7 +135,8 @@ package-z
     import numpy
     result = link_documentation(['numpy'], None)
     assert len(result) == 1
-    assert '/numpy' in result.keys()[0]
+    key = list(result.keys())[0]
+    assert '/numpy' in key
   except ImportError:
     pass
 
@@ -143,8 +144,9 @@ package-z
     import scipy
     result = link_documentation(['scipy'], None)
     assert len(result) == 1
-    assert '/scipy' in result.keys()[0]
-    assert '/reference' in result.keys()[0]
+    key = list(result.keys())[0]
+    assert '/scipy' in key
+    assert '/reference' in key
   except ImportError:
     pass
 
