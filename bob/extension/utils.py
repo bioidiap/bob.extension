@@ -345,7 +345,7 @@ def load_requirements(f=None):
   return readlines(f)
 
 
-def link_documentation(additional_packages = ['numpy'], requirements_file = "../requirements.txt", server = None):
+def link_documentation(additional_packages = ['python', 'numpy'], requirements_file = "../requirements.txt", server = None):
   """Generates a list of documented packages on pythonhosted.org for the packages read from the "requirements.txt" file and the given list of additional packages.
 
   Parameters:
@@ -415,6 +415,18 @@ def link_documentation(additional_packages = ['numpy'], requirements_file = "../
     # numpy mapping
     mapping[numpy_manual]  = None
     packages.remove('numpy')
+
+  if 'scipy' in packages:
+    scipy_version = __import__('scipy').version.version
+    if smaller_than(numpy_version, '0.9.0'):
+      scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.x'
+    else:
+      scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.0'
+    scipy_manual = 'http://docs.scipy.org/doc/scipy-%s/reference' % scipy_version
+
+    # numpy mapping
+    mapping[scipy_manual]  = None
+    packages.remove('scipy')
 
   # get the server for the other packages
   if server is None:

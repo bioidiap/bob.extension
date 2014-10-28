@@ -129,13 +129,24 @@ package-z
 --no-index
 -e http://example.com/mypackage-1.0.4.zip
 """
-  additional_packages = ['python', 'bob.extension', 'other.bob.package']
 
+  # test NumPy and SciPy docs
+  additional_packages = ['numpy', 'scipy']
+  result = link_documentation(additional_packages, None)
+  assert len(result) == 2
+  addresses = result.keys()
+  assert '/numpy' in addresses[0] or '/numpy' in addresses[1]
+  assert '/scipy' in addresses[0] or '/scipy' in addresses[1]
+  assert '/reference' in addresses[0] or '/reference' in addresses[1]
+
+  # test pypi packages
+  additional_packages = ['python', 'bob.extension', 'other.bob.package']
   if "BOB_DOCUMENTATION_SERVER" not in os.environ:
     result = link_documentation(additional_packages, stringio(f))
     expected = {'http://docs.python.org/%d.%d/' % sys.version_info[:2] : None, 'https://pythonhosted.org/setuptools' : None, 'https://pythonhosted.org/bob.extension' : None}
     nose.tools.eq_(result, expected)
 
+  # test idiap server
   os.environ["BOB_DOCUMENTATION_SERVER"] = "https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
   result = link_documentation(additional_packages, stringio(f))
   expected = {'http://docs.python.org/%d.%d/' % sys.version_info[:2] : None, 'https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master' : None}
