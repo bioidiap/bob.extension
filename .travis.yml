@@ -1,14 +1,15 @@
 language: python
 matrix:
   include:
-    - python: 2.6
-    - python: 2.7
-      env:
-        - secure: bCrXmS1k8aIOE8Ba6XuHyjUoQQPpYEC8kpTcMi9pNhyXRQyGEPLp85VgyfXga2Oxb73QcW1aW4AxGUxiR1OZjB4rBmKK2uKij2G2qq9uhcXkDqCzqqxslhtm3o8cxHEFNJWRhuSVVjS0m0RvaFuGRicdz7QdyHCLl29+Gqdkacs=
-        - secure: W81QkyB8I87JT6kqaW/eBYBngbtcpHXWXIQsBkjy06Z8V9gUGbUD5oWwCn6NKQ1hE1ZR/qELxsTtrfgvfiegCW9wci4qZzatq34DWvzKK20jacqn9hs0BnXCyI/+iQRf6vam1KAnvc4qmWzF/CfsuZqCku8TtU5ZtKk05D/K//0=
-    - python: 3.2
-    - python: 3.3
-    - python: 3.4
+  - python: 2.6
+  - python: 2.7
+    env:
+    - secure: bCrXmS1k8aIOE8Ba6XuHyjUoQQPpYEC8kpTcMi9pNhyXRQyGEPLp85VgyfXga2Oxb73QcW1aW4AxGUxiR1OZjB4rBmKK2uKij2G2qq9uhcXkDqCzqqxslhtm3o8cxHEFNJWRhuSVVjS0m0RvaFuGRicdz7QdyHCLl29+Gqdkacs=
+    - secure: W81QkyB8I87JT6kqaW/eBYBngbtcpHXWXIQsBkjy06Z8V9gUGbUD5oWwCn6NKQ1hE1ZR/qELxsTtrfgvfiegCW9wci4qZzatq34DWvzKK20jacqn9hs0BnXCyI/+iQRf6vam1KAnvc4qmWzF/CfsuZqCku8TtU5ZtKk05D/K//0=
+    - BOB_DOCUMENTATION_SERVER=https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master
+  - python: 3.2
+  - python: 3.3
+  - python: 3.4
 before_install:
 - sudo add-apt-repository -y ppa:biometrics/bob
 - sudo apt-get update -qq

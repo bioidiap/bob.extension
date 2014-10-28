@@ -448,7 +448,7 @@ More detailed information are given `here <http://pythonhosted.org/an_example_py
 2. Create and upload the documentation, following the instructions `here <https://pypi.python.org/pypi/Sphinx-PyPI-upload>`__::
 
     $ ./bin/python setup.py build_sphinx --source-dir=doc --build-dir=build/doc --all-files
-    $ ./bin/python setup.py upload_sphinx --upload-dir=build/doc/html
+    $ ./bin/python setup.py upload_docs --upload-dir=build/doc/html
 
 The link to the documentation will automatically be added to the PyPI page of your package.
 Usually it is a good idea to check the documentation after building and before uploading.

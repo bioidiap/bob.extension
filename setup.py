@@ -12,7 +12,7 @@ setup(
 
     name="bob.extension",
     version="2.0.0a0",
-    description="Helps projects building Python/C++ extensions for Bob",
+    description="Building of Python/C++ extensions for Bob",
     url='http://github.com/bioidiap/bob.extension',
     license="BSD",
     author='Andre Anjos',
@@ -25,11 +25,11 @@ setup(
 
     namespace_packages=[
       "bob",
-      ],
+    ],
 
     install_requires=[
       'setuptools',
-      ],
+    ],
 
     classifiers = [
       'Framework :: Bob',
@@ -40,6 +40,6 @@ setup(
       'Programming Language :: Python',
       'Programming Language :: Python :: 3',
       'Topic :: Software Development :: Libraries :: Python Modules',
-      ],
+    ],
 
-    )
+)
