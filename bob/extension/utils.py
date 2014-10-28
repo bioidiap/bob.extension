@@ -364,6 +364,25 @@ def link_documentation(additional_packages = ['numpy'], requirements_file = "../
     If neither ``server`` is specified, nor a ``BOB_DOCUMENTATION_SERVER`` environment variable is set, the default ``"https://pythonhosted.org/%s"`` is used.
 
   """
+
+  def smaller_than(v1, v2):
+    """Compares scipy/numpy version numbers"""
+
+    c1 = v1.split('.')
+    c2 = v2.split('.')[:len(c1)] #clip to the compared version
+    for i, k in enumerate(c2):
+      n1 = c1[i]
+      n2 = c2[i]
+      try:
+        n1 = int(n1)
+        n2 = int(n2)
+      except ValueError:
+        n1 = str(n1)
+        n2 = str(n2)
+      if n1 > n2: return False
+    return True
+
+
   if sys.version_info[0] <= 2:
     import urllib2 as urllib
     from urllib2 import HTTPError
