@@ -255,12 +255,8 @@ autodoc_default_flags = [
   ]
 
 # For inter-documentation mapping:
-intersphinx_mapping = {
-  'http://docs.python.org/%d.%d/' % sys.version_info[:2]: None,
-}
-
 from bob.extension.utils import link_documentation
-intersphinx_mapping.update(link_documentation())
+intersphinx_mapping = link_documentation(additional_packages = ['python'])
 
 
 def setup(app):

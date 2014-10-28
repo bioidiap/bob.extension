@@ -345,13 +345,14 @@ def load_requirements(f=None):
   return readlines(f)
 
 
-def link_documentation(additional_packages = [], requirements_file = "../requirements.txt", server = None):
+def link_documentation(additional_packages = ['numpy'], requirements_file = "../requirements.txt", server = None):
   """Generates a list of documented packages on pythonhosted.org for the packages read from the "requirements.txt" file and the given list of additional packages.
 
   Parameters:
 
   additional_packages : [str]
-    A list of additional bob packages for which the documentation urls are added
+    A list of additional bob packages for which the documentation urls are added.
+    By default, 'numpy' is added
 
   requirements_file : str or file-like
     The file (relative to the documentation directory), where to read the requirements from.
@@ -371,13 +372,6 @@ def link_documentation(additional_packages = [], requirements_file = "../require
     import urllib.error as error
     HTTPError = error.HTTPError
 
-  # get the server
-  if server is None:
-    if "BOB_DOCUMENTATION_SERVER" in os.environ:
-      server = os.environ["BOB_DOCUMENTATION_SERVER"]
-    else:
-      server = "https://pythonhosted.org/%s"
-
   # collect packages
   packages = []
   if requirements_file is not None:
@@ -385,7 +379,31 @@ def link_documentation(additional_packages = [], requirements_file = "../require
       packages += load_requirements(requirements_file)
   packages += additional_packages
 
-  dictionary = {}
+  # standard documentation: Python
+  mapping = {}
+  if 'python' in packages:
+    mapping['http://docs.python.org/%d.%d/' % sys.version_info[:2]] = None
+    packages.remove('python')
+
+  if 'numpy' in packages:
+    numpy_version = __import__('numpy').version.version
+    if smaller_than(numpy_version, '1.5.z'):
+      numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.x'
+    else:
+      numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.0'
+    numpy_manual = 'http://docs.scipy.org/doc/numpy-%s/' % numpy_version
+
+    # numpy mapping
+    mapping[numpy_manual]  = None
+    packages.remove('numpy')
+
+  # get the server for the other packages
+  if server is None:
+    if "BOB_DOCUMENTATION_SERVER" in os.environ:
+      server = os.environ["BOB_DOCUMENTATION_SERVER"]
+    else:
+      server = "https://pythonhosted.org/%s"
+
   # check if the packages have documentation on pythonhosted.org
   for p in packages:
     # generate URL
@@ -395,11 +413,11 @@ def link_documentation(additional_packages = [], requirements_file = "../require
       # request url
       f = urllib.urlopen(urllib.Request(url))
       print ("Found documentation on %s; adding intersphinx source" % url)
-      dictionary[url] = None
+      mapping[url] = None
     except HTTPError as exc:
       if exc.code != 404:
         # url request failed with a something else than 404 Error
         print ("Requesting URL %s returned error %s" % (url, exc))
 
-  return dictionary
+  return mapping
 

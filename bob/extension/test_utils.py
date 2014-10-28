@@ -129,15 +129,15 @@ package-z
 --no-index
 -e http://example.com/mypackage-1.0.4.zip
 """
-  additional_packages = ['bob.extension', 'other.bob.package']
+  additional_packages = ['python', 'bob.extension', 'other.bob.package']
 
   if "BOB_DOCUMENTATION_SERVER" not in os.environ:
     result = link_documentation(additional_packages, stringio(f))
-    expected = {'https://pythonhosted.org/setuptools' : None, 'https://pythonhosted.org/bob.extension' : None}
+    expected = {'http://docs.python.org/%d.%d/' % sys.version_info[:2] : None, 'https://pythonhosted.org/setuptools' : None, 'https://pythonhosted.org/bob.extension' : None}
     nose.tools.eq_(result, expected)
 
   os.environ["BOB_DOCUMENTATION_SERVER"] = "https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
   result = link_documentation(additional_packages, stringio(f))
-  expected = {'https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master' : None}
+  expected = {'http://docs.python.org/%d.%d/' % sys.version_info[:2] : None, 'https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master' : None}
   nose.tools.eq_(result, expected)
 
