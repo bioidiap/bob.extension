@@ -131,13 +131,23 @@ package-z
 """
 
   # test NumPy and SciPy docs
-  additional_packages = ['numpy', 'scipy']
-  result = link_documentation(additional_packages, None)
-  assert len(result) == 2
-  addresses = result.keys()
-  assert '/numpy' in addresses[0] or '/numpy' in addresses[1]
-  assert '/scipy' in addresses[0] or '/scipy' in addresses[1]
-  assert '/reference' in addresses[0] or '/reference' in addresses[1]
+  try:
+    import numpy
+    result = link_documentation(['numpy'], None)
+    assert len(result) == 1
+    assert '/numpy' in result.keys()[0]
+  except ImportError:
+    pass
+
+  try:
+    import scipy
+    result = link_documentation(['scipy'], None)
+    assert len(result) == 1
+    assert '/scipy' in result.keys()[0]
+    assert '/reference' in result.keys()[0]
+  except ImportError:
+    pass
+
 
   # test pypi packages
   additional_packages = ['python', 'bob.extension', 'other.bob.package']

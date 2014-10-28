@@ -418,7 +418,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
 
   if 'scipy' in packages:
     scipy_version = __import__('scipy').version.version
-    if smaller_than(numpy_version, '0.9.0'):
+    if smaller_than(scipy_version, '0.9.0'):
       scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.x'
     else:
       scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.0'
