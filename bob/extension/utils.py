@@ -401,7 +401,9 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   # standard documentation: Python
   mapping = {}
   if 'python' in packages:
-    mapping['http://docs.python.org/%d.%d/' % sys.version_info[:2]] = None
+    python_manual = 'http://docs.python.org/%d.%d' % sys.version_info[:2]
+    print ("Adding intersphinx source %s" % python_manual)
+    mapping[python_manual] = None
     packages.remove('python')
 
   if 'numpy' in packages:
@@ -410,9 +412,10 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
       numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.x'
     else:
       numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.0'
-    numpy_manual = 'http://docs.scipy.org/doc/numpy-%s/' % numpy_version
+    numpy_manual = 'http://docs.scipy.org/doc/numpy-%s' % numpy_version
 
     # numpy mapping
+    print ("Adding intersphinx source %s" % numpy_manual)
     mapping[numpy_manual]  = None
     packages.remove('numpy')
 
@@ -425,6 +428,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     scipy_manual = 'http://docs.scipy.org/doc/scipy-%s/reference' % scipy_version
 
     # numpy mapping
+    print ("Adding intersphinx source %s" % scipy_manual)
     mapping[scipy_manual]  = None
     packages.remove('scipy')
 
@@ -434,6 +438,18 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
       server = os.environ["BOB_DOCUMENTATION_SERVER"]
     else:
       server = "https://pythonhosted.org/%s"
+
+  # HACK: some packages are in the 'idiap' directory of the local documentation server
+  # so, we replace 'bioidiap' with 'idiap' for those packages,
+  # which should affect only the case when the BOB_DOCUMENTATION_SERVER env is set
+  for idiap_doc in ('gridtk', 'facereclib'):
+    if idiap_doc in packages:
+      idiap_manual = server.replace('bioidiap', 'idiap') % idiap_doc
+      # gridtk mapping
+      print ("Adding intersphinx source %s" % idiap_manual)
+      mapping[idiap_manual] = None
+      packages.remove(idiap_doc)
+
 
   # check if the packages have documentation on pythonhosted.org
   for p in packages:
