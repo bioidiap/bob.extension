@@ -52,6 +52,7 @@ The anatomy of a minimal package should look like the following:
   +-- bootstrap.py      # stock script downloaded from zc.buildout's website
   +-- buildout.cfg      # buildout configuration
   +-- setup.py          # installation + requirements for this particular package
+  +-- version.txt       # the (current) version of your package
   +-- doc               # documentation directory
   |   +-- conf.py       # Sphinx configuration
   |   +-- index.rst     # Documentation starting point for Sphinx
@@ -101,7 +102,7 @@ Particularly, it inspects the ``setup.py`` file in the root directory of the pac
 
   setup(
     name = 'bob.example.project',
-    version = '0.0.1a0',
+    version = open("version.txt").read().rstrip(),
     ...
     packages = find_packages(),
     ...
@@ -180,7 +181,7 @@ Here is how to go from nothing to everything:
 
   .. code-block:: sh
 
-    $ /idiap/group/torch5spro/nightlies/last/bob.python/linux-x86_64-release/bin/python bootstrap.py
+    $ /idiap/group/torch5spro/nightlies/last/bob/linux-x86_64-release/bin/python bootstrap.py
 
   .. warning::
      This python version is replaced every night.
@@ -190,14 +191,13 @@ Here is how to go from nothing to everything:
      Change the directory to the installed directory of the latest stable packages at Idiap, as soon as they are published.
 
 
-  Also, as long as the packages are not uploaded to PyPI_, running ``./bin/buildout`` will not find the packages (yet).
-  Use:
+  Sometimes, you don't want to use the packages that are published on PyPI_, but the latest (nightly compiled) versions of all our packages.
+  In this case, use:
 
   .. code-block:: sh
 
-    $ ./bin/buildout buildout:find-links=https://www.idiap.ch/software/bob/packages/bob.python/nightlies/last buildout:prefer-final=false
+    $ ./bin/buildout buildout:find-links=https://www.idiap.ch/software/bob/packages/nightlies/last buildout:prefer-final=false
 
-  to get the latest (nightly compiled) versions of all our packages (particularly of ``bob.buildout``).
 
 
 
@@ -270,7 +270,7 @@ Documentation
 =============
 
 To write documentation, use the `Sphinx`_ Documentation Generator.
-A template has been setup for you under the ``docs`` directory.
+A template has been setup for you under the ``doc`` directory.
 Get familiar with Sphinx and then unleash the writer in you.
 
 Once you have edited both ``doc/conf.py`` and ``doc/index.rst`` you can run the documentation generator executing:
@@ -290,7 +290,7 @@ You can find more options for ``sphinx-build`` using the ``-h`` flag:
 
 .. note::
 
-  If the code you are distributing corresponds to the work described in a publication, don't forget to mention it in your ``README.rst`` file.
+  If the code you are distributing corresponds to the work described in a publication, don't forget to mention it in your ``doc/index.rst`` file.
 
 
 Unit Tests
@@ -314,9 +314,17 @@ To run the test units on your package call:
 Distributing Your Work
 ----------------------
 
-To distribute a package, we recommend you use PyPI.
+To distribute a package, we recommend you use PyPI_.
 `The Hitchhiker’s Guide to Packaging <http://guide.python-distribute.org/>`_ contains details and good examples on how to achieve this.
+Particularly, you should edit your ``README.rst`` file to have a proper description of your package.
+This file will be used to generate the front page of your package on PyPI_ and will, hence, be the first contact point of the world with your package.
 
+.. note::
+  If you are writing a package to extend Bob, you might want to follow the README structure of all Bob packages.
+  The ``README.rst`` of **this package** (``bob.extension``) is a good example, including all the badges that show the current status of the package and the link to relevant information.
+
+To ease up your life, we also provide a script to run all steps to publish your package.
+Please read the following paragraphs to understand the steps in the ``./scripts/new_version.py`` script that will be explained at the end of this section.
 
 Version Numbering Scheme
 ========================
@@ -387,10 +395,12 @@ Here is a set of steps we recommend you follow when releasing a new version of y
    The ``-``'s mark commits on your repository.
    Time flies from left to right.
 
-   In this ficticious representation, the ``master`` branch continue under development, but one can see older branches don't receive much attention anymore.
+   In this fictitious representation, the ``master`` branch continue under development, but one can see older branches don't receive much attention anymore.
 
    Here is an example for creating a branch at github (many of our satellite packages are hosted there).
    Let's create a branch called ``1.1``::
+
+   .. code-block:: sh
 
      $ git branch 1.1
      $ git checkout 1.1
@@ -398,6 +408,8 @@ Here is a set of steps we recommend you follow when releasing a new version of y
 
 3. When you decide to release something publicly, we recommend you **tag** the version of the package on your repository, so you have a marker to what code you actually published on PyPI.
    Tagging on github would go like this::
+
+   .. code-block:: sh
 
      $ git tag v1.1.0
      $ git push && git push --tags
@@ -407,19 +419,23 @@ Here is a set of steps we recommend you follow when releasing a new version of y
 4. Finally, after branching and tagging, it is time for you to publish your new package on PyPI.
    When the package is ready and you have tested it, just do the following::
 
-     $ python setup.py register #if you modified your setup.py or README.rst
-     $ python setup.py sdist --formats zip upload
+   .. code-block:: sh
+
+     $ ./bin/python setup.py register #if you modified your setup.py or README.rst
+     $ ./bin/python setup.py sdist --formats zip upload
 
     .. note::
       You can also check the .zip file that will be uploaded to PyPI before actually uploading it.
-      Just call::
+      Just call:
 
-        $ python setup.py sdist --formats zip
+      .. code-block:: sh
+
+        $ ./bin/python setup.py sdist --formats zip
 
       and check what was put into the ``dist`` directory.
 
    .. note::
-      To be able to upload a package to PyPI_ you have to register at the web page using a username and password.
+      To be able to upload a package to PyPI_ you have to register at the web page using a user name and password.
 
 5. Announce the update on the relevant channels.
 
@@ -430,28 +446,42 @@ Upload Additional Documentation to PythonHosted.org
 In case you have written additional sphinx documentation in your satellite package that you want to share with the world, there is an easy way to push the documentation to `PythonHosted.org <http://pythonhosted.org>`_.
 More detailed information are given `here <http://pythonhosted.org/an_example_pypi_project/buildanduploadsphinx.html>`__, which translates roughly into:
 
-1. Edit your ``buildout.cfg`` and add the required package ``sphinx-pypi-upload``:
+.. code-block:: sh
 
-  .. code-block:: python
-
-    eggs = ...
-           sphinx-pypi-upload
-
-  And re-run ``buildout``::
-
-    $ ./bin/buildout
-
-  .. note::
-     When you are using our ``bob.buildout:scripts`` recipe in your ``buildout.cfg`` (the default), you can skip this step since ``sphinx-pypi-upload`` is enabled by default.
-
-
-2. Create and upload the documentation, following the instructions `here <https://pypi.python.org/pypi/Sphinx-PyPI-upload>`__::
-
-    $ ./bin/python setup.py build_sphinx --source-dir=doc --build-dir=build/doc --all-files
-    $ ./bin/python setup.py upload_docs --upload-dir=build/doc/html
+  $ ./bin/python setup.py build_sphinx --source-dir=doc --build-dir=build/doc --all-files
+  $ ./bin/python setup.py upload_docs --upload-dir=build/doc/html
 
 The link to the documentation will automatically be added to the PyPI page of your package.
 Usually it is a good idea to check the documentation after building and before uploading.
+
+
+Change the Version of your Satellite Package
+============================================
+
+It is well understood that it requires quite some work to understand and follow the steps to publish (a new version) of your package.
+Especially, when you want to update the .git repository and the version on PyPI_ at the same time.
+In total, 5 steps need to be performed, in the right order.
+These steps are:
+
+1. Adding a tag in your git repository, possibly after changing the version of your package.
+2. Running buildout to build your package.
+3. Register and upload your package at PyPI.
+4. Upload the documentation of your package to PythonHosted.org.
+
+and, finally, to keep track of new changes:
+
+5. Switch to a new version number.
+
+All these steps are combined in the ``./scripts/new_version.py`` script.
+This script needs to be run from within the root directory of your package.
+Please run:
+
+.. code-block:: sh
+
+  $ [PATH/TO/]bob.extension/script/new_version.py --help
+
+to see a list of options.
+
 
 
 Satellite Packages Available

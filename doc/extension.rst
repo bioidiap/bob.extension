@@ -63,6 +63,9 @@ Third, we have to add an extension using the ``Extension`` class, by listing all
 
 .. code-block:: python
 
+  # read version from version.txt file
+  version = open("version.txt").read().rstrip()
+
   setup(
     ...
     setup_requires = build_requires,
@@ -76,7 +79,7 @@ Third, we have to add an extension using the ``Extension`` class, by listing all
           # the Python bindings
           "bob/example/extension/main.cpp",
         ],
-        version = "1.0.0",
+        version = version,
         bob_packages = bob_packages
       ),
       ... #add more extensions if you wish
@@ -191,7 +194,7 @@ To generate a Library, simply add it in the list of ``ext_modules``:
         [
           "bob/example/library/cpp/Function.cpp",
         ],
-        version = "1.0.0",
+        version = version,
         bob_packages = bob_packages,
       ),
       # all other extensions will automatically link against the Library defined above
@@ -201,7 +204,7 @@ To generate a Library, simply add it in the list of ``ext_modules``:
           # the Python bindings
           "bob/example/library/main.cpp",
         ],
-        version = "1.0.0",
+        version = version,
         bob_packages = bob_packages,
       ),
       ... #add more Extensions if you wish
