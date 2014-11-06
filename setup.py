@@ -8,10 +8,13 @@
 
 from setuptools import setup, find_packages
 
+# Define package version
+version = open("version.txt").read().rstrip()
+
 setup(
 
     name="bob.extension",
-    version="2.0.0a0",
+    version=version,
     description="Building of Python/C++ extensions for Bob",
     url='http://github.com/bioidiap/bob.extension',
     license="BSD",
