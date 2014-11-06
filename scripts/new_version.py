@@ -44,7 +44,7 @@ def run_commands(version, *calls):
   if not args.dry_run:
     # update version to stable version, if not done yet
     with open(version_file, 'w') as f:
-      f.write(args.stable_version)
+      f.write(version)
 
   # get all calls
   for call in calls:
@@ -73,9 +73,9 @@ if 'tag' in args.steps:
   if Version(current_version) != Version(args.stable_version):
     print ("\nTagging version '%s'" % args.stable_version)
     # update stable version on github and add a tag
-    run_commands(args.stable_version, ['git', 'submodule', 'add', 'version.txt'], ['git', 'commit', '-m', '"Increased version to %s [skip ci]"' % args.stable_version], ['git' 'tag', 'v%s' % args.stable_version], ['git', 'push', '--tags'])
+    run_commands(args.stable_version, ['git', 'add', 'version.txt'], ['git', 'commit', '-m', '"Increased version to %s [skip ci]"' % args.stable_version], ['git', 'tag', 'v%s' % args.stable_version], ['git', 'push', '--tags'])
   else:
-    print ("\nSkipping the 'tag' step since the the current version '%s' is already the stable version '%s'" % (current_version, args.latest_version))
+    print ("\nSkipping the 'tag' step since the the current version '%s' is already the stable version '%s'" % (current_version, args.stable_version))
 
 
 if 'pypi' in args.steps:
@@ -84,7 +84,7 @@ if 'pypi' in args.steps:
     # update version on github and add a tag
     run_commands(args.stable_version, ['./bin/python', 'setup.py', 'register'], ['./bin/python', 'setup.py', 'sdist', '--formats', 'zip', 'upload'])
   else:
-    print ("\nSkipping the 'pypi' step since the the current version '%s' is already the stable version '%s'" % (current_version, args.latest_version))
+    print ("\nSkipping the 'pypi' step since the the current version '%s' is already the stable version '%s'" % (current_version, args.stable_version))
 
 
 if 'docs' in args.steps:
@@ -95,6 +95,6 @@ if 'docs' in args.steps:
 if 'latest' in args.steps:
   # update GitHub version to latest version
   print ("\nSetting latest version '%s'" % args.latest_version)
-  run_commands(args.latest_version, ['git', 'submodule', 'add', 'version.txt'], ['git', 'commit', '-m', '"Increased version to %s [skip ci]"' % args.latest_version], ['git', 'push'])
+  run_commands(args.latest_version, ['git', 'add', 'version.txt'], ['git', 'commit', '-m', '"Increased version to %s"' % args.latest_version], ['git', 'push'])
 
 
