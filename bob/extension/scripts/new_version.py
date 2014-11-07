@@ -47,7 +47,7 @@ def main(command_line_options = None):
   # assert the the version file is there
   version_file = 'version.txt'
   if not os.path.exists(version_file):
-    raise ValueError("Could not find the file '%s' containing the version number. Are you inside the root directory of your package?")
+    raise ValueError("Could not find the file '%s' containing the version number. Are you inside the root directory of your package?" % version_file)
 
   def run_commands(version, *calls):
     """Updates the version.txt to the given version and runs the given commands."""
