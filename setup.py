@@ -34,6 +34,12 @@ setup(
       'setuptools',
     ],
 
+    entry_points = {
+      'console_scripts': [
+        'bob_new_version.py = bob.extension.scripts:new_version',
+      ],
+    },
+
     classifiers = [
       'Framework :: Bob',
       'Development Status :: 4 - Beta',

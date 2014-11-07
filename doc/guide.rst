@@ -324,7 +324,7 @@ This file will be used to generate the front page of your package on PyPI_ and w
   The ``README.rst`` of **this package** (``bob.extension``) is a good example, including all the badges that show the current status of the package and the link to relevant information.
 
 To ease up your life, we also provide a script to run all steps to publish your package.
-Please read the following paragraphs to understand the steps in the ``./scripts/new_version.py`` script that will be explained at the end of this section.
+Please read the following paragraphs to understand the steps in the ``./bin/bob_new_version.py`` script that will be explained at the end of this section.
 
 Version Numbering Scheme
 ========================
@@ -472,13 +472,13 @@ and, finally, to keep track of new changes:
 
 5. Switch to a new version number.
 
-All these steps are combined in the ``./scripts/new_version.py`` script.
+All these steps are combined in the ``./bin/bob_new_version.py`` script.
 This script needs to be run from within the root directory of your package.
 Please run:
 
 .. code-block:: sh
 
-  $ [PATH/TO/]bob.extension/script/new_version.py --help
+  $ ./bin/bob_new_version.py --help
 
 to see a list of options.
 

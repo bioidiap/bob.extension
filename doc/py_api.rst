@@ -6,7 +6,14 @@
  Python API to `bob.extension`
 ================================
 
-This section includes information for using the Python API of
-``bob.extension``.
+This section includes information for using the Python API of ``bob.extension``.
+
+Functions
+---------
 
 .. automodule:: bob.extension
+
+Scripts
+-------
+
+.. automodule:: bob.extension.scripts
