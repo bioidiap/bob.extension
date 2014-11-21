@@ -16,6 +16,9 @@
 #include <set>
 #include <stdexcept>
 #include <iostream>
+#include <string.h>
+
+#include <bob.extension/defines.h>
 
 namespace bob{
   namespace extension{
@@ -88,6 +91,14 @@ namespace bob{
         );
 
         /**
+         * Copy constructor; will deep-copy the kwlists
+         */
+        FunctionDoc(const FunctionDoc& other);
+
+        /** Destrcutor */
+        ~FunctionDoc();
+
+        /**
          * Add a prototypical call for this function by defining the parameters and the return values.
          * This function has to be called at least ones.
          * @param variables    A string containing a comma-separated list of parameters, e.g., "param1, param2"
@@ -137,6 +148,15 @@ namespace bob{
          */
         const char* const doc(const unsigned alignment = 72, const unsigned indent = 0) const;
 
+        /**
+         * Returns the (NULL-terminated) list of variables for the given prototype index, which can be used as kwlist argument in the bindings.
+         * @param index  The index of the prototype
+         * @return  A NULL-terminated list of variable names
+         */
+        char** kwlist(int index) const{
+          if (index >= kwlists.size()) throw std::runtime_error("The prototype for the given index is not found");
+          return kwlists[index];
+        }
 
         /**
          * Generates and prints the usage string, simply listing the possible ways to call the function.
@@ -165,10 +185,12 @@ namespace bob{
         std::vector<std::string> return_types;
         std::vector<std::string> return_descriptions;
 
+        // the list of wey-word arguments
+        std::vector<char**> kwlists;
+
         // an internal string that is generated and returned.
         mutable std::string description;
     };
-
 
 
     /**
@@ -231,6 +253,16 @@ namespace bob{
         char* doc(const unsigned alignment = 72) const;
 
         /**
+         * Returns the (NULL-terminated) list of variables of the constructor documentation for the given prototype index, which can be used as kwlist argument in the bindings.
+         * @param index  The index of the prototype
+         * @return  A NULL-terminated list of variable names
+         */
+        char** kwlist(int index) const{
+          if (constructor.empty()) throw std::runtime_error("The class documentation does not have constructor documentation");
+          return constructor.front().kwlist(index);
+        }
+
+        /**
          * Prints the usage string of the constructor, if available.
          */
         void print_usage() const {if (!constructor.empty()) constructor.front().print_usage();}
@@ -263,8 +295,6 @@ namespace bob{
 
 /////////////////////////////////////////////////////////////
 /// helper functions
-// TODO: remove
-#include <iostream>
 
 #ifndef BOB_SHORT_DOCSTRINGS
 // removes leading and trailing spaces
@@ -345,9 +375,10 @@ static std::string _align(std::string str, unsigned indent, unsigned alignment){
 // Aligns the parameter description
 static void _align_parameter(std::string& str, const std::string& name, const std::string& type, const std::string& description, unsigned indent, unsigned alignment){
   if (type.find(':') != std::string::npos && type.find('`') != std::string::npos)
-    // we expect that this is a :py:class: directive, which is simply written (otherwise the *...*
+    // we expect that this is a :py:class: directive, which is simply written
     str += _align("``" + name + "`` : " + type + "", indent, alignment) + "\n\n";
   else
+    // otherwise we emphasize the parameter type with *...*
     str += _align("``" + name + "`` : *" + type + "*", indent, alignment) + "\n\n";
   str += _align(description, indent + 4, alignment) + "\n\n";
 }
@@ -432,12 +463,63 @@ inline bob::extension::FunctionDoc::FunctionDoc(
 #endif
 }
 
+inline bob::extension::FunctionDoc::FunctionDoc(
+  const bob::extension::FunctionDoc& other
+)
+: function_name(other.function_name),
+  function_description(other.function_description),
+  is_member(other.is_member),
+  prototype_variables(other.prototype_variables),
+  prototype_returns(other.prototype_returns),
+  parameter_names(other.parameter_names),
+  parameter_types(other.parameter_types),
+  parameter_descriptions(other.parameter_descriptions),
+  return_names(other.return_names),
+  return_types(other.return_types),
+  return_descriptions(other.return_descriptions)
+{
+  // Add the variables to the kwlists
+  kwlists.resize(other.kwlists.size());
+  for (unsigned i = 0; i < kwlists.size(); ++i){
+    // copy all kwlists
+    unsigned counts = _split(prototype_variables[i], ',').size();
+    char** names = new char*[counts + 1];
+    for (unsigned j = 0; j < counts; ++j){
+      names[j] = const_cast<char*>(strdup(other.kwlists[i][j]));
+    }
+    // add terminating NULL pointer
+    names[counts] = 0;
+    kwlists[i] = names;
+  }
+}
+
+inline bob::extension::FunctionDoc::~FunctionDoc(){
+
+  for (unsigned i = 0; i < kwlists.size(); ++i){
+    unsigned counts = _split(prototype_variables[i], ',').size();
+    for (unsigned j = 0; j < counts; ++j){
+      delete[] kwlists[i][j];
+    }
+    delete[] kwlists[i];
+  }
+}
+
 inline bob::extension::FunctionDoc& bob::extension::FunctionDoc::add_prototype(
   const char* const variables,
   const char* const return_values
 ){
-#ifndef BOB_SHORT_DOCSTRINGS
+  // Add the variables to the kwlists
+  std::vector<std::string> vars = _split(variables, ',');
+  char** names = new char*[vars.size() + 1];
+  for (unsigned i = 0; i < vars.size(); ++i){
+    names[i] = const_cast<char*>(strdup(_strip(vars[i]).c_str()));
+  }
+  // add terminating NULL pointer
+  names[vars.size()] = 0;
+  kwlists.push_back(names);
+
   prototype_variables.push_back(variables);
+#ifndef BOB_SHORT_DOCSTRINGS
   if (!return_values)
     prototype_returns.push_back("");
   else
@@ -526,7 +608,6 @@ inline const char* const bob::extension::FunctionDoc::doc(
       }
     }
   }
-  //  std::cout << description << std::endl;
 
   // return the description
   return description.c_str();

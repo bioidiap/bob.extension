@@ -25,4 +25,5 @@ def main():
 
   import bob.blitz
   print (bob.blitz.get_config())
+  return 0
 

@@ -297,7 +297,7 @@ This documentation can be used after:
 Function documentation
 ++++++++++++++++++++++
 
-To generate a properly aligned function documentation, you can use:
+To generate a properly aligned function documentation, you can use the :cpp:class:`bob::extension::FunctionDoc`:
 
 .. code-block:: c++
 
@@ -365,6 +365,8 @@ a. ``description.name()`` to get the name of the function
 b. ``description.doc()`` to get the aligned documentation of the function, properly indented and broken at 80 characters (by default).
    This call will check that all parameters and return values are documented, and add a ``.. todo::`` directive if not.
 
+c. ``description.kwlist(index)`` to get the list of keyword arguments for the given prototype ``index`` that can be passed as the ``keywords`` parameter to the :c:func:`PyArg_ParseTupleAndKeywords` function.
+
 which can be used during the binding of the function.
 In our example, it would look like:
 
@@ -423,10 +425,10 @@ Leading white-spaces in the documentation string are handled correctly, so you c
 **Class documentation**
 +++++++++++++++++++++++
 
-To document a bound class, you can use the ``bob::extension::ClassDoc("class_name", "Short class description", "Optional long class description")`` function to align and wrap your documentation.
+To document a bound class, you can use the :cpp:class:`bob::extension::ClassDoc` to align and wrap your documentation.
 Again, during binding you can use the functions ``description.name()`` and ``description.doc()`` as above.
 
-Additionally, the class documentation has a function to add constructor definitions, which takes an ``bob::extension::FunctionDoc`` object.
+Additionally, the class documentation has a function to add constructor definitions, which takes an :cpp:class:`bob::extension::FunctionDoc` object.
 The shortest way to get a proper class documentation is:
 
 .. code-block:: c++
@@ -449,7 +451,10 @@ The shortest way to get a proper class documentation is:
    For constructor documentations, there is no need to declare them as member functions.
    This is done automatically for you.
 
-Currently, the ``ClassDoc`` allows to highlight member functions or variables at the beginning of the class documentation.
+.. note::
+   You can use the :cpp:func:`bob::extension::ClassDoc::kwlist` function to retrieve the ``kwlist`` of the constructor documentation.
+
+Currently, the :cpp:class:`bob::extension::ClassDoc` allows to highlight member functions or variables at the beginning of the class documentation.
 This highlighting is still under development and might not work as expected.
 
 

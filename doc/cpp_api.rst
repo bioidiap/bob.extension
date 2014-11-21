@@ -28,7 +28,7 @@ Function Documentation
 
    To document a function (either a stand-alone function or a member function of a class), you should use the :cpp:class:`bob::extension::FunctionDoc`.
 
-   .. cpp:function:: FunctionDoc(\
+   .. cpp:function:: bob::extension::FunctionDoc(\
         const char* const function_name,\
         const char* const short_desctiption,\
         const char* const long_description = NULL,\
@@ -106,6 +106,12 @@ Function Documentation
       The ``indent`` is an internal parameter and should not be changed.
 
 
+   .. cpp:function:: char** kwlist(unsigned index) const
+
+      Returns the list of keyword arguments for the given prototype index added with the :cpp:func:`add_prototype` function.
+      This list is in the desired format to be passed as the ``keywords`` parameter to the :c:func:`PyArg_ParseTupleAndKeywords` function during your bindings.
+
+
    .. cpp:function:: void print_usage() const
 
       Prints a function usage string to console, including all information specified by the member functions above.
@@ -125,6 +131,7 @@ All functions adding information to the :cpp:class:`bob::extension::FunctionDoc`
    .add_parameter("param2", "float", "[Default: ``0.5``] A float value describing ...")
    .add_return("ret", ":py:class:`bob.blitz.array`", "An array ...")
    ;
+
 
 During the binding of your function, you can use it, like:
 
@@ -149,7 +156,7 @@ Variables Documentation
 
    To document a variable (either a stand-alone function or a member function of a class), you should use the :cpp:class:`bob::extension::VariableDoc`.
 
-   .. cpp:function:: VariableDoc(\
+   .. cpp:function:: bob::extension::VariableDoc(\
         const char* const variable_name,\
         const char* const variable_type,\
         const char* const short_desctiption,\
@@ -177,9 +184,9 @@ Class Documentation
 
 .. cpp:class:: bob::extension::ClassDoc
 
-   To document a function (either a stand-alone function or a member function of a class), you should use the :cpp:class:`bob::extension::FunctionDoc`.
+   To document a class including its constructor, you should use the :cpp:class:`bob::extension::ClassDoc`.
 
-   .. cpp:function:: ClassDoc(\
+   .. cpp:function:: bob::extension::ClassDoc(\
         const char* const class_name,\
         const char* const short_desctiption,\
         const char* const long_description = NULL\
@@ -212,6 +219,13 @@ Class Documentation
 
       Generates and returns the documentation string, which is composed of the information provided in the constructor, and the constructor documentation.
       The free text in the documentation is aligned to ``alignment`` characters, by default 72, so that it can be viewed correctly inside of an 80-character Python console.
+
+
+   .. cpp:function:: char** kwlist(unsigned index) const
+
+      Returns the list of keyword arguments of the constructor for the given prototype index added with the :cpp:func:`FunctionDoc::add_prototype` function.
+      This list is in the desired format to be passed as the ``keywords`` parameter to the :c:func:`PyArg_ParseTupleAndKeywords` function during your bindings.
+
 
    .. cpp:function:: void print_usage() const
 

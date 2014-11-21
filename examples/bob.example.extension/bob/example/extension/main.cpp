@@ -24,8 +24,11 @@ static bob::extension::FunctionDoc reverse_doc = bob::extension::FunctionDoc(
 // declare the function
 // we use the default Python C-API here.
 static PyObject* PyReverse(PyObject*, PyObject* args, PyObject* kwargs) {
+
+  BOB_TRY
+
   // declare the expected parameter names
-  char* kwlist[] = {const_cast<char*>("array"), NULL};
+  char** kwlist = reverse_doc.kwlist(0);
 
   // declare an object of the bridging type
   PyBlitzArrayObject* array;
@@ -50,6 +53,9 @@ static PyObject* PyReverse(PyObject*, PyObject* args, PyObject* kwargs) {
 
   // convert the blitz array back to numpy and return it
   return PyBlitzArrayCxx_AsNumpy(reversed);
+
+  // handle exceptions that occurred in this function
+  BOB_CATCH_FUNCTION("in reverse", 0)
 }
 
 

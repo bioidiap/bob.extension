@@ -13,7 +13,3 @@ Package Documentation
 .. automodule:: bob.example.project
 
 
-Script Documentation
---------------------
-
-.. automodule:: bob.example.project.script
