@@ -153,7 +153,7 @@ namespace bob{
          * @param index  The index of the prototype
          * @return  A NULL-terminated list of variable names
          */
-        char** kwlist(int index) const{
+        char** kwlist(unsigned index) const{
           if (index >= kwlists.size()) throw std::runtime_error("The prototype for the given index is not found");
           return kwlists[index];
         }
@@ -257,7 +257,7 @@ namespace bob{
          * @param index  The index of the prototype
          * @return  A NULL-terminated list of variable names
          */
-        char** kwlist(int index) const{
+        char** kwlist(unsigned index) const{
           if (constructor.empty()) throw std::runtime_error("The class documentation does not have constructor documentation");
           return constructor.front().kwlist(index);
         }
