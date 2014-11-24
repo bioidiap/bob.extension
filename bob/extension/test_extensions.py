@@ -16,13 +16,27 @@ import pkg_resources
 
 
 def _run(package, run_call):
-  example_dir = os.path.realpath(pkg_resources.resource_filename("bob.extension", "../../examples"))
+  example_url = "https://github.com/bioidiap/bob.extension/raw/master/examples/bob.example.%s.tar.bz2"%package
   temp_dir = tempfile.mkdtemp(prefix="bob_test")
+  local_archive = os.path.join(temp_dir, "bob.example.%s.tar.bz2"%package)
+
+  # download archive
+  if sys.version_info[0] <= 2:
+    import urllib2 as urllib
+  else:
+    import urllib.request as urllib
+  # download
+  url = urllib.urlopen(example_url)
+  tfile = open(local_archive, 'wb')
+  tfile.write(url.read())
+  tfile.close()
 
   # extract archive
-  subprocess.call(["tar", "-xjf", os.path.join(example_dir, "bob.example.%s.tar.bz2"%package), "-C", temp_dir])
+  import tarfile
+  tar = tarfile.open(local_archive)
+  tar.extractall(temp_dir)
+  os.remove(local_archive)
   package_dir = os.path.join(temp_dir, "bob.example.%s"%package)
-  assert os.path.exists(package_dir)
 
   # bootstrap
   subprocess.call([sys.executable, "bootstrap.py"], cwd=package_dir)
