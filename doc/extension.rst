@@ -124,6 +124,13 @@ In ``bob/example/extension/main.cpp``, we define the Python bindings to that fun
 Additionally, we give a short example of how to use our documentation classes provided in this module (see below for more details).
 Finally, the function ``reverse`` from the module ``_library`` is imported into our module in the ``bob/example/extension/__init__.py`` file.
 
+.. note::
+   In the bindings of the ``reverse`` function in ``bob/example/extension/main.cpp``, we make use of some C++ defines that makes the life easier.
+
+   1. We use a :c:macro:`BOB_TRY` and :c:macro:`BOB_CATCH_FUNCTION` block around the function call, as explained in :ref:`helpers`.
+
+   2. We use a :cpp:class:`bob::extension::FunctionDoc` to generate a proper function documentation in Python, as explained in :ref:`docs`.
+
 To compile your C++ Python bindings and the pure C++ libraries, you can follow the same instructions as shown above:
 
 .. code-block:: sh
@@ -281,6 +288,7 @@ Again, after compilation this directory can be safely removed.
 Another environment variable enables parallel compilation of C or C++ code.
 Use ``BOB_BUILD_PARALLEL=X`` (where ``X`` is the number of parallel processes you want) to enable parallel building.
 
+.. _docs:
 
 Documenting your C/C++ Python Extension
 ---------------------------------------

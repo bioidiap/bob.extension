@@ -4,6 +4,32 @@
 ..
 .. Copyright (C) 2011-2014 Idiap Research Institute, Martigny, Switzerland
 
+.. _helpers:
+
+==================
+ Helper utilities
+==================
+
+In the header file ``<bob.extension/defines.h>`` we have added some functions that help you to keep your code short and clean.
+Particularly, we provide three preprocessor definitions:
+
+.. c:macro:: BOB_TRY
+
+   Starts a try-catch block to protect your bound function against exceptions of any kinds (which would lead to a Python interpreter crash otherwise).
+
+.. c:macro:: BOB_CATCH_FUNCTION(message,ret)
+
+   Catches exceptions of any kind, adds the ``message`` in case an unknown exception is caught, and returns with the given error return (which is usually 0 for normal functions or -1 for constructors and setter functions).
+   This macro should be used when binding a stand-alone function, for binding class member functions, please use :c:macro:`BOB_CATCH_MEMBER`.
+
+.. c:macro:: BOB_CATCH_MEMBER(message,ret)
+
+   Catches exceptions of any kind, adds the ``message`` in case an unknown exception is caught, and returns with the given error return (which is usually 0 for normal functions or -1 for constructors and setter functions).
+   This macro should be used when binding a member function of a class, for binding stand-alone functions, please use :c:macro:`BOB_CATCH_FUNCTION`.
+
+
+After including the above mentioned header, we also re-define the functions :c:func:`PyInt_Check`, :c:func:` PyInt_AS_LONG`, :c:func:`PyString_Check` and :c:func:`PyString_AS_STRING` (which don't exist in the bindings for Python3) so that they can be used in bindings for both Python2 and Python3.
+
 .. _cpp_api:
 
 ======================================
