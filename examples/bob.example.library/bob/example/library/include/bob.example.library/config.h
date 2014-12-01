@@ -6,9 +6,9 @@
  */
 
 #ifndef BOB_EXAMPLE_LIBRARY_CONFIG_H
-#define BOB_EXAMPLE_LIBRARY_H
+#define BOB_EXAMPLE_LIBRARY_CONFIG_H
 
 /* Macros that define versions and important names */
-#define BOB_EXAMPLE_LIBRARY_API_VERSION 0x0200
+#define BOB_EXAMPLE_LIBRARY_API_VERSION 0x0000
 
 #endif /* BOB_EXAMPLE_LIBRARY_CONFIG_H */
