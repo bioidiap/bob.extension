@@ -370,7 +370,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
 
     c1 = v1.split('.')
     c2 = v2.split('.')[:len(c1)] #clip to the compared version
-    for i, k in enumerate(c2):
+    for i in range(len(c2)):
       n1 = c1[i]
       n2 = c2[i]
       try:
@@ -379,8 +379,9 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
       except ValueError:
         n1 = str(n1)
         n2 = str(n2)
+      if n1 < n2: return True
       if n1 > n2: return False
-    return True
+    return False
 
 
   if sys.version_info[0] <= 2:
