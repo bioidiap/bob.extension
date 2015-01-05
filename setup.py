@@ -32,6 +32,7 @@ setup(
 
     install_requires=[
       'setuptools',
+      'importlib'
     ],
 
     entry_points = {
