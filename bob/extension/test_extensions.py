@@ -39,7 +39,7 @@ def _run(package, run_call):
   package_dir = os.path.join(temp_dir, "bob.example.%s"%package)
 
   # bootstrap
-  subprocess.call([sys.executable, "bootstrap.py"], cwd=package_dir)
+  subprocess.call([sys.executable, "bootstrap-buildout.py"], cwd=package_dir)
   assert os.path.exists(os.path.join(package_dir, "bin", "buildout"))
 
   # buildout
