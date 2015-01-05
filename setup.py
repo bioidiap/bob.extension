@@ -14,7 +14,7 @@ version = open("version.txt").read().rstrip()
 requiries = ['setuptools']
 import sys
 if sys.version_info[0] == 2 and sys.version_info[1] <= 6:
-  requiries.append('import_lib')
+  requiries.append('importlib')
 
 setup(
 
