@@ -11,6 +11,11 @@ from setuptools import setup, find_packages
 # Define package version
 version = open("version.txt").read().rstrip()
 
+requiries = ['setuptools']
+import sys
+if sys.version_info[0] == 2 and sys.version_info[1] <= 6:
+  requiries.append('import_lib')
+
 setup(
 
     name="bob.extension",
@@ -30,10 +35,7 @@ setup(
       "bob",
     ],
 
-    install_requires=[
-      'setuptools',
-      'importlib'
-    ],
+    install_requires=requiries,
 
     entry_points = {
       'console_scripts': [
