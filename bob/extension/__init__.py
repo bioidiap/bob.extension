@@ -184,6 +184,11 @@ def get_bob_libraries(bob_packages):
       location = pkg_resources.require(package)[0].location
       include_path = [location] + package.split('.') + ['include']
       includes.append(os.path.join(*include_path))
+      # check if the package contains a get_include_directories() function
+      import importlib
+      pkg = importlib.import_module(package)
+      if hasattr(pkg, 'get_include_directories'):
+        includes.extend(pkg.get_include_directories())
 
       lib_name = package.replace('.', '_')
       libs = find_library(lib_name, prefixes=[resource_filename(package, '.')])

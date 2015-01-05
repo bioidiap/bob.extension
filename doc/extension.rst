@@ -135,7 +135,7 @@ To compile your C++ Python bindings and the pure C++ libraries, you can follow t
 
 .. code-block:: sh
 
-  $ python bootstrap.py
+  $ python bootstrap-buildout.py
   ...
   $ ./bin/buildout
   ...
@@ -261,7 +261,7 @@ As shown above, to compile your C++ Python bindings and the pure C++ libraries, 
 
 .. code-block:: sh
 
-  $ python bootstrap.py
+  $ python bootstrap-buildout.py
   ...
   $ ./bin/buildout
   ...
@@ -274,7 +274,7 @@ To get the source code compiled using another build directory, you can define a 
 
 .. code-block:: sh
 
-  $ python bootstrap.py
+  $ python bootstrap-buildout.py
   ...
   $ BOB_BUILD_DIRECTORY=/tmp/build_bob ./bin/buildout
   ...

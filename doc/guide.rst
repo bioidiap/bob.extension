@@ -47,16 +47,16 @@ The anatomy of a minimal package should look like the following:
 .. code-block:: sh
 
   .
-  +-- MANIFEST.in       # extras to be installed, besides the Python files
-  +-- README.rst        # a description of the package, in reStructuredText format
-  +-- bootstrap.py      # stock script downloaded from zc.buildout's website
-  +-- buildout.cfg      # buildout configuration
-  +-- setup.py          # installation + requirements for this particular package
-  +-- version.txt       # the (current) version of your package
-  +-- doc               # documentation directory
-  |   +-- conf.py       # Sphinx configuration
-  |   +-- index.rst     # Documentation starting point for Sphinx
-  +-- bob               # Python package (a.k.a. "the code")
+  +-- MANIFEST.in            # extras to be installed, besides the Python files
+  +-- README.rst             # a description of the package, in reStructuredText format
+  +-- bootstrap-buildout.py  # stock script downloaded from zc.buildout's website
+  +-- buildout.cfg           # buildout configuration
+  +-- setup.py               # installation + requirements for this particular package
+  +-- version.txt            # the (current) version of your package
+  +-- doc                    # documentation directory
+  |   +-- conf.py            # Sphinx configuration
+  |   +-- index.rst          # Documentation starting point for Sphinx
+  +-- bob                    # Python package (a.k.a. "the code")
   |   +-- example
   |   |   +-- project
   |   |   |   +-- script
@@ -131,7 +131,7 @@ Here is how to go from nothing to everything:
 
 .. code-block:: sh
 
-  $ python bootstrap.py
+  $ python bootstrap-buildout.py
   Creating directory '/home/user/bob.example.project/bin'.
   Creating directory '/home/user/bob.example.project/parts'.
   Creating directory '/home/user/bob.example.project/eggs'.
@@ -154,7 +154,7 @@ Here is how to go from nothing to everything:
 .. note::
   The Python shell used in the first line of the previous command set determines the Python interpreter that will be used for all scripts developed inside this package.
   To build your environment around a different version of Python, just make sure to correctly choose the interpreter you wish to use.
-  If you just want to get things rolling, using ``python bootstrap.py`` will, in most cases, do the right thing.
+  If you just want to get things rolling, using ``python bootstrap-buildout.py`` will, in most cases, do the right thing.
 
 .. note::
    When you have installed an older version of |project| -- i.e. |project| v1.x, you might need to uninstall it first, see https://github.com/idiap/bob/wiki/Installation.
@@ -167,12 +167,12 @@ Here is how to go from nothing to everything:
 
   **Using Bob 2.0 at Idiap**
 
-  For Idiapers, at the moment ``python bootstrap.py`` will **not** do the right thing.
+  For Idiapers, at the moment ``python bootstrap-buildout.py`` will **not** do the right thing.
   Since |project| is installed globally (and you don't have the rights to uninstall it), you should run:
 
   .. code-block:: sh
 
-    $ /idiap/group/torch5spro/externals/py27/usr/bin/python bootstrap.py
+    $ /idiap/group/torch5spro/externals/py27/usr/bin/python bootstrap-buildout.py
 
   instead to make sure that you don't mix the old and the new version of |project|.
 
@@ -181,7 +181,7 @@ Here is how to go from nothing to everything:
 
   .. code-block:: sh
 
-    $ /idiap/group/torch5spro/nightlies/last/bob/linux-x86_64-release/bin/python bootstrap.py
+    $ /idiap/group/torch5spro/nightlies/last/bob/linux-x86_64-release/bin/python bootstrap-buildout.py
 
   .. warning::
      This python version is replaced every night.
