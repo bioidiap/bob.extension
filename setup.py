@@ -40,6 +40,7 @@ setup(
     entry_points = {
       'console_scripts': [
         'bob_new_version.py = bob.extension.scripts:new_version',
+        'bob_dependecy_graph.py = bob.extension.scripts:dependency_graph',
       ],
     },
 
