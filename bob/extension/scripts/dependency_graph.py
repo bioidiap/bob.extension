@@ -28,11 +28,11 @@ def main(command_line_options = None):
   parser.add_argument("--output-file", "-w", default="dependencies.png", help = "Specify the (.png) file to write.")
   parser.add_argument("--limit-packages", '-l', nargs = '+', default = ['bob', 'facereclib', 'antispoofing'], help = "Limit packages read from --package-files to the given namespaces")
   parser.add_argument("--plot-external-dependencies", '-X', action='store_true', help = "Include external dependencies into the plot?")
-  parser.add_argument("--rank-base-tools-same", '-R', action = 'store_true', help = "Set the rank of packages bob.extension, bob.core and bob.blitz at the same size")
   parser.add_argument("--vertical", '-V', action = 'store_true', help = "Display the dot graph in vertical direction")
   parser.add_argument("--verbose", '-v', action = 'store_true', help = "Print more information")
 
   args = parser.parse_args(command_line_options)
+  args.limit_packages = tuple(args.limit_packages)
 
 
   # collect packages
@@ -40,10 +40,11 @@ def main(command_line_options = None):
   for package_file in args.package_files:
     for line in open(package_file):
       splits = line.rstrip().split()
-      packages.extend([p for p in splits if p not in packages and p.startswith(tuple(args.limit_packages))])
+      packages.extend([p for p in splits if p not in packages and p.startswith(args.limit_packages)])
       
   # generate dependencies
   dependencies = {}
+  cpp_dependencies = {}
   has_parents = set()
 
   # function to add dependencies of packages recursively
@@ -54,6 +55,15 @@ def main(command_line_options = None):
         print("Checking %s" % p)
       deps = pkg_resources.require(p)
       dependencies[p] = [d.key for d in deps[1:]]
+      if args.plot_external_dependencies and p.startswith(args.limit_packages):
+        # also load the C++ dependencies, stored in the .version package 
+        import importlib
+        lib = importlib.import_module(p)
+        try:
+          cpp_dependencies[p] = [dep for dep in lib.version.externals.keys() if not dep.startswith(args.limit_packages)]
+        except AttributeError:
+          cpp_dependencies[p] = []
+          
       for d in dependencies[p]:
         has_parents.add(d)
         _add_recursive(d)
@@ -68,14 +78,23 @@ def main(command_line_options = None):
     pruned_dependencies[package] = [dep for dep in dependencies[package] if dep not in indirect_dependencies]
 
   # split all dependencies that are from bob (i.e., that belong to the --limit-packages) or not
-  bob = set(package for package in pruned_dependencies if package.startswith(tuple(args.limit_packages)))
-  non_bob = set(dep for package in bob for dep in pruned_dependencies[package] if not dep.startswith(tuple(args.limit_packages)))
+  bob = set(package for package in pruned_dependencies if package.startswith(args.limit_packages))
+  non_bob = set(dep for package in bob for dep in pruned_dependencies[package] if not dep.startswith(args.limit_packages))
   final = set(package for package in bob if package not in has_parents)
+  
+  # also prune the C++ dependencies
+  if args.plot_external_dependencies:
+    pruned_cpp_dependencies = {}
+    for package in cpp_dependencies:
+      indirect_dependencies = set(d for i in [cpp_dependencies[dep] for dep in dependencies[package] if dep in dependencies and dep in cpp_dependencies] for d in i)
+      pruned_cpp_dependencies[package] = [dep for dep in cpp_dependencies[package] if dep not in indirect_dependencies]
+
+    cpp = set(dep for package in bob for dep in pruned_cpp_dependencies[package])
   
 
   # function to return a name for the package that can serve as a dot variable
   def _n(p):
-    return p.replace(".", "_").replace("-","_")
+    return p.replace(".", "_").replace("-","_").replace("+","X")
 
   # write dependency graph
   dot_file = args.dot_file if args.dot_file is not None else tempfile.mkstemp(suffix='.dot')[1]
@@ -91,6 +110,8 @@ def main(command_line_options = None):
     # write non-bob packages in squares
     if args.plot_external_dependencies:
       for package in non_bob:
+        f.write('\t%s [label="%s",shape=box,color=red];\n' % (_n(package), package))
+      for package in cpp:
         f.write('\t%s [label="%s",color=red];\n' % (_n(package), package))
 
     # write dependencies
@@ -100,13 +121,11 @@ def main(command_line_options = None):
           f.write('\t%s -> %s [color=blue];\n' % (_n(package), _n(dep)))
         elif args.plot_external_dependencies:
           f.write('\t%s -> %s [color=red,style=dashed];\n' % (_n(package), _n(dep)))
+
+      if args.plot_external_dependencies:
+        for dep in pruned_cpp_dependencies[package]:
+          f.write('\t%s -> %s [color=red,style=dashed];\n' % (_n(package), _n(dep)))
         
-    # rank all externals at the same level
-    if args.plot_external_dependencies:
-      f.write('\t{rank=same; %s }\n' % " ".join([_n(p) for p in non_bob]))
-    # rank base tools at the same level
-    if args.rank_base_tools_same:
-      f.write('\t{rank=same; bob_extension bob_core bob_blitz}\n')
     f.write("}\n")
   
   if args.verbose and args.dot_file is not None:
