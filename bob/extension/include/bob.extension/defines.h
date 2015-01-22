@@ -11,7 +11,7 @@
 
 /** By including this file, you will be able to
 *
-* 1. Use the Python2 functions PyInt_Check, PyInt_AS_LONG, PyString_Check and PyString_AS_STRING within the bindings for python3
+* 1. Use the Python2 functions PyInt_Check, PyInt_AS_LONG, PyString_Check, PyString_FromString and PyString_AS_STRING within the bindings for python3
 * 2. Add try{ ... } catch {...} blocks around your bindings so that you make sure that **all** exceptions in the C++ code are handled correctly.
 *
 */
@@ -24,6 +24,7 @@
 #define PyInt_Check PyLong_Check
 #define PyInt_AS_LONG PyLong_AS_LONG
 #define PyString_Check PyUnicode_Check
+#define PyString_FromString PyUnicode_FromString
 #define PyString_AS_STRING(x) PyBytes_AS_STRING(make_safe(PyUnicode_AsUTF8String(x)).get())
 #endif
 
