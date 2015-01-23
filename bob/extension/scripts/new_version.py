@@ -85,7 +85,7 @@ def main(command_line_options = None):
   if 'tag' in args.steps:
     if args.stable_version is not None and Version(args.stable_version) > Version(current_version):
       # update stable version on github
-      run_commands(args.stable_version, ['git', 'add', 'version.txt'], ['git', 'commit', '-m', 'Increased version to %s [skip ci]' % args.stable_version])
+      run_commands(args.stable_version, ['git', 'add', 'version.txt'], ['git', 'commit', '-m', 'Increased stable version to %s' % args.stable_version])
     else:
       # assure that we have the current version
       args.stable_version = current_version
@@ -114,9 +114,8 @@ def main(command_line_options = None):
   if 'latest' in args.steps:
     # update GitHub version to latest version
     print ("\nSetting latest version '%s'" % args.latest_version)
-    run_commands(args.latest_version, ['git', 'add', 'version.txt'], ['git', 'commit', '-m', 'Increased version to %s' % args.latest_version], ['git', 'push'])
+    run_commands(args.latest_version, ['git', 'add', 'version.txt'], ['git', 'commit', '-m', 'Increased latest version to %s  [skip ci]' % args.latest_version], ['git', 'push'])
 
 
 if __name__ == '__main__':
   main()
-
