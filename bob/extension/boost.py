@@ -103,8 +103,7 @@ class boost:
 
 
   def libconfig(self, modules, only_static=False,
-      templates=['boost_%(name)s-mt-%(py)s',
-        'boost_%(name)s-mt', 'boost_%(name)s']):
+      templates=['boost_%(name)s-mt-%(py)s', 'boost_%(name)s-%(py)s', 'boost_%(name)s-mt', 'boost_%(name)s']):
     """Returns a tuple containing the library configuration for requested
     modules.
 
