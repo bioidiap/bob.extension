@@ -7,6 +7,17 @@ import subprocess
 import argparse
 from distutils.version import StrictVersion as Version
 
+def _update_readme(version = None):
+  # replace the travis badge in the README.rst with the given version
+  with open("README.rst") as read:
+    with open(".README.rst", 'w') as write:
+      for line in read:
+        if "?branch=" in line:
+          pos = line.find("?branch=")
+          line = line[:pos] + "?branch=%s\n" % ("v%s"%version if version is not None else "master")
+        write.write(line)
+  os.rename(".README.rst", "README.rst")
+
 def main(command_line_options = None):
   """
   This script will push a new ``'stable'`` version of the current package on GitHub and PyPI, and update the new version of the package to the given ``'latest'`` version.
@@ -84,8 +95,10 @@ def main(command_line_options = None):
 
   if 'tag' in args.steps:
     if args.stable_version is not None and Version(args.stable_version) > Version(current_version):
+      print ("\nReplacing travis branch tag in README.rst")
+      _update_readme(args.stable_version)
       # update stable version on github
-      run_commands(args.stable_version, ['git', 'add', 'version.txt'], ['git', 'commit', '-m', 'Increased stable version to %s' % args.stable_version])
+      run_commands(args.stable_version, ['git', 'add', 'version.txt', 'README.rst'], ['git', 'commit', '-m', 'Increased stable version to %s' % args.stable_version])
     else:
       # assure that we have the current version
       args.stable_version = current_version
@@ -113,8 +126,10 @@ def main(command_line_options = None):
 
   if 'latest' in args.steps:
     # update GitHub version to latest version
+    print ("\nReplacing travis branch tag in README.rst")
+    _update_readme()
     print ("\nSetting latest version '%s'" % args.latest_version)
-    run_commands(args.latest_version, ['git', 'add', 'version.txt'], ['git', 'commit', '-m', 'Increased latest version to %s  [skip ci]' % args.latest_version], ['git', 'push'])
+    run_commands(args.latest_version, ['git', 'add', 'version.txt', 'README.rst'], ['git', 'commit', '-m', 'Increased latest version to %s  [skip ci]' % args.latest_version], ['git', 'push'])
 
 
 if __name__ == '__main__':
