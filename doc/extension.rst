@@ -2,6 +2,8 @@
 .. Manuel Guenther <manuel.guenther@idiap.ch>
 .. Mon Oct 13 16:57:44 CEST 2014
 
+.. _extension-c++:
+
 ==================================
  Extending Python with C/C++ code
 ==================================
@@ -473,5 +475,3 @@ In order to speed up the loading time of the modules, you might want to reduce t
 For this purpose, just compile your bindings using the ``"-DBOB_SHORT_DOCSTRINGS"`` compiler option, e.g. by simply define an environment variable ``BOB_SHORT_DOCSTRINGS=1`` before invoking ``buildout``.
 
 In any of these cases, only the short descriptions will be returned as the doc string.
-
-

@@ -20,10 +20,13 @@
 """Test Units
 """
 
+from bob.extension.nose import memory_check
+
+@memory_check
 def test_reverse():
   from . import reverse
-  source = [0., 1., 2., 3., 4.]
+  count = 10000
+  source = [float(f) for f in range(count)]
   target = reverse(source)
-  for i in range(5):
-    assert target[i] == source[4-i]
-
+  for i in range(count):
+    assert target[i] == source[count-i-1]

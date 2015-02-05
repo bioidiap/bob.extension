@@ -20,10 +20,6 @@
 """Test Units
 """
 
-import unittest
-
-class MyTests(unittest.TestCase):
-
-  def test_version(self):
-    from .script import version
-    self.assertEqual(version.main(), 0)
+def test_version(self):
+  from .script import version
+  assert version.main() == 0
