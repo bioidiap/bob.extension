@@ -20,7 +20,7 @@
 """Test Units
 """
 
-from bob.extension.nose import memory_check
+from bob.extension.nose_utils import memory_check
 
 @memory_check
 def test_reverse():

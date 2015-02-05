@@ -315,7 +315,7 @@ If you want to assure that you haven't generated memory leaks in your code (whic
 
 .. code-block:: py
 
-  from bob.extension.nose import memory_check
+  from bob.extension.nose_utils import memory_check
 
   @memory_check
   def test_reverse():
