@@ -28,8 +28,6 @@ def memory_check(test_function):
     result = test_function(*args, **kwargs)
     after = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
 
-    print (before, after)
-
     assert before == after, "The memory inside the function '%s' was changed from %d to %d (a change of %d bytes); do you have a memory leak there?" % (test_function.__name__, before, after, after-before)
     return result
   return wrapper
