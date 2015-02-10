@@ -498,7 +498,7 @@ inline bob::extension::FunctionDoc::~FunctionDoc(){
   for (unsigned i = 0; i < kwlists.size(); ++i){
     unsigned counts = _split(prototype_variables[i], ',').size();
     for (unsigned j = 0; j < counts; ++j){
-      delete[] kwlists[i][j];
+      free(kwlists[i][j]);
     }
     delete[] kwlists[i];
   }
@@ -764,4 +764,3 @@ inline char* bob::extension::VariableDoc::doc(
 }
 
 #endif // BOB_EXTENSION_DOCUMENTATION_H_INCLUDED
-
