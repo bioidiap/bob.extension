@@ -7,13 +7,18 @@ import os
 import sys
 import subprocess
 import logging
-from .utils import uniq, uniq_paths
+from .utils import uniq, uniq_paths, find_executable
 
 def call_pkgconfig(cmd, paths=None):
   """Runs a command as a subprocess and raises if that does not work
 
   Returns the exit status, stdout and stderr.
   """
+
+  # locates the pkg-config program
+  pkg_config = find_executable('pkg-config')
+  if not pkg_config:
+    raise OSError("Cannot find `pkg-config' - did you install it?")
 
   # sets the PKG_CONFIG_PATH taking into consideration:
   # 1. BOB_PREFIX_PATH, if set
@@ -43,7 +48,7 @@ def call_pkgconfig(cmd, paths=None):
   env['PKG_CONFIG_PATH'] = os.pathsep.join([var, old]) if old else var
 
   # calls the program
-  cmd = ['pkg-config'] + [str(k) for k in cmd]
+  cmd = pkg_config[:1] + [str(k) for k in cmd]
   subproc = subprocess.Popen(
       cmd,
       env=env,
