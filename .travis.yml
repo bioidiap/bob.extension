@@ -16,7 +16,7 @@ before_install:
 - sudo apt-get install -qq libboost-all-dev libblitz1-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended
 - pip install --find-links http://wheels.astropy.org/ --find-links http://wheels2.astropy.org/ --use-wheel sphinx nose==1.3.0 jinja2==2.6 coveralls pygments==1.6
 install:
-- SETUPTOOLS_VERSION=`python -c "import setuptools; print setuptools.version.__version__"`
+- SETUPTOOLS_VERSION=`python -c "import setuptools; print(setuptools.version.__version__)"`
 - python bootstrap-buildout.py --setuptools-version $SETUPTOOLS_VERSION
 - ./bin/buildout
 script:
