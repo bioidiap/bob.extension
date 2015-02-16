@@ -488,6 +488,7 @@ and, finally, to keep track of new changes:
 
 All these steps are combined in the ``./bin/bob_new_version.py`` script.
 This script needs to be run from within the root directory of your package.
+By default, it will make an elaborate guess on the version that you want to upload.
 Please run:
 
 .. code-block:: sh
