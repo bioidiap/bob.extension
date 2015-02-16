@@ -111,6 +111,9 @@ def main(command_line_options = None):
   if args.stable_version is not None and Version(current_version) > Version(args.stable_version):
     raise ValueError("The stable version '%s' cannot be smaller than the current version '%s'" % (args.stable_version, current_version))
 
+  if not os.path.exists('./bin/buildout'):
+    raise IOError("The bin/buildout script does not exist. Have you bootstrapped your system?")
+
 
   if 'tag' in args.steps:
     if args.stable_version is not None and Version(args.stable_version) > Version(current_version):
