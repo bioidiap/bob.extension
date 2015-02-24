@@ -310,20 +310,6 @@ To run the test units on your package call:
 
   OK
 
-If you want to assure that you haven't generated memory leaks in your code (which might easily happen when you use the Python C-API, see :ref:`extension-c++`) you might want to use the :py:func:`bob.extension.nose.memory_check` annotator function:
-
-
-.. code-block:: py
-
-  from bob.extension.nose_utils import memory_check
-
-  @memory_check
-  def test_reverse():
-    ...
-
-.. note::
-   Due to operating system limitations, small memory leaks might not be detected.
-
 
 Distributing Your Work
 ----------------------
