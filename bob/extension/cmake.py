@@ -37,8 +37,8 @@ HEADER = (
   'endif()\n'
   '\n'
   '# These are used in type checks for cmake, be aware and don\'t change those\n'
-  'set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} ${COMMON_FLAGS} $ENV{CXXFLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)\n'
-  'set(CMAKE_C_FLAGS "${COMMON_C_FLAGS} ${COMMON_FLAGS} $ENV{CFLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)\n'
+  'set(CMAKE_CXX_FLAGS "${COMMON_CXX_FLAGS} ${COMMON_FLAGS} $ENV{CXXFLAGS} $ENV{CPPFLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)\n'
+  'set(CMAKE_C_FLAGS "${COMMON_C_FLAGS} ${COMMON_FLAGS} $ENV{CFLAGS} $ENV{CPPFLAGS}" CACHE STRING "Flags used by the compiler during release builds" FORCE)\n'
   '\n'
   'set(BUILD_SHARED_LIBS "ON" CACHE BOOL "Build shared libs")\n\n'
 )
@@ -130,4 +130,3 @@ class CMakeListsGenerator:
       # link libraries
       if self.libraries:
         f.write('target_link_libraries(${PROJECT_NAME} %s)\n\n' % " ".join(self.libraries))
-
