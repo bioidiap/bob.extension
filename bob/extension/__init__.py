@@ -181,17 +181,16 @@ def get_bob_libraries(bob_packages):
     # TODO: need to handle versions?
     bob_packages = normalize_requirements([k.strip().lower() for k in bob_packages])
     for package in bob_packages:
-      location = pkg_resources.require(package)[0].location
-      include_path = [location] + package.split('.') + ['include']
-      includes.append(os.path.join(*include_path))
-      # check if the package contains a get_include_directories() function
       import importlib
       pkg = importlib.import_module(package)
+      location = os.path.dirname(pkg.__file__)
+      includes.append(os.path.join(location, 'include'))
+      # check if the package contains a get_include_directories() function
       if hasattr(pkg, 'get_include_directories'):
         includes.extend(pkg.get_include_directories())
 
       lib_name = package.replace('.', '_')
-      libs = find_library(lib_name, prefixes=[resource_filename(package, '.')])
+      libs = find_library(lib_name, prefixes=[location])
       # add the FIRST lib that we found, if any
       if len(libs):
         libraries.append(lib_name)
