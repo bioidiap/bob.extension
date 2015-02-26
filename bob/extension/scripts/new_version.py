@@ -1,27 +1,56 @@
 #!/usr/bin/env python
 
 """
-This script will push a new ``'stable'`` version of the current package on GitHub and PyPI, and update the new version of the package to the given ``'latest'`` version on GitHub.
-It assumes that you are in the main directory of the package and have successfully ran bootstrap, and that you have submitted all changes that should go into the new version.
-Preferably, the build on Travis passed.
-For database packages, it also assumes that the ``.sql3`` files have been generated.
-Also, it assumes that the ``'stable'`` version has not yet been uploaded to PyPI, and that no GitHub tag with this version exists.
+This script will push a new ``'stable'`` version of the current package on
+GitHub and PyPI, and update the new version of the package to the given
+``'latest'`` version on GitHub.
 
-The ``'stable'`` version (i.e., what will be downloadable from PyPI) can be current version of the package, but not lower than that.
-The ``'latest'`` version (i.e., what will be the new master branch on GitHub) must be higher than the current and than the stable version.
-Both versions can be automatically computed from the current version, which is stored in the 'version.txt' file.
-By default, five steps are executed, in this order:
+It assumes that you are in the main directory of the package and have
+successfully ran bootstrap, and that you have submitted all changes that should
+go into the new version.
 
-- ``tag``: If given, the --stable-version will be set and added to GitHub; and the version is tagged in GitHub and pushed.
-- ``build``: The package will be (re-)built with bin/buildout using the provided build options.
-- ``pypi``: The --stable-version (or the current version) will be registered and uploaded to PyPI
-- ``docs``: The documentation will be generated and uploaded to PythonHosted
-- ``latest``: The --latest-version will be set and committed to GitHub
+Preferably, the build on Travis passed.  For database packages, it also assumes
+that the ``.sql3`` files have been generated.  Also, it assumes that the
+``'stable'`` version has not yet been uploaded to PyPI, and that no GitHub tag
+with this version exists.
 
-If any of these commands fail, the remaining steps will be skipped, unless you specify the ``--keep-going`` option.
+The ``'stable'`` version (i.e., what will be downloadable from PyPI) can be
+current version of the package, but not lower than that.
 
-If you only want a subset of the steps to be executed, you can limit them using the ``--steps`` option.
-A valid use case, e.g., is only to re-upload the documentation.
+The ``'latest'`` version (i.e., what will be the new master branch on GitHub)
+must be higher than the current and than the stable version.
+
+Both versions can be automatically computed from the current version, which is
+stored in the 'version.txt' file.  By default, five steps are executed, in this
+order:
+
+  * ``tag``: If given, the --stable-version will be set and added to GitHub;
+    and the version is tagged in GitHub and pushed.
+
+  * ``build``: The package will be (re-)built with bin/buildout using the
+    provided build options.
+
+  * ``pypi``: The --stable-version (or the current version) will be registered
+    and uploaded to PyPI
+
+  * ``docs``: The documentation will be generated and uploaded to PythonHosted
+
+  * ``latest``: The --latest-version will be set and committed to GitHub
+
+If any of these commands fail, the remaining steps will be skipped, unless you
+specify the ``--keep-going`` option.
+
+If you only want a subset of the steps to be executed, you can limit them using
+the ``--steps`` option. A valid use case, e.g., is only to re-upload the
+documentation.
+
+Example:
+
+  Tags and deploy on PyPI my package with the stable version ``2.0.0``. Update
+  my next package version to ``2.0.1a0``. Do it verbosely (``-vv``):
+
+    %(prog)s --latest-version=2.0.1a0 --stable-version=2.0.0 -vv
+
 """
 
 from __future__ import print_function
@@ -45,7 +74,8 @@ def _update_readme(version = None):
   os.rename(".README.rst", "README.rst")
 
 def main(command_line_options = None):
-  parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+  doc = __doc__ % dict(prog=os.path.basename(sys.argv[0]))
+  parser = argparse.ArgumentParser(description=doc, formatter_class=argparse.RawDescriptionHelpFormatter)
 
   parser.add_argument("--latest-version", '-l', help = "The latest version for the package; if not specified, it is guessed from the current version")
   parser.add_argument("--stable-version", '-s', help = "The stable version for the package; if not specified, it is guessed from the current version")
