@@ -27,6 +27,9 @@ Particularly, we provide three preprocessor definitions:
    Catches exceptions of any kind, adds the ``message`` in case an unknown exception is caught, and returns with the given error return (which is usually 0 for normal functions or -1 for constructors and setter functions).
    This macro should be used when binding a member function of a class, for binding stand-alone functions, please use :c:macro:`BOB_CATCH_FUNCTION`.
 
+.. c:macro:: PyBob_NumberCheck(o)
+
+   Checks if the given object ``o`` is a number, i.e., an int, a long, a float or a complex.
 
 After including the above mentioned header, we also re-define the functions :c:func:`PyInt_Check`, :c:func:` PyInt_AS_LONG`, :c:func:`PyString_Check` and :c:func:`PyString_AS_STRING` (which don't exist in the bindings for Python3) so that they can be used in bindings for both Python2 and Python3.
 
@@ -279,4 +282,3 @@ As for functions, the :cpp:class:`bob::extension::ClassDoc` is designed to be us
      .add_parameter("param1", "int", "An int value used for ...")
      .add_parameter("param2", "float", "[Default: ``0.5``] A float value describing ...")
    );
-

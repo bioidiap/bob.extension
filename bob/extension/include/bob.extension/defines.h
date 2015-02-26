@@ -28,6 +28,7 @@
 #define PyString_AS_STRING(x) PyBytes_AS_STRING(make_safe(PyUnicode_AsUTF8String(x)).get())
 #endif
 
+#define PyBob_NumberCheck(x) (PyInt_Check(x) || PyLong_Check(x) || PyFloat_Check(x) || PyComplex_Check(x))
 
 // BOB_TRY is simply a try{
 #define BOB_TRY try{
