@@ -11,8 +11,6 @@ This section includes information for using the Python API of ``bob.extension``.
 Functions
 ---------
 
-.. automodule:: bob.extension.nose_utils
-
 .. automodule:: bob.extension
 
 Scripts
