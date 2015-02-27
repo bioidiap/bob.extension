@@ -16,7 +16,11 @@ import pkg_resources
 
 
 def _run(package, run_call):
-  example_url = 'file://' + os.path.join(pkg_resources.resource_filename('bob.extension', '../../examples'), 'bob.example.%s.tar.bz2'%package)
+  local_file = os.path.join(pkg_resources.resource_filename('bob.extension', '../../examples'), 'bob.example.%s.tar.bz2'%package)
+  if os.path.exists(local_file):
+    example_url = 'file://' + local_file
+  else:
+    example_url = "https://github.com/bioidiap/bob.extension/raw/master/examples/bob.example.%s.tar.bz2"%package
   temp_dir = tempfile.mkdtemp(prefix="bob_test")
   local_archive = os.path.join(temp_dir, "bob.example.%s.tar.bz2"%package)
 
