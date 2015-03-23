@@ -41,17 +41,17 @@
 // BOB_CATCH_FUNCTION is to be used to bind functions outside a class
 #define BOB_CATCH_MEMBER(message,ret) }\
   catch (std::exception& e) {\
-    PyErr_SetString(PyExc_RuntimeError, e.what());\
+    PyErr_Format(PyExc_RuntimeError, "%s - " message ": C++ exception caught: '%s'", Py_TYPE(self)->tp_name, e.what());\
     return ret;\
   } \
   catch (...) {\
-    PyErr_Format(PyExc_RuntimeError, "%s " message ": unknown exception caught", Py_TYPE(self)->tp_name);\
+    PyErr_Format(PyExc_RuntimeError, "%s - " message ": unknown exception caught", Py_TYPE(self)->tp_name);\
     return ret;\
   }
 
 #define BOB_CATCH_FUNCTION(message, ret) }\
   catch (std::exception& e) {\
-    PyErr_SetString(PyExc_RuntimeError, e.what());\
+    PyErr_Format(PyExc_RuntimeError, message ": C++ exception caught: '%s'", e.what());\
     return ret;\
   } \
   catch (...) {\
