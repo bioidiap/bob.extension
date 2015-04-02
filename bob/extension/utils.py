@@ -386,11 +386,12 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
 
   if sys.version_info[0] <= 2:
     import urllib2 as urllib
-    from urllib2 import HTTPError
+    from urllib2 import HTTPError, URLError
   else:
     import urllib.request as urllib
     import urllib.error as error
     HTTPError = error.HTTPError
+    URLError = error.URLError
 
   # collect packages
   packages = []
@@ -466,6 +467,8 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
       if exc.code != 404:
         # url request failed with a something else than 404 Error
         print ("Requesting URL %s returned error %s" % (url, exc))
+    except URLError as exc:
+      # url request failed with a something else than 404 Error
+      print ("Requesting URL %s did not succeed; are you offline? The error is %s" % (url, exc))
 
   return mapping
-
