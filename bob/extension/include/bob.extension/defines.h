@@ -25,6 +25,7 @@
 #define PyInt_AS_LONG PyLong_AS_LONG
 #define PyString_Check PyUnicode_Check
 #define PyString_FromString PyUnicode_FromString
+#define PyString_FromFormat PyUnicode_FromFormat
 #define PyString_AS_STRING(x) PyBytes_AS_STRING(make_safe(PyUnicode_AsUTF8String(x)).get())
 #endif
 

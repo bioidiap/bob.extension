@@ -149,6 +149,23 @@ namespace bob{
         const char* const doc(const unsigned alignment = 72, const unsigned indent = 0) const;
 
         /**
+         * Generates and returns the documentation string, overwriting the function name with the given one.
+         This is useful, when a function is bound with several names.
+         * A .. todo:: directive is added for each detected mistake.
+         * @param nameThe name of the function
+         * @param alignment The default alignment is 80 characters.
+         *                  Since the package level documentation is automatically indented by 8 spaces in the python documentation, we need to subtract these values here...
+         * @return The documentation string, properly aligned, possibly including "ToDo's" for detected problems.
+         */
+        const char* const doc(const char* const name, const unsigned alignment = 72, const unsigned indent = 0) const {
+          std::string old_name = function_name;
+          function_name = name;
+          auto retval = doc(alignment, indent);
+          function_name = old_name;
+          return retval;
+        }
+
+        /**
          * Returns the (NULL-terminated) list of variables for the given prototype index, which can be used as kwlist argument in the bindings.
          * @param index  The index of the prototype
          * @return  A NULL-terminated list of variable names
@@ -168,7 +185,7 @@ namespace bob{
 
       private:
         // the function name
-        std::string function_name;
+        mutable std::string function_name;
         // the description
         std::string function_description;
         // if this is a member function, the indentation must be shorter
