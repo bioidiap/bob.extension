@@ -99,6 +99,17 @@ namespace bob{
         ~FunctionDoc();
 
         /**
+         * Clones this FunctionDoc by providing a new function name
+         * This is useful, when a function is bound with several names.
+         * @param function_name     The new name of the function
+        */
+        FunctionDoc clone(const char* const function_name){
+          FunctionDoc retval = FunctionDoc(*this);
+          retval.function_name = function_name;
+          return retval;
+        }
+
+        /**
          * Add a prototypical call for this function by defining the parameters and the return values.
          * This function has to be called at least ones.
          * @param variables    A string containing a comma-separated list of parameters, e.g., "param1, param2"
@@ -149,23 +160,6 @@ namespace bob{
         const char* const doc(const unsigned alignment = 72, const unsigned indent = 0) const;
 
         /**
-         * Generates and returns the documentation string, overwriting the function name with the given one.
-         This is useful, when a function is bound with several names.
-         * A .. todo:: directive is added for each detected mistake.
-         * @param nameThe name of the function
-         * @param alignment The default alignment is 80 characters.
-         *                  Since the package level documentation is automatically indented by 8 spaces in the python documentation, we need to subtract these values here...
-         * @return The documentation string, properly aligned, possibly including "ToDo's" for detected problems.
-         */
-        const char* const doc(const char* const name, const unsigned alignment = 72, const unsigned indent = 0) const {
-          std::string old_name = function_name;
-          function_name = name;
-          auto retval = doc(alignment, indent);
-          function_name = old_name;
-          return retval;
-        }
-
-        /**
          * Returns the (NULL-terminated) list of variables for the given prototype index, which can be used as kwlist argument in the bindings.
          * @param index  The index of the prototype
          * @return  A NULL-terminated list of variable names
@@ -185,7 +179,7 @@ namespace bob{
 
       private:
         // the function name
-        mutable std::string function_name;
+        std::string function_name;
         // the description
         std::string function_description;
         // if this is a member function, the indentation must be shorter
