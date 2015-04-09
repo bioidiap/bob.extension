@@ -68,6 +68,12 @@ Function Documentation
       If wanted, you can define a longer description as well.
       When you use this FunctionDoc to document a member function of a class, please set ``is_member_function = true``.
 
+   .. cpp:function:: FunctionDoc clone(\
+        const char* const function_name\
+      )
+
+      Returns a copy of this documentation class, where the function name is replaced by the given one.
+      This is useful, when a function is bound with several names.
 
    .. cpp:function:: FunctionDoc& add_prototype(\
         const char* const variables,\
@@ -134,13 +140,6 @@ Function Documentation
       The free text in the documentation is aligned to ``alignment`` characters, by default 72, so that it can be viewed correctly inside of an 80-character Python console.
       The ``indent`` is an internal parameter and should not be changed.
 
-
-   .. cpp:function:: const char* const doc(const char* const name, const unsigned alignment = 72, const unsigned indent = 0) const
-
-      Generates and returns the documentation string, replacing the function name with the given one.
-      This might be useful if the same function is bound to different names.
-      The free text in the documentation is aligned to ``alignment`` characters, by default 72, so that it can be viewed correctly inside of an 80-character Python console.
-      The ``indent`` is an internal parameter and should not be changed.
 
    .. cpp:function:: char** kwlist(unsigned index) const
 
