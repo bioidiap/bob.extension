@@ -317,7 +317,7 @@ static std::string _strip(const std::string& str, const std::string& sep = " [](
 }
 
 // splits the given string by the given separator
-static std::vector<std::string> _split(const std::string& str, char limit = ' '){
+static std::vector<std::string> _split(const std::string& str, char limit = ' ', bool allow_empty=true){
   std::vector<std::string> splits;
   size_t j = str.find_first_not_of(limit);
   size_t i = str.find(limit, j);
@@ -328,6 +328,8 @@ static std::vector<std::string> _split(const std::string& str, char limit = ' ')
     i = str.find(limit, j);
   }
   splits.push_back(str.substr(j));
+  if (!allow_empty && !splits.empty() && splits.back().empty())
+    splits.pop_back();
   return splits;
 }
 
@@ -493,7 +495,7 @@ inline bob::extension::FunctionDoc::FunctionDoc(
   kwlists.resize(other.kwlists.size());
   for (unsigned i = 0; i < kwlists.size(); ++i){
     // copy all kwlists
-    unsigned counts = _split(prototype_variables[i], ',').size();
+    unsigned counts = _split(prototype_variables[i], ',', false).size();
     char** names = new char*[counts + 1];
     for (unsigned j = 0; j < counts; ++j){
       names[j] = const_cast<char*>(strdup(other.kwlists[i][j]));
@@ -520,7 +522,7 @@ inline bob::extension::FunctionDoc& bob::extension::FunctionDoc::add_prototype(
   const char* const return_values
 ){
   // Add the variables to the kwlists
-  std::vector<std::string> vars = _split(variables, ',');
+  std::vector<std::string> vars = _split(variables, ',', false);
   char** names = new char*[vars.size() + 1];
   for (unsigned i = 0; i < vars.size(); ++i){
     names[i] = const_cast<char*>(strdup(_strip(vars[i]).c_str()));
