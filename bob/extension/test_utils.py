@@ -164,3 +164,18 @@ package-z
   expected = {'http://docs.python.org/%d.%d' % sys.version_info[:2] : None, 'https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master' : None, 'https://www.idiap.ch/software/bob/docs/latest/idiap/gridtk/master' : None}
   nose.tools.eq_(result, expected)
 
+def test_get_config():
+  # Test the generic get_config() function
+  import bob.extension
+  cfg = bob.extension.get_config()
+  splits = cfg.split("\n")
+  assert splits[0].startswith('bob.extension')
+  assert splits[1].startswith("* Python dependencies")
+  assert any([s.startswith("  - setuptools") for s in splits[2:]])
+
+  cfg = bob.extension.get_config("setuptools", {'MyPackage' : {'my_dict' : 42}}, 0x0204)
+  splits = cfg.split("\n")
+  assert splits[0].startswith('setuptools')
+  assert "api=0x0204" in splits[0]
+  assert splits[1].startswith("* C/C++ dependencies")
+  assert any([s.startswith("  - MyPackage") for s in splits[2:]])

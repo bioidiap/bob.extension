@@ -16,13 +16,14 @@ import pkg_resources
 
 
 def _run(package, run_call):
-  local_file = os.path.join(pkg_resources.resource_filename('bob.extension', '../../examples'), 'bob.example.%s.tar.bz2'%package)
+  local_file = os.path.realpath(os.path.join(pkg_resources.resource_filename('bob.extension', '../../examples'), 'bob.example.%s.tar.bz2'%package))
   if os.path.exists(local_file):
     example_url = 'file://' + local_file
   else:
     example_url = "https://github.com/bioidiap/bob.extension/raw/master/examples/bob.example.%s.tar.bz2"%package
   temp_dir = tempfile.mkdtemp(prefix="bob_test")
   local_archive = os.path.join(temp_dir, "bob.example.%s.tar.bz2"%package)
+  print ("Downloading package '%s'" % example_url)
 
   # download archive
   if sys.version_info[0] <= 2:
@@ -58,6 +59,8 @@ def _run(package, run_call):
 
   subprocess.call(['./bin/sphinx-build', 'doc', 'sphinx'], cwd=package_dir)
   assert os.path.exists(os.path.join(package_dir, "sphinx", "index.html"))
+
+  subprocess.call('./bin/python -c "from bob.example.%s import get_config; print(get_config())"'%package, cwd=package_dir, shell=True)
 
   shutil.rmtree(temp_dir)
 
