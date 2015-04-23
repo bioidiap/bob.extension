@@ -24,7 +24,7 @@ This is a great way to release code for laboratory exercises or for a particular
   If you are not familiar with Python's ``setuptools``, ``distutils`` or PyPI, it can be beneficial to `learn about those <https://docs.python.org/2/distutils/>`_ before you start.
   Python's `Setuptools`_ and `Distutils`_ are mechanisms to *define and distribute* Python code in a packaged format, optionally through `PyPI`_, a web-based Python package index and distribution portal.
 
-  `zc.buildout`_ is a tool to *deploy* Python packages locally, automatically  setting up and encapsulating your work environment.
+  `zc.buildout`_ is a tool to *deploy* Python packages locally, automatically setting up and encapsulating your work environment.
 
 
 Anatomy of a buildout Python package
@@ -77,14 +77,7 @@ To customize the package to your needs, you will need to edit this file and modi
 Before doing so, it is suggested you go through all of this tutorial so you are familiar with the whole environment.
 The example package, as it is distributed, contains a fully working example.
 
-In the remainder of this document, we explain how to setup ``buildout.cfg`` so you can work in different operational modes - the ones which are more common development scenarios.
-
-.. todo::
-   This is not true.
-   We are not talking about setting up the buildout.cfg in this tutorial at all.
-   Change this to the proper Wiki page at the Bob_ webpage.
-
-
+In the remainder of this document, we explain how to setup the ``setup.py`` and the ``buildout.cfg`` so you can work in different operational modes - the ones which are more common development scenarios.
 
 Pure-Python Packages
 --------------------
@@ -94,7 +87,7 @@ They contain code that is exclusively written in Python.
 This contrasts to packages that are written in a mixture of Python and C/C++, which are explained in more detail below.
 
 The package you cloned above is a pure-Python example package and contains all elements to get you started.
-It defines a single library module called ``bob.example.project``, which declares a simple script, called ``version.py`` that prints out the version of the dependent library ``bob.blitz``.
+It defines a single library module called ``bob.example.project``, which declares a simple script, called ``version.py`` that prints out the version of the dependent library :ref:`bob.blitz <bob.blitz>`.
 When you clone the package, you will not find any executable as ``buildout`` needs to check all dependencies and install missing ones before you can execute anything.
 Particularly, it inspects the ``setup.py`` file in the root directory of the package, which contains all required information to build the package, all of which is contained in the ``setup`` function:
 
@@ -167,17 +160,22 @@ Here is how to go from nothing to everything:
 
   **Using Bob 2.0 at Idiap**
 
-  For Idiapers, at the moment ``python bootstrap-buildout.py`` will **not** do the right thing.
-  Since |project| is installed globally (and you don't have the rights to uninstall it), you should run:
+  At Idiap_, we provide a pre-installed version of the latest stable version of the packages.
+  To use these packages, you just have to bootstrap your package with the following command:
 
   .. code-block:: sh
 
-    $ /idiap/group/torch5spro/externals/py27/usr/bin/python bootstrap-buildout.py
+     $ /idiap/group/torch5spro/releases/bob-stable/py27/bin/python bootstrap-buildout.py
 
-  instead to make sure that you don't mix the old and the new version of |project|.
+  or
 
-  On the other hand, when you just want to **use** the |project| packages in your satellite package, you might want to bootstrap using a Python with all |project| 2.0 packages installed.
-  Currently you can do that using:
+  .. code-block:: sh
+
+     $ /idiap/group/torch5spro/releases/bob-stable/py34/bin/python bootstrap-buildout.py
+
+  if you prefer Python 3.
+
+  On the other hand, when you want to use the latest (unstable) versions of the |project| packages in your satellite package, you might want to use:
 
   .. code-block:: sh
 
@@ -187,10 +185,6 @@ Here is how to go from nothing to everything:
      This python version is replaced every night.
      Do not use it in any over-night calculations.
 
-  .. todo::
-     Change the directory to the installed directory of the latest stable packages at Idiap, as soon as they are published.
-
-
   Sometimes, you don't want to use the packages that are published on PyPI_, but the latest (nightly compiled) versions of all our packages.
   In this case, use:
 
@@ -198,25 +192,142 @@ Here is how to go from nothing to everything:
 
     $ ./bin/buildout buildout:find-links=https://www.idiap.ch/software/bob/packages/nightlies/last buildout:prefer-final=false
 
+  .. note::
+     You can freely mix the all possible ways to obtain packages.
+     For example, you can use the ``bob-stable`` installations, and hand-select some packages to be downloaded from PyPI_ or from the nightlies packages (see above), e.g., using ``mr.developer`` (see below).
 
 
+Using buildout
+==============
 
-You should now be able to execute ``./bin/version.py``:
+Buildout has set up you local environment with packages that it finds from different sources.
+It is initialized by the ``buildout.cfg`` file, which is part of the package that you unzipped above.
+Let's have a look inside it:
+
+.. code-block:: guess
+
+   [buildout]
+   parts = scripts
+   eggs = bob.example.project
+   extensions = bob.buildout
+
+   develop = .
+
+   ; options for bob.buildout
+   debug = true
+   verbose = true
+   newest = false
+
+   [scripts]
+   recipe = bob.buildout:scripts
+
+It is organized in several *sections*, which are indicated by ``[]``, where the default section ``[buildout]`` is always required.
+Some of the entries need attention.
+
+* The first entry are the ``eggs``.
+  In there, you can list all python packages that should be installed, additionally to the ones specified in the ``install_requires`` section of the ``setup.py`` (see below).
+  These packages can contain other |project| packages (like any database package such as ``bob.db.mobio``), but also other Python packages such as ``gridtk``.
+  These packages will be available to be used in your environment.
+  At least, the current package needs to be in the ``eggs`` list.
+
+* The ``extensions`` list includes all extensions that are required in the buildout process.
+  By default, only ``bob.buildout`` is required, but more extensions can be added (see ``mr.developer`` below).
+
+* The next entry is the ``develop`` list.
+  There, you can list directories that contain Python packages, which will be build in exactly the order that you specified there.
+  With this option, you can tell buildout particularly, in which directories it should look for some packages.
+  Note that the ``develop``ed packages are not automatically included into the ``eggs``.
+  Of course, you need to develop the current package, which is stored in directory ``.``.
+
+The remaining options define, how the packages are build.
+For example, the ``debug`` flag defined, how the C++ code in all the packages is built.
+The ``verbose`` options handles the verbosity of the build.
+When the ``newest`` flag is set to ``true``, buildout will install all packages in the latest versions, even if an older version is already available.
+
+
+Using mr.developer
+==================
+
+One extension that is regularly used in most of |project|'s packages is `mr.developer`_.
+It can be used to automatically check out packages from git repositories, and places them into the ``./src`` directory.
+It can be simply set up:
+
+.. code-block:: guess
+
+   [buildout]
+   ...
+
+   extensions = bob.buildout
+                mr.developer
+
+   auto-checkout = *
+
+   develop = src/bob.blitz
+             .
+
+   [sources]
+   bob.blitz = git https://github.com/bioidiap/bob.blitz
+
+   ...
+
+A new section called ``[sources]`` appears, where the package information for `mr.developer`_ is initialized, for more details, please read it's documentation.
+Again, ``mr.developer`` does not automatically place the packages into the ``develop`` list (and neither in the ``eggs``), so you have to do that yourself.
+
+
+Running buildout
+================
+
+Finally, running buildout is a two-step process, which is detailed above.
+The command line ``./bin/buildout`` will actually run buildout and build your local environment.
+All options in the buildout.cfg can be overwritten on command line, by specifying ``buildout:option=...``, where ``option`` can be any entry in the ``buildout.cfg``.
+Finally, buildout will perform the following steps:
+
+1. It checks out the packages that you specified using ``mr.developer``.
+2. It develops all packages in the ``develop`` section.
+3. It will go through the list of ``eggs`` and search for according packages in the following order:
+
+   a) In one of the already developed directories.
+   b) In the python environment, e.g., packages installed with ``pip``.
+   c) Online, i.e., in the ``find-links`` directory, or by default on PyPI_.
+
+4. It will populate the ``./bin`` directory with all the ``console_scripts`` that you have specified in the ``setup.py``.
+In our example, this is ``./bin/version.py``.
+
+Your local environment
+======================
+
+After buildout has finished, you should now be able to execute ``./bin/version.py``:
 
 .. code-block:: sh
 
-  $ ./bin/version.py
-  bob.blitz: 2.0.0a0 [api=0x0200] (/home/user/bob.example.project/eggs/bob.blitz-2.0.0a0-py2.7-linux-x86_64.egg)
-    - c/c++ dependencies:
-      - Blitz++: 0.10
-      - Boost: 1.55.0
-      - Compiler: {'version': '4.7.2', 'name': 'gcc'}
-      - NumPy: {'abi': '0x01000009', 'api': '0x00000009'}
-      - Python: 2.7.8
-    - python dependencies:
-      - bob.extension: 0.3.0a0 (/home/user/bob.example.project/eggs/bob.extension-0.3.0a0-py2.7.egg)
-      - numpy: 1.8.1 (/usr/lib/python2.7/site-packages)
-      - setuptools: 5.4.1 (/home/user/bob.example.project/eggs/setuptools-5.4.1-py2.7.egg)
+   $ ./bin/version.py
+   bob.blitz: 2.0.5 [api=0x0201] ([PATH]/eggs/bob.blitz-2.0.5-py2.7-linux-x86_64.egg)
+   * C/C++ dependencies:
+     - Blitz++: 0.10
+     - Boost: 1.55.0
+     - Compiler: {'version': '4.9.2', 'name': 'gcc'}
+     - NumPy: {'abi': '0x01000009', 'api': '0x00000009'}
+     - Python: 2.7.9
+   * Python dependencies:
+     - bob.extension: 2.0.7 ([PATH]/bob.example.project/eggs/bob.extension-2.0.7-py2.7.egg)
+     - numpy: 1.8.2 (/usr/lib/python2.7/dist-packages)
+     - setuptools: 15.1 ([PATH]/bob.example.project/eggs/setuptools-15.1-py2.7.egg)
+
+Also, when using the newly generated ``./bin/python`` script, you can access all packages that you have developed, including your own package:
+
+.. code-block:: guess
+
+   $ ./bin/python
+   >>> import bob.example.project
+   >>> print (bob.example.project)
+   <module 'bob.example.project' from '[PATH]/bob/example/project/__init__.py'>
+   >>> print (bob.example.project.get_config())
+   bob.example.project: 0.0.1a0 ([PATH]/bob.example.project)
+   * Python dependencies:
+     - bob.blitz: 2.0.5 ([PATH]/eggs/bob.blitz-2.0.5-py2.7-linux-x86_64.egg)
+     - bob.extension: 2.0.7 ([PATH]/bob.example.project/eggs/bob.extension-2.0.7-py2.7.egg)
+     - numpy: 1.8.2 (/usr/lib/python2.7/dist-packages)
+     - setuptools: 15.1 ([PATH]/bob.example.project/eggs/setuptools-15.1-py2.7.egg)
 
 Everything is now setup for you to continue the development of this package.
 Modify all required files to setup your own package name, description and dependencies.
@@ -243,7 +354,7 @@ Creating Database Satellite Packages
 Database satellite packages are special satellite packages that can hook-in |project|'s database manager ``bob_dbmanage.py``.
 Except for this detail, they should look exactly like a normal package.
 
-To allow the database to be hooked to the ``bob_dbmanage.py`` you must implement a non-virtual Python class that inherits from :py:class:`bob.db.driver.Interface`.
+To allow the database to be hooked to the ``bob_dbmanage.py`` you must implement a non-virtual Python class that inherits from :py:class:`bob.db.base.driver.Interface`.
 Your concrete implementation should then be described at the ``setup.py`` file with a special ``bob.db`` entry point:
 
 .. code-block:: python
@@ -482,7 +593,11 @@ Please run:
   $ ./bin/bob_new_version.py --help
 
 to see a list of options.
+Detailed information of what the script is doing, you can get when using the ``--dry-run`` option (a step that you always should consider before actually executing the script):
 
+.. code-block:: sh
+
+  $ ./bin/bob_new_version.py -vv --dry-run
 
 
 Satellite Packages Available

@@ -256,7 +256,7 @@ autodoc_default_flags = [
 
 # For inter-documentation mapping:
 from bob.extension.utils import link_documentation
-intersphinx_mapping = link_documentation(additional_packages = ['python'])
+intersphinx_mapping = link_documentation(additional_packages = ['python', 'bob.blitz', 'bob.db.base'])
 
 
 def setup(app):
