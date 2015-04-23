@@ -736,7 +736,8 @@ def get_config(package=__name__, externals=None, api_version=None):
   if len(deps):
     retval += "* Python dependencies:\n"
     # sort python dependencies and make them unique
-    deps_dict = {d.key : d for d in deps}
+    deps_dict = {}
+    for d in deps: deps_dict[d.key] = d
     for k in sorted(deps_dict):
       retval += "  - %s: %s (%s)\n" % (deps_dict[k].key, deps_dict[k].version, deps_dict[k].location)
 
