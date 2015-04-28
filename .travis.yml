@@ -9,7 +9,7 @@ matrix:
   - python: 2.7
     env:
     - BOB_DOCUMENTATION_SERVER=https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master
-    - BOB_UPLOAD_WHEEL="--universal=true"
+    - BOB_UPLOAD_WHEEL="--universal"
   - python: 3.2
     env:
     - SPHINXSPEC===1.2
