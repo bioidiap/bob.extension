@@ -6,7 +6,7 @@ if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
   exit 0
 fi
 
-if [ -z "${DOCUSER}" ] || [ -z "${DOCPASS}" ]; then
+if [ -z "${DOCUSER}" ] || [ -z "${DOCPASS}" ] || [ -z "${BOB_DOCUMENTATION_SERVER}" ]; then
   echo "Server username and/or password undefined - not uploading documentation";
   exit 0
 fi
