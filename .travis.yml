@@ -1,15 +1,12 @@
 language: python
-env:
-  global:
-  - secure: bCrXmS1k8aIOE8Ba6XuHyjUoQQPpYEC8kpTcMi9pNhyXRQyGEPLp85VgyfXga2Oxb73QcW1aW4AxGUxiR1OZjB4rBmKK2uKij2G2qq9uhcXkDqCzqqxslhtm3o8cxHEFNJWRhuSVVjS0m0RvaFuGRicdz7QdyHCLl29+Gqdkacs=
-  - secure: W81QkyB8I87JT6kqaW/eBYBngbtcpHXWXIQsBkjy06Z8V9gUGbUD5oWwCn6NKQ1hE1ZR/qELxsTtrfgvfiegCW9wci4qZzatq34DWvzKK20jacqn9hs0BnXCyI/+iQRf6vam1KAnvc4qmWzF/CfsuZqCku8TtU5ZtKk05D/K//0=
 matrix:
   include:
   - python: 2.6
   - python: 2.7
     env:
+    - secure: bCrXmS1k8aIOE8Ba6XuHyjUoQQPpYEC8kpTcMi9pNhyXRQyGEPLp85VgyfXga2Oxb73QcW1aW4AxGUxiR1OZjB4rBmKK2uKij2G2qq9uhcXkDqCzqqxslhtm3o8cxHEFNJWRhuSVVjS0m0RvaFuGRicdz7QdyHCLl29+Gqdkacs=
+    - secure: W81QkyB8I87JT6kqaW/eBYBngbtcpHXWXIQsBkjy06Z8V9gUGbUD5oWwCn6NKQ1hE1ZR/qELxsTtrfgvfiegCW9wci4qZzatq34DWvzKK20jacqn9hs0BnXCyI/+iQRf6vam1KAnvc4qmWzF/CfsuZqCku8TtU5ZtKk05D/K//0=
     - BOB_DOCUMENTATION_SERVER=https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master
-    - BOB_UPLOAD_WHEEL="--universal"
   - python: 3.2
     env:
     - SPHINXSPEC===1.2
@@ -19,7 +16,7 @@ before_install:
 - sudo add-apt-repository -y ppa:biometrics/bob
 - sudo apt-get update -qq
 - sudo apt-get install -qq libboost-all-dev libblitz1-dev texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended
-- pip install --find-links http://wheels.astropy.org/ --find-links http://wheels2.astropy.org/ --use-wheel sphinx$SPHINXSPEC nose==1.3.0 jinja2==2.6 coveralls pygments==1.6 wheel
+- pip install --find-links https://www.idiap.ch/software/bob/wheels/travis/ --use-wheel sphinx$SPHINXSPEC nose==1.3.0 jinja2==2.6 coverage coveralls pygments==1.6
 install:
 - python bootstrap-buildout.py
 - ./bin/buildout
@@ -31,4 +28,3 @@ script:
 after_success:
 - coveralls
 - ./scripts/upload-sphinx.sh
-- ./scripts/upload-wheel.sh
