@@ -21,5 +21,7 @@ bin/python setup.py bdist_wheel -d wheel $WHEEL_OPTION
 wheel=`find wheel -name "*.whl"`
 server=https://${DOCUSER}:${DOCPASS}@www.idiap.ch/software/bob/wheels-upload/travis/
 
+echo -e "\n\nUploading wheel $wheel to server https://www.idiap.ch/software/bob/wheels-upload/travis/"
+
 # send
 curl --silent --insecure --upload-file $wheel ${server}
