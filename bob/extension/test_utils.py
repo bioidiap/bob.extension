@@ -10,7 +10,7 @@ import os
 import sys
 import nose.tools
 from .utils import uniq, egrep, find_file, find_header, find_library, \
-    load_requirements, link_documentation
+    load_requirements, find_packages, link_documentation
 
 def test_uniq():
 
@@ -110,6 +110,18 @@ package-z
   result = load_requirements(stringio(f))
   expected = ['package-a >= 0.42', 'package-b', 'package-c', 'package-z']
   nose.tools.eq_(result, expected)
+
+
+def test_find_packages():
+  # tests the find-packages command inside the current package
+  import os
+  if not os.path.exists("bob/extension"):
+    raise SkipTest("We are not currently testing the bob.extension package")
+
+  packages = find_packages()
+  assert 'bob' in packages
+  assert 'bob.extension' in packages
+  assert 'bob.extension.scripts' in packages
 
 
 def test_documentation_generation():

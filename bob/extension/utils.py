@@ -344,6 +344,20 @@ def load_requirements(f=None):
   # read the contents
   return readlines(f)
 
+def find_packages(directories=['bob']):
+  """This function replaces the ``find_packages`` command from ``setuptools`` to search for packages only in the given directories.
+  Using this function will increase the building speed, especially when you have (links to) deep non-code-related directory structures inside your package directory.
+  The given ``directories`` should be a list of top-level sub-directories of your package, where package code can be found.
+  By default, it uses ``'bob'`` as the only directory to search.
+  """
+  from setuptools import find_packages as _original
+  if isinstance(directories, str):
+    directories = [directories]
+  packages = []
+  for d in directories:
+    packages += [d]
+    packages += ["%s.%s" % (d, p) for p in _original(d)]
+  return packages
 
 def link_documentation(additional_packages = ['python', 'numpy'], requirements_file = "../requirements.txt", server = None):
   """Generates a list of documented packages on pythonhosted.org for the packages read from the "requirements.txt" file and the given list of additional packages.

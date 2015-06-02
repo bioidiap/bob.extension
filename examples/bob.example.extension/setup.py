@@ -39,14 +39,14 @@
 setup_packages = ['bob.extension', 'bob.blitz']
 bob_packages = []
 
-from setuptools import setup, find_packages, dist
+from setuptools import setup, dist
 dist.Distribution(dict(setup_requires = setup_packages + bob_packages))
 
 # import the Extension class and the build_ext function from bob.blitz
 from bob.blitz.extension import Extension, build_ext
 
 # load the requirements.txt for additional requirements
-from bob.extension.utils import load_requirements
+from bob.extension.utils import load_requirements, find_packages
 build_requires = setup_packages + bob_packages + load_requirements()
 
 # read version from "version.txt" file
@@ -74,7 +74,8 @@ setup(
     long_description = open('README.rst').read(),
 
     # This line is required for any distutils based packaging.
-    packages = find_packages(),
+    # It will find all package-data inside the 'bob' directory.
+    packages = find_packages('bob'),
     include_package_data = True,
 
     # These lines define which packages should be installed when you "install"
