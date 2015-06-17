@@ -9,6 +9,7 @@
 import os
 import sys
 import nose.tools
+from nose.plugins.skip import SkipTest
 from .utils import uniq, egrep, find_file, find_header, find_library, \
     load_requirements, find_packages, link_documentation
 

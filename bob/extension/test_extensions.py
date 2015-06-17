@@ -48,7 +48,7 @@ def _run(package, run_call):
   assert os.path.exists(os.path.join(package_dir, "bin", "buildout"))
 
   # buildout
-  subprocess.call(['./bin/buildout', 'buildout:prefer-final=false', 'buildout:develop=%s\n.'%os.getcwd()], cwd=package_dir)
+  subprocess.call(['./bin/buildout', 'buildout:prefer-final=false', 'buildout:develop=%s\n.'%pkg_resources.require("bob.extension")[0]], cwd=package_dir)
   assert os.path.exists(os.path.join(package_dir, "bin", "python"))
 
   # nosetests
