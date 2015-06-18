@@ -36,12 +36,9 @@
 from setuptools import setup, dist
 dist.Distribution(dict(setup_requires = ['bob.extension']))
 
-# import the Extension and Library classes and the build_ext function from bob.blitz
-from bob.blitz.extension import Extension, Library, build_ext
-
 # load the requirements.txt for additional requirements
 from bob.extension.utils import load_requirements, find_packages
-build_requires = load_requirements()
+install_requires = load_requirements()
 
 # The only thing we do in this file is to call the setup() function with all
 # parameters that define our package.
@@ -73,10 +70,7 @@ setup(
     # on the current system will be installed locally and only visible to the
     # scripts of this package. Don't worry - You won't need administrative
     # privileges when using buildout.
-    install_requires = [
-      'setuptools',
-      'bob.blitz'
-    ],
+    install_requires = install_requires,
 
     # Your project should be called something like 'bob.<foo>' or
     # 'bob.<foo>.<bar>'. To implement this correctly and still get all your
