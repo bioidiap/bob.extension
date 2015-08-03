@@ -42,8 +42,8 @@ def test_cflags_other():
   obj = pkg.cflags_other()
   #print obj
 
-  assert obj['extra_compile_args']
-  assert isinstance(obj['extra_compile_args'], list)
+  #assert obj['extra_compile_args']
+  #assert isinstance(obj['extra_compile_args'], list)
   #assert isinstance(obj['extra_compile_args'][0], tuple)
  
   #assert obj['define_macros']
