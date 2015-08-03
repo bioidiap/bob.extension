@@ -38,13 +38,19 @@ def test_include_directories():
   #print obj
 
 def test_cflags_other():
-  pkg = pkgconfig('QtCore')
+  pkg = pkgconfig('gmodule-export-2.0')
   obj = pkg.cflags_other()
-  assert obj['define_macros']
-  assert isinstance(obj['define_macros'], list)
-  assert isinstance(obj['define_macros'][0], tuple)
-  assert isinstance(obj, dict)
   #print obj
+
+  assert obj['extra_compile_args']
+  assert isinstance(obj['extra_compile_args'], list)
+  #assert isinstance(obj['extra_compile_args'][0], tuple)
+ 
+  #assert obj['define_macros']
+  #assert isinstance(obj['define_macros'], list)
+  #assert isinstance(obj['define_macros'][0], tuple) 
+
+  assert isinstance(obj, dict)
 
 def test_libraries():
   pkg = pkgconfig(test_package)
