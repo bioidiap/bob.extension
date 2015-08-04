@@ -23,7 +23,7 @@ before_install:
 - pip install --find-links https://www.idiap.ch/software/bob/wheels/travis/ --use-wheel sphinx nose --pre coveralls bob.blitz
 install:
 - python bootstrap-buildout.py
-- ./bin/buildout
+- ./bin/buildout buildout:prefer-final=true 
 script:
 - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
 - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
