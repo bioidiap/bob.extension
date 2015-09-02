@@ -48,7 +48,10 @@ def _run(package, run_call):
   assert os.path.exists(os.path.join(package_dir, "bin", "buildout"))
 
   # buildout
-  subprocess.call(['./bin/buildout', 'buildout:prefer-final=false', 'buildout:develop=%s\n.'%pkg_resources.require("bob.extension")[0]], cwd=package_dir)
+  # if we have a setup.py in our current directory, we develop both (as we might be in the current source directory of bob.extension and use it),
+  # otherwise we only develop the downloaded source package
+  develop = '%s\n.'%os.getcwd() if os.path.exists("setup.py") else '.'
+  subprocess.call(['./bin/buildout', 'buildout:prefer-final=false', 'buildout:develop=%s'%develop], cwd=package_dir)
   assert os.path.exists(os.path.join(package_dir, "bin", "python"))
 
   # nosetests

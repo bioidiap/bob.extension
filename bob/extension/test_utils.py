@@ -117,6 +117,7 @@ def test_find_packages():
   # tests the find-packages command inside the current package
   import os
   if not os.path.exists("bob/extension"):
+    from nose.plugins.skip import SkipTest
     raise SkipTest("We are not currently testing the bob.extension package")
 
   packages = find_packages()
