@@ -25,6 +25,9 @@ def _run(package, run_call):
   local_archive = os.path.join(temp_dir, "bob.example.%s.tar.bz2"%package)
   print ("Downloading package '%s'" % example_url)
 
+  # redirect output of functions to /dev/null to avoid spamming the console
+  devnull = open(os.devnull, 'w')
+
   # download archive
   if sys.version_info[0] <= 2:
     import urllib2 as urllib
@@ -44,26 +47,26 @@ def _run(package, run_call):
   package_dir = os.path.join(temp_dir, "bob.example.%s"%package)
 
   # bootstrap
-  subprocess.call([sys.executable, "bootstrap-buildout.py"], cwd=package_dir)
+  subprocess.call([sys.executable, "bootstrap-buildout.py"], cwd=package_dir, stdout=devnull, stderr=devnull)
   assert os.path.exists(os.path.join(package_dir, "bin", "buildout"))
 
   # buildout
   # if we have a setup.py in our current directory, we develop both (as we might be in the current source directory of bob.extension and use it),
   # otherwise we only develop the downloaded source package
   develop = '%s\n.'%os.getcwd() if os.path.exists("setup.py") else '.'
-  subprocess.call(['./bin/buildout', 'buildout:prefer-final=false', 'buildout:develop=%s'%develop], cwd=package_dir)
+  subprocess.call(['./bin/buildout', 'buildout:prefer-final=false', 'buildout:develop=%s'%develop], cwd=package_dir, stdout=devnull)
   assert os.path.exists(os.path.join(package_dir, "bin", "python"))
 
   # nosetests
-  subprocess.call(['./bin/nosetests', '-sv'], cwd=package_dir)
+  subprocess.call(['./bin/nosetests', '-sv'], cwd=package_dir, stdout=devnull, stderr=devnull)
 
   # check that the call is working
-  subprocess.call(run_call, cwd=package_dir)
+  subprocess.call(run_call, cwd=package_dir, stdout=devnull)
 
-  subprocess.call(['./bin/sphinx-build', 'doc', 'sphinx'], cwd=package_dir)
+  subprocess.call(['./bin/sphinx-build', 'doc', 'sphinx'], cwd=package_dir, stdout=devnull)
   assert os.path.exists(os.path.join(package_dir, "sphinx", "index.html"))
 
-  subprocess.call('./bin/python -c "from bob.example.%s import get_config; print(get_config())"'%package, cwd=package_dir, shell=True)
+  subprocess.call('./bin/python -c "import pkg_resources; from bob.example.%s import get_config; print(get_config())"'%package, cwd=package_dir, stdout=devnull, shell=True)
 
   shutil.rmtree(temp_dir)
 
