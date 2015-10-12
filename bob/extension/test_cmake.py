@@ -79,11 +79,13 @@ def test_library():
     version = '3.2.1'
   )
 
+  # redirect output of functions to /dev/null to avoid spamming the console
+  devnull = open(os.devnull, 'w')
   # compile
   compile_dir = os.path.join(temp_dir, 'build', 'lib')
   os.makedirs(compile_dir)
   os.makedirs(target_dir)
-  library.compile(compile_dir)
+  library.compile(compile_dir,stdout=devnull)
 
   # check that the library was generated sucessfully
   if platform.system() == 'Darwin':
@@ -99,4 +101,3 @@ def test_library():
 
   # finally, clean up the mess
   shutil.rmtree(temp_dir)
-

@@ -542,7 +542,7 @@ class Library (Extension):
     self.c_define_macros.extend(self.pkg_macros)
 
 
-  def compile(self, build_directory, compiler = None):
+  def compile(self, build_directory, compiler = None, stdout=None):
     """This function will automatically create a CMakeLists.txt file in the ``package_directory`` including the required information.
     Afterwards, the library is built using CMake in the given ``build_directory``.
     The build type is automatically taken from the debug option in the buildout.cfg.
@@ -578,12 +578,12 @@ class Library (Extension):
       env['CXX'] = compiler
     # configure cmake
     command = [self.c_cmake, final_build_dir]
-    if subprocess.call(command, cwd=final_build_dir, env=env) != 0:
+    if subprocess.call(command, cwd=final_build_dir, env=env, stdout=stdout) != 0:
       raise OSError("Could not generate makefiles with CMake")
     # run make
     make_call = ['make']
     if  "BOB_BUILD_PARALLEL" in os.environ: make_call += ['-j%s' % os.environ["BOB_BUILD_PARALLEL"]]
-    if subprocess.call(make_call, cwd=final_build_dir, env=env) != 0:
+    if subprocess.call(make_call, cwd=final_build_dir, env=env, stdout=stdout) != 0:
       raise OSError("CMake compilation stopped with an error; stopping ...")
 
 
