@@ -94,10 +94,7 @@ setup(
     # Our database packages are good examples of namespace implementations
     # using several layers. You can check them out here:
     # https://github.com/idiap/bob/wiki/Satellite-Packages
-    namespace_packages = [
-      'bob',
-      'bob.example',
-    ],
+
 
     # In fact, we are defining two extensions here. In any case, you can define
     # as many extensions as you need. Each of them will be compiled

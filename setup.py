@@ -31,9 +31,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
 
-    namespace_packages=[
-      "bob",
-    ],
+
 
     install_requires=requiries,
 
