@@ -171,17 +171,26 @@ package-z
     except ImportError:
       pass
 
+    try:
+      import matplotlib
+      result = link_documentation(['matplotlib'], None)
+      assert len(result) == 1
+      key = list(result.keys())[0]
+      assert '/matplotlib' in key
+    except ImportError:
+      pass
+
     # test pypi packages
-    additional_packages = ['python', 'bob.extension', 'gridtk', 'other.bob.package']
+    additional_packages = ['python', 'matplotlib', 'bob.extension', 'gridtk', 'other.bob.package']
     if "BOB_DOCUMENTATION_SERVER" not in os.environ:
       result = link_documentation(additional_packages, stringio(f))
-      expected = {'http://docs.python.org/%d.%d' % sys.version_info[:2] : None, 'https://pythonhosted.org/setuptools' : None, 'https://pythonhosted.org/bob.extension' : None, 'https://pythonhosted.org/gridtk' : None}
+      expected = {'http://docs.python.org/%d.%d' % sys.version_info[:2] : None, 'http://matplotlib.sourceforge.net' : None, 'https://pythonhosted.org/setuptools' : None, 'https://pythonhosted.org/bob.extension' : None, 'https://pythonhosted.org/gridtk' : None}
       nose.tools.eq_(result, expected)
 
     # test idiap server
     os.environ["BOB_DOCUMENTATION_SERVER"] = "https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
     result = link_documentation(additional_packages, stringio(f))
-    expected = {'http://docs.python.org/%d.%d' % sys.version_info[:2] : None, 'https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master' : None, 'https://www.idiap.ch/software/bob/docs/latest/idiap/gridtk/master' : None}
+    expected = {'http://docs.python.org/%d.%d' % sys.version_info[:2] : None, 'http://matplotlib.sourceforge.net' : None, 'https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master' : None, 'https://www.idiap.ch/software/bob/docs/latest/idiap/gridtk/master' : None}
     nose.tools.eq_(result, expected)
 
   finally:
