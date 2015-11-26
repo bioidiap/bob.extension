@@ -448,6 +448,12 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     mapping[scipy_manual]  = None
     packages.remove('scipy')
 
+  if 'matplotlib' in packages:
+    matplotlib_manual = "http://matplotlib.sourceforge.net"
+    print ("Adding intersphinx source %s" % matplotlib_manual)
+    mapping[matplotlib_manual] = None
+    packages.remove('matplotlib')
+
   # get the server for the other packages
   if server is None:
     if "BOB_DOCUMENTATION_SERVER" in os.environ:
