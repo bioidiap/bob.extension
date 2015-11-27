@@ -423,11 +423,15 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     packages.remove('python')
 
   if 'numpy' in packages:
-    numpy_version = __import__('numpy').version.version
-    if smaller_than(numpy_version, '1.5.z'):
-      numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.x'
-    else:
-      numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.0'
+    try:
+      import numpy
+      numpy_version = numpy.version.version
+      if smaller_than(numpy_version, '1.5.z'):
+        numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.x'
+      else:
+        numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.0'
+    except ImportError:
+      numpy_version = '1.9.1'
     numpy_manual = 'http://docs.scipy.org/doc/numpy-%s' % numpy_version
 
     # numpy mapping
@@ -436,11 +440,15 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     packages.remove('numpy')
 
   if 'scipy' in packages:
-    scipy_version = __import__('scipy').version.version
-    if smaller_than(scipy_version, '0.9.0'):
-      scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.x'
-    else:
-      scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.0'
+    try:
+      import scipy
+      scipy_version = scipy.version.version
+      if smaller_than(scipy_version, '0.9.0'):
+        scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.x'
+      else:
+        scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.0'
+    except ImportError:
+      scipy_version = '0.16.1'
     scipy_manual = 'http://docs.scipy.org/doc/scipy-%s/reference' % scipy_version
 
     # numpy mapping
