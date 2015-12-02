@@ -11,8 +11,8 @@ if [ -z "${DOCUSER}" ] || [ -z "${DOCPASS}" ] || [ -z "${BOB_DOCUMENTATION_SERVE
   exit 0
 fi
 
-# check branch (see: http://stackoverflow.com/a/10915331)
-branch=$(git symbolic-ref --short HEAD)
+# check branch (see: http://stackoverflow.com/a/2111099)
+branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
 if [ "$branch" != "master" ]; then
   echo "Not on master branch -- not uploading documentation";
   exit 0;
