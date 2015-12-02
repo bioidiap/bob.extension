@@ -12,7 +12,8 @@ if [ -z "${DOCUSER}" ] || [ -z "${DOCPASS}" ] || [ -z "${BOB_UPLOAD_WHEEL}" ]; t
 fi
 
 # check branch (see: http://stackoverflow.com/a/2111099)
-branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+#branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+branch=$(git branch)
 if [ "$branch" != "master" ]; then
   echo "Not on master branch, but on branch '$branch' -- not uploading wheel";
   exit 0;
