@@ -14,7 +14,7 @@ fi
 # check branch (see: http://stackoverflow.com/a/2111099)
 branch=$(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
 if [ "$branch" != "master" ]; then
-  echo "Not on master branch -- not uploading documentation";
+  echo "Not on master branch, but on branch '$branch' -- not uploading documentation";
   exit 0;
 fi
 
