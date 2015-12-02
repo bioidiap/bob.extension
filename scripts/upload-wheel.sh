@@ -2,13 +2,20 @@
 
 # some checks
 if [ "${TRAVIS_PULL_REQUEST}" != "false" ]; then
-  echo "This is a pull request - not uploading documentation";
+  echo "This is a pull request - not uploading wheel";
   exit 0
 fi
 
 if [ -z "${DOCUSER}" ] || [ -z "${DOCPASS}" ] || [ -z "${BOB_UPLOAD_WHEEL}" ]; then
   echo "Server username and/or password undefined - not uploading wheel";
   exit 0
+fi
+
+# check branch (see: http://stackoverflow.com/a/10915331)
+branch=$(git symbolic-ref --short HEAD)
+if [ "$branch" != "master" ]; then
+  echo "Not on master branch -- not uploading wheel";
+  exit 0;
 fi
 
 # create wheel

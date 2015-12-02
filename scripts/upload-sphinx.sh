@@ -11,6 +11,13 @@ if [ -z "${DOCUSER}" ] || [ -z "${DOCPASS}" ] || [ -z "${BOB_DOCUMENTATION_SERVE
   exit 0
 fi
 
+# check branch (see: http://stackoverflow.com/a/10915331)
+branch=$(git symbolic-ref --short HEAD)
+if [ "$branch" != "master" ]; then
+  echo "Not on master branch -- not uploading documentation";
+  exit 0;
+fi
+
 info=sphinx/.travis.info
 codename=$(basename ${TRAVIS_REPO_SLUG})-${TRAVIS_COMMIT}
 server=https://${DOCUSER}:${DOCPASS}@www.idiap.ch/software/bob/docs-upload/
