@@ -54,7 +54,7 @@ static PyObject* PyBobExampleLibrary_Reverse(PyObject*, PyObject* args, PyObject
   return PyBlitzArrayCxx_AsNumpy(reversed);
 
   // handle exceptions that occurred in this function
-  BOB_CATCH_FUNCTION("in reverse", 0)
+  BOB_CATCH_FUNCTION("reverse", 0)
 }
 
 
@@ -93,20 +93,20 @@ static PyObject* create_module (void) {
 
 # if PY_VERSION_HEX >= 0x03000000
   PyObject* module = PyModule_Create(&module_definition);
+  auto module_ = make_xsafe(module);
+  const char* ret = "O";
 # else
   PyObject* module = Py_InitModule3(BOB_EXT_MODULE_NAME, module_methods, module_docstr);
+  const char* ret = "N";
 # endif
   if (!module) return 0;
-  auto module_ = make_safe(module); ///< protects against early returns
 
   if (PyModule_AddStringConstant(module, "__version__", BOB_EXT_MODULE_VERSION) < 0) return 0;
 
   /* imports bob.blitz C-API + dependencies */
   if (import_bob_blitz() < 0) return 0;
 
-  Py_INCREF(module);
-  return module;
-
+  return Py_BuildValue(ret, module);
 }
 
 PyMODINIT_FUNC BOB_EXT_ENTRY_NAME (void) {

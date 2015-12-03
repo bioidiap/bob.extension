@@ -72,18 +72,6 @@ setup(
     # privileges when using buildout.
     install_requires = install_requires,
 
-    # Your project should be called something like 'bob.<foo>' or
-    # 'bob.<foo>.<bar>'. To implement this correctly and still get all your
-    # packages to be imported w/o problems, you need to implement namespaces
-    # on the various levels of the package and declare them here. See more
-    # about this here:
-    # http://peak.telecommunity.com/DevCenter/setuptools#namespace-packages
-    #
-    # Our database packages are good examples of namespace implementations
-    # using several layers. You can check them out here:
-    # https://github.com/idiap/bob/wiki/Satellite-Packages
-
-
     # This entry defines which scripts you will have inside the 'bin' directory
     # once you install the package (or run 'bin/buildout'). The order of each
     # entry under 'console_scripts' is like this:

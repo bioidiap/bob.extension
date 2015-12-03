@@ -86,18 +86,6 @@ setup(
     setup_requires = build_requires,
     install_requires = build_requires,
 
-    # Your project should be called something like 'bob.<foo>' or
-    # 'bob.<foo>.<bar>'. To implement this correctly and still get all your
-    # packages to be imported w/o problems, you need to implement namespaces
-    # on the various levels of the package and declare them here. See more
-    # about this here:
-    # http://peak.telecommunity.com/DevCenter/setuptools#namespace-packages
-    #
-    # Our database packages are good examples of namespace implementations
-    # using several layers. You can check them out here:
-    # https://github.com/idiap/bob/wiki/Satellite-Packages
-
-
     # In fact, we are defining two extensions here. In any case, you can define
     # as many extensions as you need. Each of them will be compiled
     # independently into a separate .so file.
