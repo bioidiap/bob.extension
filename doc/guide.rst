@@ -104,11 +104,6 @@ Particularly, it inspects the ``setup.py`` file in the root directory of the pac
       'bob.blitz'
     ],
     ...
-    namespace_packages = [
-      'bob',
-      'bob.example',
-    ],
-    ...
     entry_points = {
       'console_scripts' : [
         'version.py = bob.example.project.script.version:main',
