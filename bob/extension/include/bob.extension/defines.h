@@ -27,6 +27,7 @@
 #define PyString_FromString PyUnicode_FromString
 #define PyString_FromFormat PyUnicode_FromFormat
 #define PyString_AS_STRING(x) PyBytes_AS_STRING(make_safe(PyUnicode_AsUTF8String(x)).get())
+#define PyString_AsString(x) PyUnicode_AsUTF8(x)
 #endif
 
 #define PyBob_NumberCheck(x) (PyInt_Check(x) || PyLong_Check(x) || PyFloat_Check(x) || PyComplex_Check(x))
