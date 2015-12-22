@@ -18,6 +18,8 @@ if [[ "$branch" != *"master"* ]]; then
   exit 0;
 fi
 
+echo "Detected branch '$branch' to be master branch -- uploading wheel to Idiap servers"
+
 info=sphinx/.travis.info
 codename=$(basename ${TRAVIS_REPO_SLUG})-${TRAVIS_COMMIT}
 server=https://${DOCUSER}:${DOCPASS}@www.idiap.ch/software/bob/docs-upload/

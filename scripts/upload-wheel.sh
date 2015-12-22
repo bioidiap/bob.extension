@@ -18,6 +18,8 @@ if [[ "$branch" != *"master"* ]]; then
   exit 0;
 fi
 
+echo "Detected branch '$branch' to be master branch -- uploading wheel to Idiap servers"
+
 # create wheel
 if [ "${BOB_UPLOAD_WHEEL}" != "1" ]; then
   WHEEL_OPTION=${BOB_UPLOAD_WHEEL}
