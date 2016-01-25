@@ -123,7 +123,7 @@ def main(command_line_options = None):
     ver[-1] += 1
     args.latest_version = ".".join([str(v) for v in ver])
     if version.prerelease is not None:
-      args.latest_version += "".join(str(p) for p in version.prerelease)
+      args.latest_version += "".join(str(p) for p in version.prerelease[:-1]) + '0'
     print ("Assuming latest version to be %s (since current version %s)" % (args.latest_version, current_version))
 
 
