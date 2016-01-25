@@ -22,9 +22,9 @@ By default, both versions can be automatically computed from the 'current'
 version, which is read from the 'version.txt' file. In this case, the 
 'stable' version will be the 'current' version without the trailing beta
 indicator, and the 'latest' version will be 1 patch level above the 'current'
-version, with the same beta indicator, for example:
+version, with the beta indicator 0, for example:
 
-* current version (in version.txt): 2.1.6b0
+* current version (in version.txt): 2.1.6b3
 -> automatic stable version: 2.1.6
 -> automatic latest version: 2.1.7b0
 
