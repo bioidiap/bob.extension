@@ -1,56 +1,72 @@
 #!/usr/bin/env python
 
 """
-This script will push a new ``'stable'`` version of the current package on
+This script will push a new 'stable' version of the current package on
 GitHub and PyPI, and update the new version of the package to the given
-``'latest'`` version on GitHub.
+'latest' version on GitHub.
 
 It assumes that you are in the main directory of the package and have
 successfully ran bootstrap, and that you have submitted all changes that should
-go into the new version.
+go into the new version. Preferably, the build on Travis passed. For database 
+packages, it also assumes that the '.sql3' file has been generated (if any). 
+Further, it assumes that the 'stable' version has not yet been uploaded to 
+PyPI, and that no GitHub tag with this version exists.
 
-Preferably, the build on Travis passed.  For database packages, it also assumes
-that the ``.sql3`` files have been generated.  Also, it assumes that the
-``'stable'`` version has not yet been uploaded to PyPI, and that no GitHub tag
-with this version exists.
-
-The ``'stable'`` version (i.e., what will be downloadable from PyPI) can be
+The 'stable' version (i.e., what will be downloadable from PyPI) can be
 current version of the package, but not lower than that.
 
-The ``'latest'`` version (i.e., what will be the new master branch on GitHub)
+The 'latest' version (i.e., what will be the new master branch on GitHub)
 must be higher than the current and than the stable version.
 
-Both versions can be automatically computed from the current version, which is
-stored in the 'version.txt' file.  By default, five steps are executed, in this
-order:
+By default, both versions can be automatically computed from the 'current' 
+version, which is read from the 'version.txt' file. In this case, the 
+'stable' version will be the 'current' version without the trailing beta
+indicator, and the 'latest' version will be 1 patch level above the 'current'
+version, with the same beta indicator, for example:
 
-  * ``tag``: If given, the --stable-version will be set and added to GitHub;
+* current version (in version.txt): 2.1.6b0
+-> automatic stable version: 2.1.6
+-> automatic latest version: 2.1.7b0
+
+
+By default, this script executes five steps, in this order:
+
+  * tag: If given, the 'stable' version will be set and added to GitHub;
     and the version is tagged in GitHub and pushed.
 
-  * ``build``: The package will be (re-)built with bin/buildout using the
+  * build: The package will be (re-)built with bin/buildout using the
     provided build options.
 
-  * ``pypi``: The --stable-version (or the current version) will be registered
+  * pypi: The 'stable' version (or the current version) will be registered
     and uploaded to PyPI
 
-  * ``docs``: The documentation will be generated and uploaded to PythonHosted
+  * docs: The documentation will be generated and uploaded to PythonHosted
 
-  * ``latest``: The --latest-version will be set and committed to GitHub
+  * latest: The 'latest' version will be set and committed to GitHub
 
 If any of these commands fail, the remaining steps will be skipped, unless you
-specify the ``--keep-going`` option.
+specify the '--keep-going' option.
 
 If you only want a subset of the steps to be executed, you can limit them using
-the ``--steps`` option. A valid use case, e.g., is only to re-upload the
+the '--steps' option. A valid use case, e.g., is only to re-upload the
 documentation.
 
-Example:
+Examples:
 
-  Tags and deploy on PyPI my package with the stable version ``2.0.0``. Update
-  my next package version to ``2.0.1a0``. Do it verbosely (``-vv``):
+  Tags and deploy on PyPI my package with the stable version '2.0.0'. Update
+  my next package version to '2.0.1a0'. Do it verbosely ('-vv'):
 
     %(prog)s --latest-version=2.0.1a0 --stable-version=2.0.0 -vv
 
+
+  Print out, what would be done using the '--dry-run' option:
+  
+    %(prog)s -q
+
+
+  Do everything automatically (assumes a proper version.txt file):
+  
+    %(prog)s -vv
 """
 
 from __future__ import print_function
