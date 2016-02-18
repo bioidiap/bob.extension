@@ -13,10 +13,10 @@ fi
 
 # check branch (see: http://stackoverflow.com/a/229606)
 branch=$(git branch)
-#if [[ "$branch" != *"master"* ]]; then
-#  echo "Not on master branch, but on branch '$branch' -- not uploading wheel";
-#  exit 0;
-#fi
+if [[ "$branch" != *"master"* ]]; then
+  echo "Not on master branch, but on branch '$branch' -- not uploading wheel";
+  exit 0;
+fi
 
 echo "Detected branch '$branch' to be master branch -- uploading wheel to Idiap servers"
 
