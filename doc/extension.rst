@@ -131,7 +131,13 @@ Finally, the function ``reverse`` from the module ``_library`` is imported into 
 
    1. We use a :c:macro:`BOB_TRY` and :c:macro:`BOB_CATCH_FUNCTION` block around the function call, as explained in :ref:`helpers`.
 
+      .. warning::
+         By choosing ``debug = true`` in your ``buildout.cfg`` (which is the **default**, see below), the :ref:`C++ exception handling <helpers>` will be disabled (in order to support debuggers like ``gdb`` or ``gdb-python`` to handle these exceptions properly).
+         This will result in any C++ exception to be handled by the default C++ exception handler, which reports the exception in the console and stop the program (including any running python shells).
+
    2. We use a :cpp:class:`bob::extension::FunctionDoc` to generate a proper function documentation in Python, as explained in :ref:`docs`.
+
+
 
 To compile your C++ Python bindings and the pure C++ libraries, you can follow the same instructions as shown above:
 
@@ -143,9 +149,9 @@ To compile your C++ Python bindings and the pure C++ libraries, you can follow t
   ...
 
 .. note::
+   By default, we compile the source code (of this and **all dependent packages**, both the ones installed as ``eggs``, and the ones developed using ``mr.developer``) in debug mode.
+   If you want to change that, switch the according flag in the ``buildout.cfg`` to ``debug = False``, and the compilation will be done with optimization flags and C++ exception handling enabled.
 
-   By default, we compile the source code (of this and all dependent packages) in debug mode.
-   If you want to change that, switch the according flag in the ``buildout.cfg`` to ``debug = False``, and the compilation will be done with optimization flags enabled.
 
 Now, we can use the script ``./bin/reverse.py`` (that we have registered in the ``setup.py``) to reverse a list of floats, using the C++ implementation of the ``reverse`` function:
 

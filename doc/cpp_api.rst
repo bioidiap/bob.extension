@@ -11,7 +11,7 @@
 ==================
 
 In the header file ``<bob.extension/defines.h>`` we have added some functions that help you to keep your code short and clean.
-Particularly, we provide three preprocessor definitions:
+Particularly, we provide three preprocessor directives:
 
 .. c:macro:: BOB_TRY
 
@@ -19,19 +19,27 @@ Particularly, we provide three preprocessor definitions:
 
 .. c:macro:: BOB_CATCH_FUNCTION(message,ret)
 
-   Catches exceptions of any kind, adds the ``message`` in case an unknown exception is caught, and returns with the given error return (which is usually 0 for normal functions or -1 for constructors and setter functions).
+   Catches C++ exceptions of any kind, adds the ``message`` in case an unknown exception is caught, and returns with the given error return (which is usually 0 for normal functions or -1 for constructors and setter functions).
    This macro should be used when binding a stand-alone function, for binding class member functions, please use :c:macro:`BOB_CATCH_MEMBER`.
 
 .. c:macro:: BOB_CATCH_MEMBER(message,ret)
 
-   Catches exceptions of any kind, adds the ``message`` in case an unknown exception is caught, and returns with the given error return (which is usually 0 for normal functions or -1 for constructors and setter functions).
+   Catches C++ exceptions of any kind, adds the ``message`` in case an unknown exception is caught, and returns with the given error return (which is usually 0 for normal functions or -1 for constructors and setter functions).
    This macro should be used when binding a member function of a class, for binding stand-alone functions, please use :c:macro:`BOB_CATCH_FUNCTION`.
+
+These preprocessor directives will catch any C++ exception that is raised inside the C/C++ code that you bind to python and translate them into proper Python exceptions.
+
+.. warning::
+   These directives will only be active in **release** mode, when compiling with ``debug = true``, they will not do anything.
+   This is in order to support C++ debuggers like ``gdb`` or ``gdb-python`` to be able to handle these exceptions.
+
+Additionally, we added some preprocessor directives that help in the bindings:
 
 .. c:macro:: PyBob_NumberCheck(o)
 
    Checks if the given object ``o`` is a number, i.e., an int, a long, a float or a complex.
 
-After including the above mentioned header, we also re-define the functions :c:func:`PyInt_Check`, :c:func:` PyInt_AS_LONG`, :c:func:`PyString_Check` and :c:func:`PyString_AS_STRING` (which don't exist in the bindings for Python3) so that they can be used in bindings for both Python2 and Python3.
+After including the above mentioned header, we also re-define the functions :c:func:`PyInt_Check`, :c:func:`PyInt_AS_LONG`, :c:func:`PyString_Check` and :c:func:`PyString_AS_STRING` (which don't exist in the bindings for Python3) so that they can be used in bindings for both Python2 and Python3.
 
 .. _cpp_api:
 

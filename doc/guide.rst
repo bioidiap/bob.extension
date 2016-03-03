@@ -232,10 +232,10 @@ Some of the entries need attention.
   There, you can list directories that contain Python packages, which will be build in exactly the order that you specified there.
   With this option, you can tell buildout particularly, in which directories it should look for some packages.
   Note that the ``develop``ed packages are not automatically included into the ``eggs``.
-  Of course, you need to develop the current package, which is stored in directory ``.``.
+  Of course, you need to develop the current package, which is stored in ``.`` i.e, the current directory.
 
 The remaining options define, how the packages are build.
-For example, the ``debug`` flag defined, how the C++ code in all the packages is built.
+For example, the ``debug`` flag defined, how the :ref:`C++ code <extension-c++>` in all the packages is built.
 The ``verbose`` options handles the verbosity of the build.
 When the ``newest`` flag is set to ``true``, buildout will install all packages in the latest versions, even if an older version is already available.
 

@@ -32,9 +32,17 @@
 
 #define PyBob_NumberCheck(x) (PyInt_Check(x) || PyLong_Check(x) || PyFloat_Check(x) || PyComplex_Check(x))
 
+
+#ifdef BOB_DEBUG
+
+#define BOB_TRY {
+#define BOB_CATCH_MEMBER(m,r) }
+#define BOB_CATCH_FUNCTION(m,r) }
+
+#else // BOB_DEBUG
+
 // BOB_TRY is simply a try{
 #define BOB_TRY try{
-
 
 // for catching exceptions, you can define a message, and you have to select the error return value (i.e., -1 for constructors, and 0 for other functions)
 
@@ -61,5 +69,6 @@
     return ret;\
   }
 
+#endif // BOB_DEBUG
 
 #endif // BOB_EXTENSION_DEFINES_H_INCLUDED
