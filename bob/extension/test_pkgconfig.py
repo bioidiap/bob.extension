@@ -38,7 +38,7 @@ def test_include_directories():
   #print obj
 
 def test_cflags_other():
-  pkg = pkgconfig('gmodule-export-2.0')
+  pkg = pkgconfig('freetype2')
   obj = pkg.cflags_other()
   #print obj
 
