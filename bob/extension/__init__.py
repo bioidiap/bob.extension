@@ -176,6 +176,7 @@ def get_bob_libraries(bob_packages):
   includes = []
   libraries = []
   library_directories = []
+  macros = []
   # iterate through the list of bob packages
   if bob_packages is not None:
     # TODO: need to handle versions?
@@ -188,6 +189,8 @@ def get_bob_libraries(bob_packages):
       # check if the package contains a get_include_directories() function
       if hasattr(pkg, 'get_include_directories'):
         includes.extend(pkg.get_include_directories())
+      if hasattr(pkg, 'get_macros'):
+        macros.extend(pkg.get_macros())
 
       lib_name = package.replace('.', '_')
       libs = find_library(lib_name, prefixes=[location])
@@ -196,7 +199,7 @@ def get_bob_libraries(bob_packages):
         libraries.append(lib_name)
         library_directories.append(os.path.dirname(libs[0]))
 
-  return includes, libraries, library_directories
+  return includes, libraries, library_directories, macros
 
 
 def get_full_libname(name, path=None, version=None):
@@ -288,7 +291,7 @@ class Extension(DistutilsExtension):
     else:
       self.bob_packages = None
 
-    bob_includes, bob_libraries, bob_library_dirs = get_bob_libraries(self.bob_packages)
+    bob_includes, bob_libraries, bob_library_dirs, bob_macros = get_bob_libraries(self.bob_packages)
 
     # system include directories
     if 'system_include_dirs' in kwargs:
@@ -323,7 +326,7 @@ class Extension(DistutilsExtension):
 
     # Mixing
     parameters = {
-        'define_macros': generate_self_macros(name, version),
+        'define_macros': generate_self_macros(name, version) + bob_macros,
         'extra_compile_args': ['-std=c++0x'], #synonym for c++11?
         'extra_link_args': [],
         'library_dirs': [],
@@ -521,10 +524,11 @@ class Library (Extension):
     self.c_define_macros = define_macros[:]
 
     # add includes and libs for bob packages as the PREFERRED path (i.e., in front)
-    bob_includes, bob_libraries, bob_library_dirs = get_bob_libraries(bob_packages)
+    bob_includes, bob_libraries, bob_library_dirs, bob_macros = get_bob_libraries(bob_packages)
     self.c_include_directories = bob_includes + self.c_include_directories
     self.c_libraries = bob_libraries + self.c_libraries
     self.c_library_directories = bob_library_dirs + self.c_library_directories
+    self.c_define_macros = bob_macros + self.c_define_macros
 
     # find the cmake executable
     cmake = find_executable("cmake")
