@@ -72,6 +72,8 @@ Examples:
 from __future__ import print_function
 import sys, os
 import subprocess
+import shutil
+import tempfile
 
 import argparse
 from distutils.version import StrictVersion as Version
@@ -89,6 +91,29 @@ def _update_readme(version = None):
         write.write(line)
   os.rename(".README.rst", "README.rst")
 
+
+def get_remote_md5_sum(url, max_file_size=100 * 1024 * 1024):
+    try:
+      from urllib.request import urlopen
+    except ImportError:
+      from urllib2 import urlopen
+    import hashlib
+    remote = urlopen(url)
+    hash = hashlib.md5()
+
+    total_read = 0
+    while True:
+        data = remote.read(4096)
+        total_read += 4096
+
+        if not data or total_read > max_file_size:
+            break
+
+        hash.update(data)
+
+    return hash.hexdigest()
+
+
 def main(command_line_options = None):
   doc = __doc__ % dict(prog=os.path.basename(sys.argv[0]))
   parser = argparse.ArgumentParser(description=doc, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -96,7 +121,7 @@ def main(command_line_options = None):
   parser.add_argument("--latest-version", '-l', help = "The latest version for the package; if not specified, it is guessed from the current version")
   parser.add_argument("--stable-version", '-s', help = "The stable version for the package; if not specified, it is guessed from the current version")
   parser.add_argument("--build-options", '-b', nargs='+', default = [], help = "Add options to build your package")
-  parser.add_argument("--steps", nargs = "+", choices = ['tag', 'build', 'pypi', 'docs', 'latest'], default = ['tag', 'build', 'pypi', 'docs', 'latest'], help = "Select the steps that you want to execute")
+  parser.add_argument("--steps", nargs = "+", choices = ['tag', 'build', 'pypi', 'docs', 'latest', 'conda-forge'], default = ['tag', 'build', 'pypi', 'docs', 'latest', 'conda-forge'], help = "Select the steps that you want to execute")
   parser.add_argument("--dry-run", '-q', action = 'store_true', help = "Only print the actions, but do not execute them")
   parser.add_argument("--keep-going", '-f', action = 'store_true', help = "Run all steps, even if some of them fail. HANDLE THIS FLAG WITH CARE!")
   parser.add_argument("--verbose", '-v', action = 'store_true', help = "Print more information")
@@ -144,7 +169,6 @@ def main(command_line_options = None):
         # execute call
         if subprocess.call(call):
           # call failed (has non-zero exit status)
-          print ("Command '%s' failed; stopping" % ' '.join(call))
           if not args.keep_going:
             raise ValueError("Command '%s' failed; stopping" % ' '.join(call))
 
@@ -199,6 +223,50 @@ def main(command_line_options = None):
     print ("\nSetting latest version '%s'" % args.latest_version)
     run_commands(args.latest_version, ['git', 'add', 'version.txt', 'README.rst'], ['git', 'commit', '-m', 'Increased latest version to %s  [skip ci]' % args.latest_version], ['git', 'push'])
 
+  if 'conda-forge' in args.steps:
+    # open a pull request on conda-forge
+    package = os.path.basename(os.getcwd())
+    url = 'https://pypi.io/packages/source/{0}/{1}/{1}-{2}.zip'.format(package[0], package, args.stable_version)
+    try:
+      md5 = get_remote_md5_sum(url)
+    except Exception:
+      if not args.dry_run:
+        raise
+      else:
+        md5 = 'dryrunmd5'
+    temp_dir = tempfile.mkdtemp()
+    try:
+      print("\nClonning the feedstock")
+      feedstock = os.path.join(temp_dir, 'feedstock')
+      try:
+        run_commands(None,
+                     ['git', 'clone', 'git@github.com:conda-forge/{}-feedstock.git'.format(package), feedstock])
+      except ValueError:
+        print("\nThe feedstock does not exist on conda-forge. Exiting ...")
+        raise
+      if not args.dry_run:
+        os.chdir(feedstock)
+      run_commands(None, ['git', 'remote', 'add', 'bioidiap', 'git@github.com:bioidiap/{}-feedstock.git'.format(package)],
+                   ['git', 'fetch', '--all'],
+                   ['git', 'checkout', '-b', args.stable_version])
+      # update meta.yaml
+      if not args.dry_run:
+        with open('recipe/meta.yaml') as f:
+          doc = f.read()
+        import re
+        doc = re.sub(r'\{\%\s?set\s?version\s?=\s?".*"\s?\%\s?\}', '{% set version = "' + str(args.stable_version) + '" %}', doc, count=1)
+        doc = re.sub(r'\s+number\:\s?[0-9]+', '\n  number: 0', doc, count=1)
+        doc = re.sub(r'\s+md5\:.*', '\n  md5: {}'.format(md5), doc, count=1)
+        with open('recipe/meta.yaml', 'w') as f:
+          f.write(doc)
+      run_commands(None,
+                   ['git', '--no-pager', 'diff'],
+                   ['git', 'commit', '-am', 'Updating to version {}'.format(args.stable_version)],
+                   ['git', 'push', '--set-upstream', 'bioidiap', args.stable_version],
+                   ['firefox', 'https://github.com/conda-forge/{}-feedstock/compare/master...bioidiap:{}?expand=1'.format(package, args.stable_version)])
+      print('\nPlease create the pull request in the webpage that was openned.')
+    finally:
+      shutil.rmtree(temp_dir)
 
 if __name__ == '__main__':
   main()
