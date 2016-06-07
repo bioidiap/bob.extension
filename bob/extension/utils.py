@@ -120,12 +120,20 @@ def find_header(name, subpaths=None, prefixes=None):
   description.
   """
 
-  headerpaths = ['include']
+  headerpaths = []
 
-  if platform.architecture()[0] == '32bit':
-    headerpaths.append(os.path.join('include', 'i386-linux-gnu'))
+  # arm-based system (e.g. raspberry pi 32 or 64-bit)
+  if platform.machine().startswith('arm'):
+    headerpaths += [os.path.join('include', 'arm-linux-gnueabihf')]
+
+  # else, consider it intel compatible
+  elif platform.architecture()[0] == '32bit':
+    headerpaths += [os.path.join('include', 'i386-linux-gnu')]
   else:
-    headerpaths.append(os.path.join('include', 'x86_64-linux-gnu'))
+    headerpaths += [os.path.join('include', 'x86_64-linux-gnu')]
+
+  # Raspberry PI search directory (arch independent) + normal include
+  headerpaths += ['include']
 
   # Exhaustive combination of paths and subpaths
   if subpaths:
@@ -177,9 +185,14 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
   description.
   """
 
-  libpaths = ['lib']
+  libpaths = []
 
-  if platform.architecture()[0] == '32bit':
+  # arm-based system (e.g. raspberry pi 32 or 64-bit)
+  if platform.machine().startswith('arm'):
+    libpaths += [os.path.join('lib', 'arm-linux-gnueabihf')]
+
+  # else, consider it intel compatible
+  elif platform.architecture()[0] == '32bit':
     libpaths += [
         os.path.join('lib', 'i386-linux-gnu'),
         os.path.join('lib32'),
@@ -189,6 +202,8 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
         os.path.join('lib', 'x86_64-linux-gnu'),
         os.path.join('lib64'),
         ]
+
+  libpaths += ['lib']
 
   # Exhaustive combination of paths and subpaths
   if subpaths:
@@ -256,9 +271,14 @@ def find_executable(name, subpaths=None, prefixes=None):
   description.
   """
 
-  binpaths = ['bin']
+  binpaths = []
 
-  if platform.architecture()[0] == '32bit':
+  # arm-based system (e.g. raspberry pi 32 or 64-bit)
+  if platform.machine().startswith('arm'):
+    binpaths += [os.path.join('bin', 'arm-linux-gnueabihf')]
+
+  # else, consider it intel compatible
+  elif platform.architecture()[0] == '32bit':
     binpaths += [
         os.path.join('bin', 'i386-linux-gnu'),
         os.path.join('bin32'),
@@ -268,6 +288,8 @@ def find_executable(name, subpaths=None, prefixes=None):
         os.path.join('bin', 'x86_64-linux-gnu'),
         os.path.join('bin64'),
         ]
+
+  binpaths += ['bin']
 
   # Exhaustive combination of paths and subpaths
   if subpaths:

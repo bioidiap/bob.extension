@@ -96,9 +96,9 @@ class CMakeListsGenerator:
 
     # check if CFLAGS or CXXFLAGS are set, and set them if not
     if 'CFLAGS' not in os.environ:
-      os.environ['CFLAGS'] = '-O3 -g0 -DNDEBUG -mtune=generic'
+      os.environ['CFLAGS'] = '-O3 -g0 -DNDEBUG -mtune=native'
     if 'CXXFLAGS' not in os.environ:
-      os.environ['CXXFLAGS'] = '-O3 -g0 -DNDEBUG -mtune=generic'
+      os.environ['CXXFLAGS'] = '-O3 -g0 -DNDEBUG -mtune=native'
 
     source_dir = os.path.realpath(source_directory)
 
