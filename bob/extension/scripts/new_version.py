@@ -74,11 +74,12 @@ import sys, os
 import subprocess
 import shutil
 import tempfile
-import warnings
+import logging
 
 import argparse
 from distutils.version import StrictVersion as Version
 
+logger = logging.getLogger("bob.extension")
 
 
 def _update_readme(version = None):
@@ -136,7 +137,7 @@ def main(command_line_options = None):
   version_file = 'version.txt'
   if not os.path.exists(version_file):
     if args.force:
-      warnings.warn("Could not find the file '%s' containing the version number. Are you inside the root directory of your package?" % version_file)
+      logger.warn("Could not find the file '%s' containing the version number. Are you inside the root directory of your package?" % version_file)
     else:
       raise ValueError("Could not find the file '%s' containing the version number. Are you inside the root directory of your package?" % version_file)
 
@@ -182,23 +183,23 @@ def main(command_line_options = None):
   # check the versions
   if args.stable_version is not None and Version(args.latest_version) <= Version(args.stable_version):
     if args.force:
-      warnings.warn("The latest version '%s' must be greater than the stable version '%s'" % (args.latest_version, args.stable_version))
+      logger.warn("The latest version '%s' must be greater than the stable version '%s'" % (args.latest_version, args.stable_version))
     else:
       raise ValueError("The latest version '%s' must be greater than the stable version '%s'" % (args.latest_version, args.stable_version))
   if Version(current_version) >= Version(args.latest_version):
     if args.force:
-      warnings.warn("The latest version '%s' must be greater than the current version '%s'" % (args.latest_version, current_version))
+      logger.warn("The latest version '%s' must be greater than the current version '%s'" % (args.latest_version, current_version))
     else:
       raise ValueError("The latest version '%s' must be greater than the current version '%s'" % (args.latest_version, current_version))
   if args.stable_version is not None and Version(current_version) > Version(args.stable_version):
     if args.force:
-      warnings.warn("The stable version '%s' cannot be smaller than the current version '%s'" % (args.stable_version, current_version))
+      logger.warn("The stable version '%s' cannot be smaller than the current version '%s'" % (args.stable_version, current_version))
     else:
       raise ValueError("The stable version '%s' cannot be smaller than the current version '%s'" % (args.stable_version, current_version))
 
   if not os.path.exists('./bin/buildout'):
     if args.force or args.no_buildout:
-      warnings.warn("The bin/buildout script does not exist. Have you bootstrapped your system?")
+      logger.warn("The bin/buildout script does not exist. Have you bootstrapped your system?")
     else:
       raise IOError("The bin/buildout script does not exist. Have you bootstrapped your system?")
 
@@ -218,8 +219,8 @@ def main(command_line_options = None):
 
 
   if 'build' in args.steps:
-    print ("\nBuilding the package")
     if not args.no_buildout:
+      print ("\nBuilding the package")
       run_commands(None, ['./bin/buildout'] + args.build_options)
 
 
