@@ -44,5 +44,17 @@ def test_new_version():
     # assert that it does raise an exception, when the stable version is higher than latest version
     nose.tools.assert_raises(ValueError, new_version, ['--dry-run', '--stable-version', '20.8.0', '--latest-version', '20.8.0a1'])
 
+    # assert that it does not raise an exception, when --force is given and the latest version is too low
+    if os.path.exists("version.txt"):
+      new_version(['--force', '--dry-run', '--latest-version', '0.8.0'])
+
+    # assert that it does not raise an exception, when --force is given and the stable version is too low
+    if os.path.exists("version.txt"):
+      new_version(['--force', '--dry-run', '--stable-version', '0.8.0', '--latest-version', '0.9.0'])
+
+    # assert that it does not raise an exception, when --force is given and the stable version is higher than latest version
+    if os.path.exists("version.txt"):
+      new_version(['--force', '--dry-run', '--stable-version', '20.8.0', '--latest-version', '20.8.0a1'])
+
   finally:
     sys.stdout, sys.stderr = _stdout, _stderr

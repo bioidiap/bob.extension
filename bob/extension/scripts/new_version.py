@@ -223,23 +223,24 @@ def main(command_line_options = None):
       print ("\nBuilding the package")
       run_commands(None, ['./bin/buildout'] + args.build_options)
 
+  if args.no_buildout:
+    if sys.executable:
+      python_cmd = sys.executable
+    else:
+      python_cmd = 'python'
+  else:
+    python_cmd = './bin/python'
 
   if 'pypi' in args.steps:
     print ("\nUploading version '%s' to PyPI" % args.stable_version)
     # update version on github and add a tag
-    if args.no_buildout:
-      run_commands(None, ['python', 'setup.py', 'register'], ['python', 'setup.py', 'sdist', '--formats', 'zip', 'upload'])
-    else:
-      run_commands(None, ['./bin/python', 'setup.py', 'register'], ['./bin/python', 'setup.py', 'sdist', '--formats', 'zip', 'upload'])
+    run_commands(None, [python_cmd, 'setup.py', 'register'], [python_cmd, 'setup.py', 'sdist', '--formats', 'zip', 'upload'])
 
 
   if 'docs' in args.steps:
     # Documentation can be uploaded, independent of the versions
     print ("\nUploading documentation to PythonHosted.org")
-    if args.no_buildout:
-      run_commands(None, ["python", "setup.py", "build_sphinx", "--source-dir", "doc", "--build-dir", "build/doc", "--all-files"], ["python", "setup.py", "upload_docs", "--upload-dir", "build/doc/html"])
-    else:
-      run_commands(None, ["./bin/python", "setup.py", "build_sphinx", "--source-dir", "doc", "--build-dir", "build/doc", "--all-files"], ["./bin/python", "setup.py", "upload_docs", "--upload-dir", "build/doc/html"])
+    run_commands(None, [python_cmd, "setup.py", "build_sphinx", "--source-dir", "doc", "--build-dir", "build/doc", "--all-files"], [python_cmd, "setup.py", "upload_docs", "--upload-dir", "build/doc/html"])
 
 
   if 'latest' in args.steps:
