@@ -74,10 +74,12 @@ import sys, os
 import subprocess
 import shutil
 import tempfile
+import logging
 
 import argparse
 from distutils.version import StrictVersion as Version
 
+logger = logging.getLogger("bob.extension")
 
 
 def _update_readme(version = None):
@@ -125,6 +127,8 @@ def main(command_line_options = None):
   parser.add_argument("--dry-run", '-q', action = 'store_true', help = "Only print the actions, but do not execute them")
   parser.add_argument("--keep-going", '-f', action = 'store_true', help = "Run all steps, even if some of them fail. HANDLE THIS FLAG WITH CARE!")
   parser.add_argument("--verbose", '-v', action = 'store_true', help = "Print more information")
+  parser.add_argument("--force", action='store_true', help="Ignore some checks. Use this with caution.")
+  parser.add_argument("--no-buildout", action='store_true', help="Do not use the binaries in the ./bin folder")
 
   args = parser.parse_args(command_line_options)
 
@@ -132,7 +136,10 @@ def main(command_line_options = None):
   # assert the the version file is there
   version_file = 'version.txt'
   if not os.path.exists(version_file):
-    raise ValueError("Could not find the file '%s' containing the version number. Are you inside the root directory of your package?" % version_file)
+    if args.force:
+      logger.warn("Could not find the file '%s' containing the version number. Are you inside the root directory of your package?" % version_file)
+    else:
+      raise ValueError("Could not find the file '%s' containing the version number. Are you inside the root directory of your package?" % version_file)
 
   # get current version
   current_version = open(version_file).read().rstrip()
@@ -175,14 +182,26 @@ def main(command_line_options = None):
 
   # check the versions
   if args.stable_version is not None and Version(args.latest_version) <= Version(args.stable_version):
-    raise ValueError("The latest version '%s' must be greater than the stable version '%s'" % (args.latest_version, args.stable_version))
+    if args.force:
+      logger.warn("The latest version '%s' must be greater than the stable version '%s'" % (args.latest_version, args.stable_version))
+    else:
+      raise ValueError("The latest version '%s' must be greater than the stable version '%s'" % (args.latest_version, args.stable_version))
   if Version(current_version) >= Version(args.latest_version):
-    raise ValueError("The latest version '%s' must be greater than the current version '%s'" % (args.latest_version, current_version))
+    if args.force:
+      logger.warn("The latest version '%s' must be greater than the current version '%s'" % (args.latest_version, current_version))
+    else:
+      raise ValueError("The latest version '%s' must be greater than the current version '%s'" % (args.latest_version, current_version))
   if args.stable_version is not None and Version(current_version) > Version(args.stable_version):
-    raise ValueError("The stable version '%s' cannot be smaller than the current version '%s'" % (args.stable_version, current_version))
+    if args.force:
+      logger.warn("The stable version '%s' cannot be smaller than the current version '%s'" % (args.stable_version, current_version))
+    else:
+      raise ValueError("The stable version '%s' cannot be smaller than the current version '%s'" % (args.stable_version, current_version))
 
   if not os.path.exists('./bin/buildout'):
-    raise IOError("The bin/buildout script does not exist. Have you bootstrapped your system?")
+    if args.force or args.no_buildout:
+      logger.warn("The bin/buildout script does not exist. Have you bootstrapped your system?")
+    else:
+      raise IOError("The bin/buildout script does not exist. Have you bootstrapped your system?")
 
 
   if 'tag' in args.steps:
@@ -200,20 +219,28 @@ def main(command_line_options = None):
 
 
   if 'build' in args.steps:
-    print ("\nBuilding the package")
-    run_commands(None, ['./bin/buildout'] + args.build_options)
+    if not args.no_buildout:
+      print ("\nBuilding the package")
+      run_commands(None, ['./bin/buildout'] + args.build_options)
 
+  if args.no_buildout:
+    if sys.executable:
+      python_cmd = sys.executable
+    else:
+      python_cmd = 'python'
+  else:
+    python_cmd = './bin/python'
 
   if 'pypi' in args.steps:
     print ("\nUploading version '%s' to PyPI" % args.stable_version)
     # update version on github and add a tag
-    run_commands(None, ['./bin/python', 'setup.py', 'register'], ['./bin/python', 'setup.py', 'sdist', '--formats', 'zip', 'upload'])
+    run_commands(None, [python_cmd, 'setup.py', 'register'], [python_cmd, 'setup.py', 'sdist', '--formats', 'zip', 'upload'])
 
 
   if 'docs' in args.steps:
     # Documentation can be uploaded, independent of the versions
     print ("\nUploading documentation to PythonHosted.org")
-    run_commands(None, ["./bin/python", "setup.py", "build_sphinx", "--source-dir", "doc", "--build-dir", "build/doc", "--all-files"], ["./bin/python", "setup.py", "upload_docs", "--upload-dir", "build/doc/html"])
+    run_commands(None, [python_cmd, "setup.py", "build_sphinx", "--source-dir", "doc", "--build-dir", "build/doc", "--all-files"], [python_cmd, "setup.py", "upload_docs", "--upload-dir", "build/doc/html"])
 
 
   if 'latest' in args.steps:
@@ -257,6 +284,7 @@ def main(command_line_options = None):
         doc = re.sub(r'\{\%\s?set\s?version\s?=\s?".*"\s?\%\s?\}', '{% set version = "' + str(args.stable_version) + '" %}', doc, count=1)
         doc = re.sub(r'\s+number\:\s?[0-9]+', '\n  number: 0', doc, count=1)
         doc = re.sub(r'\s+md5\:.*', '\n  md5: {}'.format(md5), doc, count=1)
+        doc = re.sub(r'\s+url\:.*', '\n  url: {}'.format(url.replace(args.stable_version, '{{ version }}')), doc, count=1)
         with open('recipe/meta.yaml', 'w') as f:
           f.write(doc)
       run_commands(None,
