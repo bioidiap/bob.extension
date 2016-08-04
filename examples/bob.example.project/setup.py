@@ -50,7 +50,7 @@ setup(
     version = open("version.txt").read().rstrip(),
     description = 'Example for using Bob inside a buildout project',
 
-    url = 'https://www.github.com/<YourInstitution>/<YourPackage>',
+    url = 'https://github.com/<YourInstitution>/<YourPackage>',
     license = 'GPLv3',
     author = '<YourName>',
     author_email = '<YourEmail>',

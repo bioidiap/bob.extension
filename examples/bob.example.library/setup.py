@@ -61,7 +61,7 @@ setup(
     version = version,
     description = 'Example for using Bob inside a C++ extension of a buildout project',
 
-    url = 'https://www.github.com/<YourInstitution>/<YourPackage>',
+    url = 'https://github.com/<YourInstitution>/<YourPackage>',
     license = 'GPLv3',
     author = '<YourName>',
     author_email='<YourEmail>',

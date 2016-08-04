@@ -23,7 +23,7 @@ You can check it out by:
 
 .. code-block:: sh
 
-  $ wget https://github.com/bioidiap/bob.extension/raw/master/examples/bob.example.extension.tar.bz2
+  $ wget https://gitlab.idiap.ch/bo/bob.extension/raw/master/examples/bob.example.extension.tar.bz2
   $ tar -xjf bob.example.extension.tar.bz2
   $ cd bob.example.extension
 
@@ -187,7 +187,7 @@ Again, a complete example can be downloaded via:
 
 .. code-block:: sh
 
-  $ wget https://github.com/bioidiap/bob.extension/raw/master/examples/bob.example.library.tar.bz2
+  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/examples/bob.example.library.tar.bz2
   $ tar -xjf bob.example.library.tar.bz2
   $ cd bob.example.library
 
@@ -259,7 +259,7 @@ No worries, if the library is not used in the extension, the linker should be ab
 
 You can also export your Python bindings to be used in other libraries.
 Unfortunately, this is an extremely tedious process and is not explained in detail here.
-As an example, you might want (or maybe not) to have a look into `bob.blitz/bob/blitz/include/bob.blitz/capi.h <https://github.com/bioidiap/bob.blitz/blob/master/bob/blitz/include/bob.blitz/capi.h>`_.
+As an example, you might want (or maybe not) to have a look into `bob.blitz/bob/blitz/include/bob.blitz/capi.h <https://gitlab.idiap.ch/bob/bob.blitz/blob/master/bob/blitz/include/bob.blitz/capi.h>`_.
 
 
 Compiling your Library and Extension

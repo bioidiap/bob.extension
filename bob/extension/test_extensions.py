@@ -20,7 +20,7 @@ def _run(package, run_call):
   if os.path.exists(local_file):
     example_url = 'file://' + local_file
   else:
-    example_url = "https://github.com/bioidiap/bob.extension/raw/master/examples/bob.example.%s.tar.bz2"%package
+    example_url = "https://gitlab.idiap.ch/bob/bob.extension/raw/master/examples/bob.example.%s.tar.bz2"%package
   temp_dir = tempfile.mkdtemp(prefix="bob_test")
   local_archive = os.path.join(temp_dir, "bob.example.%s.tar.bz2"%package)
   print ("Downloading package '%s'" % example_url)

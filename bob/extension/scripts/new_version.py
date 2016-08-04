@@ -7,9 +7,9 @@ GitHub and PyPI, and update the new version of the package to the given
 
 It assumes that you are in the main directory of the package and have
 successfully ran bootstrap, and that you have submitted all changes that should
-go into the new version. Preferably, the build on Travis passed. For database 
-packages, it also assumes that the '.sql3' file has been generated (if any). 
-Further, it assumes that the 'stable' version has not yet been uploaded to 
+go into the new version. Preferably, the build on Travis passed. For database
+packages, it also assumes that the '.sql3' file has been generated (if any).
+Further, it assumes that the 'stable' version has not yet been uploaded to
 PyPI, and that no GitHub tag with this version exists.
 
 The 'stable' version (i.e., what will be downloadable from PyPI) can be
@@ -18,8 +18,8 @@ current version of the package, but not lower than that.
 The 'latest' version (i.e., what will be the new master branch on GitHub)
 must be higher than the current and than the stable version.
 
-By default, both versions can be automatically computed from the 'current' 
-version, which is read from the 'version.txt' file. In this case, the 
+By default, both versions can be automatically computed from the 'current'
+version, which is read from the 'version.txt' file. In this case, the
 'stable' version will be the 'current' version without the trailing beta
 indicator, and the 'latest' version will be 1 patch level above the 'current'
 version, with the beta indicator 0, for example:
@@ -60,12 +60,12 @@ Examples:
 
 
   Print out, what would be done using the '--dry-run' option:
-  
+
     %(prog)s -q
 
 
   Do everything automatically (assumes a proper version.txt file):
-  
+
     %(prog)s -vv
 """
 
@@ -208,12 +208,12 @@ def main(command_line_options = None):
     if args.stable_version is not None and Version(args.stable_version) > Version(current_version):
       print ("\nReplacing branch tag in README.rst to '%s'"%('v'+args.stable_version))
       _update_readme(args.stable_version)
-      # update stable version on github
+      # update stable version on git
       run_commands(args.stable_version, ['git', 'add', 'version.txt', 'README.rst'], ['git', 'commit', '-m', 'Increased stable version to %s' % args.stable_version])
     else:
       # assure that we have the current version
       args.stable_version = current_version
-    # add a github tag
+    # add a git tag
     print ("\nTagging version '%s'" % args.stable_version)
     run_commands(None, ['git', 'tag', 'v%s' % args.stable_version], ['git', 'push', '--tags'])
 
@@ -233,7 +233,7 @@ def main(command_line_options = None):
 
   if 'pypi' in args.steps:
     print ("\nUploading version '%s' to PyPI" % args.stable_version)
-    # update version on github and add a tag
+    # update version on git and add a tag
     run_commands(None, [python_cmd, 'setup.py', 'register'], [python_cmd, 'setup.py', 'sdist', '--formats', 'zip', 'upload'])
 
 

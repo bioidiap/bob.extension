@@ -1,6 +1,5 @@
 .. vim: set fileencoding=utf-8 :
-.. Andre Anjos <andre.anjos@idiap.ch>
-.. Thu 30 Jan 08:46:53 2014 CET
+.. Thu 04 Aug 2016 16:39:57 CEST
 
 .. image:: http://img.shields.io/badge/docs-stable-yellow.png
    :target: http://pythonhosted.org/bob.extension/index.html
@@ -21,18 +20,32 @@
  Python/C++ Bob Extension Building Support
 ===========================================
 
-This package is part of the signal-processing and machine learning toolbox Bob_.
-It provides a simple mechanism for using Bob_, or extending Bob_ by building packages using either a pure Python API, or even a mix of C++ and python.
+This package is part of the signal-processing and machine learning toolbox
+Bob_.  It provides a simple mechanism for using Bob_, or extending Bob_ by
+building packages using either a pure Python API, or even a mix of C++ and
+python.
 
 Installation
 ------------
-To install this package -- alone or together with other `Packages of Bob <https://github.com/idiap/bob/wiki/Packages>`_ -- please read the `Installation Instructions <https://github.com/idiap/bob/wiki/Installation>`_.
-For Bob_ to be able to work properly, some dependent packages are required to be installed.
-Please make sure that you have read the `Dependencies <https://github.com/idiap/bob/wiki/Dependencies>`_ for your operating system.
+
+Follow our `binary installation`_ instructions.  Then, using the Python
+interpreter inside that distribution, bootstrap and buildout this package::
+
+  $ python bootstrap-buildout.py
+  $ ./bin/buildout
+
 
 Documentation
 -------------
-For further documentation on this package, please read the `Stable Version <http://pythonhosted.org/bob.extension/index.html>`_ or the `Latest Version <https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master/index.html>`_ of the documentation.
-For a list of tutorials on this or the other packages ob Bob_, or information on submitting issues, asking questions and starting discussions, please visit its website.
 
+For further documentation on this package, please read the `Stable Version`_ or
+the `Latest Version`_ of the documentation.  For a list of tutorials on this or
+the other packages ob Bob_, or information on submitting issues, asking
+questions and starting discussions, please visit its website.
+
+
+.. Place your references here:
 .. _bob: https://www.idiap.ch/software/bob
+.. _binary installation: https://gitlab.idiap.ch/bob/bob/wikis/Binary-Installation
+.. _stable version: http://pythonhosted.org/bob.extension/index.html
+.. _latest version: https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master/index.html

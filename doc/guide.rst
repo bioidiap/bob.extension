@@ -35,7 +35,7 @@ Fire-up a shell window and than do this:
 
 .. code-block:: sh
 
-  $ wget https://github.com/bioidiap/bob.extension/raw/master/examples/bob.example.project.tar.bz2
+  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/examples/bob.example.project.tar.bz2
   $ tar -xjf bob.example.project.tar.bz2
   $ cd bob.example.project
 
@@ -145,7 +145,7 @@ Here is how to go from nothing to everything:
   If you just want to get things rolling, using ``python bootstrap-buildout.py`` will, in most cases, do the right thing.
 
 .. note::
-   When you have installed an older version of |project| -- i.e. |project| v1.x, you might need to uninstall it first, see https://github.com/idiap/bob/wiki/Installation.
+   When you have installed an older version of |project| -- i.e. |project| v1.x, you might need to uninstall it first, see https://gitlab.idiap.ch/bob/bob/wikis/Installation.
 
 
 
@@ -261,7 +261,7 @@ It can be simply set up:
              .
 
    [sources]
-   bob.blitz = git https://github.com/bioidiap/bob.blitz
+   bob.blitz = git https://gitlab.idiap.ch/bob/bob.blitz
 
    ...
 
@@ -503,7 +503,7 @@ Here is a set of steps we recommend you follow when releasing a new version of y
 
    In this fictitious representation, the ``master`` branch continue under development, but one can see older branches don't receive much attention anymore.
 
-   Here is an example for creating a branch at github (many of our satellite packages are hosted there).
+   Here is an example for creating a branch at gitlab (many of our satellite packages are hosted there).
    Let's create a branch called ``1.1``::
 
    .. code-block:: sh
@@ -513,7 +513,7 @@ Here is a set of steps we recommend you follow when releasing a new version of y
      $ git push origin 1.1
 
 3. When you decide to release something publicly, we recommend you **tag** the version of the package on your repository, so you have a marker to what code you actually published on PyPI.
-   Tagging on github would go like this::
+   Tagging on gitlab would go like this::
 
    .. code-block:: sh
 

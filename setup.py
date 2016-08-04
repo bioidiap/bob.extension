@@ -11,17 +11,17 @@ from setuptools import setup, find_packages
 # Define package version
 version = open("version.txt").read().rstrip()
 
-requiries = ['setuptools']
+requires = ['setuptools']
 import sys
 if sys.version_info[0] == 2 and sys.version_info[1] <= 6:
-  requiries.append('importlib')
+  requires.append('importlib')
 
 setup(
 
     name="bob.extension",
     version=version,
     description="Building of Python/C++ extensions for Bob",
-    url='http://github.com/bioidiap/bob.extension',
+    url='http://gitlab.idiap.ch/bob/bob.extension',
     license="BSD",
     author='Andre Anjos',
     author_email='andre.anjos@idiap.ch',
@@ -33,7 +33,7 @@ setup(
 
 
 
-    install_requires=requiries,
+    install_requires=requires,
 
     entry_points = {
       'console_scripts': [
