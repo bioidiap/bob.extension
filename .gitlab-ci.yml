@@ -47,3 +47,50 @@ py35-linux:
     - ./scripts/upload-wheel.sh
   tags:
     - lidiap2015
+
+py27-macosx:
+  script:
+    - git clean -ffdx
+    - source /opt/conda/bin/activate `cat /opt/conda/envs/latest-devel-2.7.txt`
+    - python bootstrap-buildout.py
+    - ./bin/buildout
+    - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
+    - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
+    - ./bin/sphinx-build -b doctest doc sphinx
+    - ./bin/sphinx-build -b html doc sphinx
+  after_script:
+    - ./scripts/upload-wheel.sh
+  tags:
+    - beat-macosx
+
+py34-macosx:
+  script:
+    - git clean -ffdx
+    - source /opt/conda/bin/activate `cat /opt/conda/envs/latest-devel-3.4.txt`
+    - python bootstrap-buildout.py
+    - ./bin/buildout
+    - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
+    - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
+    - ./bin/sphinx-build -b doctest doc sphinx
+    - ./bin/sphinx-build -b html doc sphinx
+  tags:
+    - beat-macosx
+
+
+py35-macosx:
+  variables:
+    BOB_DOCUMENTATION_SERVER: "https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
+    BOB_UPLOAD_WHEEL: "--python-tag py3"
+  script:
+    - git clean -ffdx
+    - source /opt/conda/bin/activate `cat /opt/conda/envs/latest-devel-3.5.txt`
+    - python bootstrap-buildout.py
+    - ./bin/buildout
+    - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
+    - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
+    - ./bin/sphinx-build -b doctest doc sphinx
+    - ./bin/sphinx-build -b html doc sphinx
+  after_script:
+    - ./scripts/upload-wheel.sh
+  tags:
+    - beat-macosx
