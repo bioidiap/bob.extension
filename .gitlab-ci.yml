@@ -43,6 +43,9 @@ py35-linux:
 
 py27-macosx:
   variables:
+    MACOSX_DEPLOYMENT_TARGET: "10.9"
+    CFLAGS: "-pthread"
+    LDFLAGS: "-lpthread"
     BOB_UPLOAD_WHEEL: "--python-tag py27"
   script:
     - git clean -ffdx
@@ -60,6 +63,10 @@ py27-macosx:
     - beat-macosx
 
 py34-macosx:
+  variables:
+    MACOSX_DEPLOYMENT_TARGET: "10.9"
+    CFLAGS: "-pthread"
+    LDFLAGS: "-lpthread"
   script:
     - git clean -ffdx
     - source /opt/conda/bin/activate `cat /opt/conda/envs/latest-devel-3.4.txt`
@@ -76,6 +83,9 @@ py34-macosx:
 
 py35-macosx:
   variables:
+    MACOSX_DEPLOYMENT_TARGET: "10.9"
+    CFLAGS: "-pthread"
+    LDFLAGS: "-lpthread"
     BOB_DOCUMENTATION_SERVER: "https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
     BOB_UPLOAD_WHEEL: "--python-tag py3"
   script:
