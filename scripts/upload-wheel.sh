@@ -22,9 +22,9 @@ bin/python setup.py bdist_wheel -d wheel $WHEEL_OPTION
 
 # uplaod wheel
 wheel=`find wheel -name "*.whl"`
-server=https://${DOCUSER}:${DOCPASS}@www.idiap.ch/software/bob/wheels-upload/${CI_RUNNER_TAGS}/
+server=https://${DOCUSER}:${DOCPASS}@www.idiap.ch/software/bob/wheels-upload/gitlab/
 
-echo -e "\n\nUploading wheel $wheel to server https://www.idiap.ch/software/bob/wheels-upload/${CI_RUNNER_TAGS}/"
+echo -e "\n\nUploading wheel $wheel to server https://www.idiap.ch/software/bob/wheels-upload/gitlab/"
 
 # send
 curl --silent --insecure --upload-file $wheel ${server}
