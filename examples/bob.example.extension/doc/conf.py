@@ -25,7 +25,6 @@ import pkg_resources
 extensions = [
   'sphinx.ext.todo',
   'sphinx.ext.coverage',
-  'sphinx.ext.pngmath',
   'sphinx.ext.ifconfig',
   'sphinx.ext.autodoc',
   'sphinx.ext.autosummary',
@@ -37,6 +36,11 @@ extensions = [
 import sphinx
 if sphinx.__version__ >= "1.0":
   extensions.append('sphinx.ext.viewcode')
+
+if sphinx.__version__ >= "1.4":
+  extensions.append('sphinx.ext.imgmath')
+else:
+  extensions.append('sphinx.ext.pngmath')
 
 # Always includes todos
 todo_include_todos = True
