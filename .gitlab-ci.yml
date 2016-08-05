@@ -55,7 +55,6 @@ stages:
     CONDA_FOLDER: "/opt/conda"
     MACOSX_DEPLOYMENT_TARGET: "10.9"
     CFLAGS: "-pthread"
-    LDFLAGS: "-lpthread"
 
 
 # Template for the test stage
@@ -70,7 +69,6 @@ stages:
   variables:
     MACOSX_DEPLOYMENT_TARGET: "10.9"
     CFLAGS: "-pthread"
-    LDFLAGS: "-lpthread"
 
 
 # Template for the wheel uploading stage
