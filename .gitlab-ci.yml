@@ -162,7 +162,7 @@ test_linux_35:
     - lidiap2015
 
 
-# Mac OSX + Python 2.7: Builds, tests and uploads the latest docs
+# Mac OSX + Python 2.7: Builds, tests and uploads the wheel
 build_macosx_27:
   <<: *macosx_build_job
   variables:
