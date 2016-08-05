@@ -1,105 +1,96 @@
-py27-linux:
+stages:
+  - build
+  - deploy
+
+.build_template: &build_job
+  stage: build
   script:
     - git clean -ffdx
-    - source /idiap/group/torch5spro/conda/bin/activate `cat /idiap/group/torch5spro/conda/envs/latest-devel-2.7.txt`
+    - source $CONDA_FOLDER/bin/activate `cat $CONDA_FOLDER/envs/latest-devel-$PYTHON_VER.txt`
     - which python
+    - python -V
     - python bootstrap-buildout.py
     - ./bin/buildout
     - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
     - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
     - ./bin/sphinx-build -b doctest doc sphinx
     - ./bin/sphinx-build -b html doc sphinx
+  artifacts:
+    paths:
+    - wheel/
+
+.build_linux_template: &build_linux_job
+  <<: *build_job
+  variables: &variables_linux
+    CONDA_FOLDER: "/idiap/group/torch5spro/conda"
   tags:
     - lidiap2015
 
-py34-linux:
-  script:
-    - git clean -ffdx
-    - source /idiap/group/torch5spro/conda/bin/activate `cat /idiap/group/torch5spro/conda/envs/latest-devel-3.4.txt`
-    - which python
-    - python bootstrap-buildout.py
-    - ./bin/buildout
-    - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
-    - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
-    - ./bin/sphinx-build -b doctest doc sphinx
-    - ./bin/sphinx-build -b html doc sphinx
-  tags:
-    - lidiap2015
-
-
-py35-linux:
-  script:
-    - git clean -ffdx
-    - source /idiap/group/torch5spro/conda/bin/activate `cat /idiap/group/torch5spro/conda/envs/latest-devel-3.5.txt`
-    - which python
-    - python bootstrap-buildout.py
-    - ./bin/buildout
-    - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
-    - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
-    - ./bin/sphinx-build -b doctest doc sphinx
-    - ./bin/sphinx-build -b html doc sphinx
-  tags:
-    - lidiap2015
-
-py27-macosx:
-  variables:
+.build_mac_template: &build_mac_job
+  <<: *build_job
+  variables: &variables_mac
+    CONDA_FOLDER: "/opt/conda"
     MACOSX_DEPLOYMENT_TARGET: "10.9"
     CFLAGS: "-pthread"
     LDFLAGS: "-lpthread"
-    BOB_UPLOAD_WHEEL: "--python-tag py27"
+  tags:
+    - beat-macosx
+
+.deploy_template: &deploy_job
+  stage: deploy
+  when: on_success
+  only:
+    - master
   script:
-    - git clean -ffdx
-    - source /opt/conda/bin/activate `cat /opt/conda/envs/latest-devel-2.7.txt`
-    - which python
-    - python bootstrap-buildout.py
-    - ./bin/buildout
-    - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
-    - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
-    - ./bin/sphinx-build -b doctest doc sphinx
-    - ./bin/sphinx-build -b html doc sphinx
-  after_script:
     - ./scripts/upload-wheel.sh
   tags:
     - beat-macosx
 
-py34-macosx:
+build_linux_27:
+  <<: *build_linux_job
   variables:
-    MACOSX_DEPLOYMENT_TARGET: "10.9"
-    CFLAGS: "-pthread"
-    LDFLAGS: "-lpthread"
-  script:
-    - git clean -ffdx
-    - source /opt/conda/bin/activate `cat /opt/conda/envs/latest-devel-3.4.txt`
-    - which python
-    - python bootstrap-buildout.py
-    - ./bin/buildout
-    - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
-    - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
-    - ./bin/sphinx-build -b doctest doc sphinx
-    - ./bin/sphinx-build -b html doc sphinx
-  tags:
-    - beat-macosx
+    <<: *variables_linux
+    PYTHON_VER: "2.7"
 
-
-py35-macosx:
+build_linux_34:
+  <<: *build_linux_job
   variables:
-    MACOSX_DEPLOYMENT_TARGET: "10.9"
-    CFLAGS: "-pthread"
-    LDFLAGS: "-lpthread"
-    BOB_DOCUMENTATION_SERVER: "https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
+    <<: *variables_linux
+    PYTHON_VER: "3.4"
+
+build_linux_35:
+  <<: *build_linux_job
+  variables:
+    <<: *variables_linux
+    PYTHON_VER: "3.5"
+
+build_mac_27:
+  <<: *build_mac_job
+  variables:
+    <<: *variables_mac
+    PYTHON_VER: "2.7"
+
+build_mac_34:
+  <<: *build_mac_job
+  variables:
+    <<: *variables_mac
+    PYTHON_VER: "3.4"
+
+build_mac_35:
+  <<: *build_mac_job
+  variables:
+    <<: *variables_mac
+    PYTHON_VER: "3.5"
+
+deploy_27:
+  <<: *deploy_job
+  variables:
+    BOB_UPLOAD_WHEEL: "--python-tag py27"
+
+deploy_35:
+  <<: *deploy_job
+  variables:
     BOB_UPLOAD_WHEEL: "--python-tag py3"
-  script:
-    - git clean -ffdx
-    - source /opt/conda/bin/activate `cat /opt/conda/envs/latest-devel-3.5.txt`
-    - which python
-    - python bootstrap-buildout.py
-    - ./bin/buildout
-    - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
-    - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
-    - ./bin/sphinx-build -b doctest doc sphinx
-    - ./bin/sphinx-build -b html doc sphinx
+    BOB_DOCUMENTATION_SERVER: "https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
   after_script:
     - ./scripts/upload-sphinx.sh
-    - ./scripts/upload-wheel.sh
-  tags:
-    - beat-macosx
