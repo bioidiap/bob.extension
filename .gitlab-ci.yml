@@ -1,96 +1,204 @@
+# This build file is defined in two parts: 1) a generic set of instructions you
+# probably **don't** need to change and 2) a part you have to tune to your
+# project, that you may not need to change. It heavily uses template features
+# from YAML to help you in only changing a minimal part of it and avoid code
+# duplication to a maximum while still providing a nice pipeline display on
+# your package.
+
+
+# 1) Generic instructions (only change if you know what you're doing)
+# -------------------------------------------------------------------
+
+# Definition of our build pipeline
 stages:
   - build
-  - deploy
+  - test
+  - docs
+  - wheels
 
+
+# Template for the build stage
+# Needs to run on all supported architectures, platforms and python versions
 .build_template: &build_job
   stage: build
   script:
     - git clean -ffdx
-    - source $CONDA_FOLDER/bin/activate `cat $CONDA_FOLDER/envs/latest-devel-$PYTHON_VER.txt`
+    - source ${CONDA_FOLDER}/bin/activate `cat ${CONDA_FOLDER}/envs/latest-devel-${PYTHON_VER}.txt`
     - which python
     - python -V
     - python bootstrap-buildout.py
     - ./bin/buildout
-    - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
-    - ./bin/coverage run --source=bob.extension ./bin/nosetests -sv
-    - ./bin/sphinx-build -b doctest doc sphinx
     - ./bin/sphinx-build -b html doc sphinx
-  artifacts:
-    paths:
-    - wheel/
 
-.build_linux_template: &build_linux_job
+
+# Template for building on a Linux machine
+.build_linux_template: &linux_build_job
   <<: *build_job
-  variables: &variables_linux
+  variables: &linux_variables
     CONDA_FOLDER: "/idiap/group/torch5spro/conda"
-  tags:
-    - lidiap2015
 
-.build_mac_template: &build_mac_job
+
+# Template for building on a Mac OSX machine
+.build_mac_template: &macosx_build_job
   <<: *build_job
-  variables: &variables_mac
+  variables: &macosx_variables
     CONDA_FOLDER: "/opt/conda"
     MACOSX_DEPLOYMENT_TARGET: "10.9"
     CFLAGS: "-pthread"
     LDFLAGS: "-lpthread"
-  tags:
-    - beat-macosx
 
-.deploy_template: &deploy_job
-  stage: deploy
-  when: on_success
+
+# Template for the test stage
+# Needs to run on all supported architectures, platforms and python versions
+.test_template: &test_job
+  stage: test
+  script:
+    - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
+    - ./bin/coverage run --source=${CI_PROJECT_NAME} ./bin/nosetests -sv
+    - ./bin/sphinx-build -b doctest doc sphinx
+
+
+# Template for the wheel uploading stage
+# Needs to run against one combination of python 2.x and 3.x if it is a python
+# only package, otherwise, needs to run in both pythons to all supported
+# architectures (Linux and Mac OSX 64-bit)
+.wheels_template: &wheels_job
+  stage: wheels
   only:
     - master
+    - tags
   script:
     - ./scripts/upload-wheel.sh
+
+
+.wheels_py27_template: &wheels_py27_job
+  <<: *wheels_job
+  variables:
+    BOB_WHEEL_TAG: "py27"
+
+
+.wheels_py3_template: &wheels_py3_job
+  <<: *wheels_job
+  variables:
+    BOB_WHEEL_TAG: "py3"
+
+
+# Template for (latest) documentation upload stage
+# Only one real job needs to do this (normally, the latest python on OSX)
+.docs_template: &docs_job
+  stage: docs
+  only:
+    - master
+    - tags
+  script:
+    - ./scripts/upload-sphinx.sh
+
+
+# 2) Package specific instructions (you may tune this if needed)
+# --------------------------------------------------------------
+
+# Linux + Python 2.7: Builds, test, build docs
+# This is a python-only package, no need to upload wheels
+build_linux_27:
+  <<: *linux_build_job
+  variables:
+    <<: *linux_variables
+    PYTHON_VER: "2.7"
+  tags:
+    - lidiap2015
+
+test_linux_27:
+  <<: *test_job
+  tags:
+    - lidiap2015
+
+
+# Linux + Python 3.4: Builds, test, build docs
+build_linux_34:
+  <<: *linux_build_job
+  variables:
+    <<: *linux_variables
+    PYTHON_VER: "3.4"
+  tags:
+    - lidiap2015
+
+test_linux_34:
+  <<: *test_job
+  tags:
+    - lidiap2015
+
+
+# Linux + Python 3.5: Builds, test, build docs
+build_linux_35:
+  <<: *linux_build_job
+  variables:
+    <<: *linux_variables
+    PYTHON_VER: "3.5"
+  tags:
+    - lidiap2015
+
+test_linux_35:
+  <<: *test_job
+  tags:
+    - lidiap2015
+
+
+# Mac OSX + Python 2.7: Builds, test, build docs
+# Upload wheel for python2.x from this build
+build_macosx_27:
+  <<: *macosx_build_job
+  variables:
+    <<: *macosx_variables
+    PYTHON_VER: "2.7"
   tags:
     - beat-macosx
 
-build_linux_27:
-  <<: *build_linux_job
-  variables:
-    <<: *variables_linux
-    PYTHON_VER: "2.7"
+test_macosx_27:
+  <<: *test_job
+  tags:
+    - beat-macosx
 
-build_linux_34:
-  <<: *build_linux_job
+wheels_macosx_27:
+  <<: *wheels_py27_job
+  tags:
+    - beat-macosx
+
+
+# Mac OSX + Python 3.4: Builds, test, build docs
+build_macosx_34:
+  <<: *macosx_build_job
   variables:
-    <<: *variables_linux
+    <<: *macosx_variables
     PYTHON_VER: "3.4"
+  tags:
+    - beat-macosx
 
-build_linux_35:
-  <<: *build_linux_job
+test_macosx_34:
+  <<: *test_job
+  tags:
+    - beat-macosx
+
+
+# Mac OSX + Python 3.5: Builds, test, build docs
+build_macosx_35:
+  <<: *macosx_build_job
   variables:
-    <<: *variables_linux
+    <<: *macosx_variables
     PYTHON_VER: "3.5"
+  tags:
+    - beat-macosx
 
-build_mac_27:
-  <<: *build_mac_job
-  variables:
-    <<: *variables_mac
-    PYTHON_VER: "2.7"
+test_macosx_35:
+  <<: *test_job
+  tags:
+    - beat-macosx
 
-build_mac_34:
-  <<: *build_mac_job
-  variables:
-    <<: *variables_mac
-    PYTHON_VER: "3.4"
+wheels_macosx_35:
+  <<: *wheels_py3_job
+  tags:
+    - beat-macosx
 
-build_mac_35:
-  <<: *build_mac_job
-  variables:
-    <<: *variables_mac
-    PYTHON_VER: "3.5"
-
-deploy_27:
-  <<: *deploy_job
-  variables:
-    BOB_UPLOAD_WHEEL: "--python-tag py27"
-
-deploy_35:
-  <<: *deploy_job
-  variables:
-    BOB_UPLOAD_WHEEL: "--python-tag py3"
-    BOB_DOCUMENTATION_SERVER: "https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
-  after_script:
-    - ./scripts/upload-sphinx.sh
+docs_macosx_35:
+  <<: *docs_job
+  tags:
+    - beat-macosx

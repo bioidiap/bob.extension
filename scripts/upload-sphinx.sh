@@ -1,18 +1,9 @@
 #!/usr/bin/env bash
 
-if [ -z "${DOCUSER}" ] || [ -z "${DOCPASS}" ] || [ -z "${BOB_DOCUMENTATION_SERVER}" ]; then
+if [ -z "${DOCUSER}" ] || [ -z "${DOCPASS}" ]; then
   echo "Server username and/or password undefined - not uploading documentation";
   exit 0
 fi
-
-# check branch (see: http://stackoverflow.com/a/229606)
-branch=$(git branch)
-if [[ "$branch" != *"master"* ]]; then
-  echo "Not on master branch, but on branch '$branch' -- not uploading documentation";
-  exit 0;
-fi
-
-echo "Detected branch '$branch' to be master branch -- uploading wheel to Idiap servers"
 
 info=sphinx/.gitlab-ci.info
 codename=$(basename ${CI_PROJECT_NAME})-${CI_BUILD_REF}
