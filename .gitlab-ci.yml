@@ -111,54 +111,58 @@ stages:
 # 2) Package specific instructions (you may tune this if needed)
 # --------------------------------------------------------------
 
-# Linux + Python 2.7: Builds, test, build docs
-# This is a python-only package, no need to upload wheels
-#build_linux_27:
-#  <<: *linux_build_job
-#  variables:
-#    <<: *linux_variables
-#    PYTHON_VER: "2.7"
-#  tags:
-#    - lidiap2015
-#
-#test_linux_27:
-#  <<: *test_job
-#  tags:
-#    - lidiap2015
+# Linux + Python 2.7: Builds and tests
+build_linux_27:
+  <<: *linux_build_job
+  variables:
+    <<: *linux_variables
+    PYTHON_VER: "2.7"
+  tags:
+    - lidiap2015
+
+test_linux_27:
+  <<: *test_job
+  dependencies:
+    - build_linux_27
+  tags:
+    - lidiap2015
 
 
-# Linux + Python 3.4: Builds, test, build docs
-#build_linux_34:
-#  <<: *linux_build_job
-#  variables:
-#    <<: *linux_variables
-#    PYTHON_VER: "3.4"
-#  tags:
-#    - lidiap2015
-#
-#test_linux_34:
-#  <<: *test_job
-#  tags:
-#    - lidiap2015
+# Linux + Python 3.4: Builds and tests
+build_linux_34:
+  <<: *linux_build_job
+  variables:
+    <<: *linux_variables
+    PYTHON_VER: "3.4"
+  dependencies:
+    - build_linux_34
+  tags:
+    - lidiap2015
+
+test_linux_34:
+  <<: *test_job
+  tags:
+    - lidiap2015
 
 
-# Linux + Python 3.5: Builds, test, build docs
-#build_linux_35:
-#  <<: *linux_build_job
-#  variables:
-#    <<: *linux_variables
-#    PYTHON_VER: "3.5"
-#  tags:
-#    - lidiap2015
-#
-#test_linux_35:
-#  <<: *test_job
-#  tags:
-#    - lidiap2015
+# Linux + Python 3.5: Builds and tests
+build_linux_35:
+  <<: *linux_build_job
+  variables:
+    <<: *linux_variables
+    PYTHON_VER: "3.5"
+  tags:
+    - lidiap2015
+
+test_linux_35:
+  <<: *test_job
+  dependencies:
+    - build_linux_35
+  tags:
+    - lidiap2015
 
 
-# Mac OSX + Python 2.7: Builds, test, build docs
-# Upload wheel for python2.x from this build
+# Mac OSX + Python 2.7: Builds, tests and uploads the latest docs
 build_macosx_27:
   <<: *macosx_build_job
   variables:
@@ -182,22 +186,26 @@ wheels_macosx_27:
     - beat-macosx
 
 
-# Mac OSX + Python 3.4: Builds, test, build docs
-#build_macosx_34:
-#  <<: *macosx_build_job
-#  variables:
-#    <<: *macosx_variables
-#    PYTHON_VER: "3.4"
-#  tags:
-#    - beat-macosx
-#
-#test_macosx_34:
-#  <<: *test_job
-#  tags:
-#    - beat-macosx
-#
+# Mac OSX + Python 3.4: Builds and tests
+build_macosx_34:
+  <<: *macosx_build_job
+  variables:
+    <<: *macosx_variables
+    PYTHON_VER: "3.4"
+  dependencies:
+    - build_macosx_34
+  tags:
+    - beat-macosx
 
-# Mac OSX + Python 3.5: Builds, test, build docs
+test_macosx_34:
+  <<: *test_job
+  dependencies:
+    - build_macosx_34
+  tags:
+    - beat-macosx
+
+
+# Mac OSX + Python 3.5: Builds, tests, uploads the wheel and the latest docs
 build_macosx_35:
   <<: *macosx_build_job
   variables:
