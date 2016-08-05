@@ -67,6 +67,10 @@ stages:
     - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
     - ./bin/coverage run --source=${CI_PROJECT_NAME} ./bin/nosetests -sv
     - ./bin/sphinx-build -b doctest doc sphinx
+  variables:
+    MACOSX_DEPLOYMENT_TARGET: "10.9"
+    CFLAGS: "-pthread"
+    LDFLAGS: "-lpthread"
 
 
 # Template for the wheel uploading stage
