@@ -99,48 +99,48 @@ stages:
 
 # Linux + Python 2.7: Builds, test, build docs
 # This is a python-only package, no need to upload wheels
-build_linux_27:
-  <<: *linux_build_job
-  variables:
-    <<: *linux_variables
-    PYTHON_VER: "2.7"
-  tags:
-    - lidiap2015
-
-test_linux_27:
-  <<: *test_job
-  tags:
-    - lidiap2015
+#build_linux_27:
+#  <<: *linux_build_job
+#  variables:
+#    <<: *linux_variables
+#    PYTHON_VER: "2.7"
+#  tags:
+#    - lidiap2015
+#
+#test_linux_27:
+#  <<: *test_job
+#  tags:
+#    - lidiap2015
 
 
 # Linux + Python 3.4: Builds, test, build docs
-build_linux_34:
-  <<: *linux_build_job
-  variables:
-    <<: *linux_variables
-    PYTHON_VER: "3.4"
-  tags:
-    - lidiap2015
-
-test_linux_34:
-  <<: *test_job
-  tags:
-    - lidiap2015
+#build_linux_34:
+#  <<: *linux_build_job
+#  variables:
+#    <<: *linux_variables
+#    PYTHON_VER: "3.4"
+#  tags:
+#    - lidiap2015
+#
+#test_linux_34:
+#  <<: *test_job
+#  tags:
+#    - lidiap2015
 
 
 # Linux + Python 3.5: Builds, test, build docs
-build_linux_35:
-  <<: *linux_build_job
-  variables:
-    <<: *linux_variables
-    PYTHON_VER: "3.5"
-  tags:
-    - lidiap2015
-
-test_linux_35:
-  <<: *test_job
-  tags:
-    - lidiap2015
+#build_linux_35:
+#  <<: *linux_build_job
+#  variables:
+#    <<: *linux_variables
+#    PYTHON_VER: "3.5"
+#  tags:
+#    - lidiap2015
+#
+#test_linux_35:
+#  <<: *test_job
+#  tags:
+#    - lidiap2015
 
 
 # Mac OSX + Python 2.7: Builds, test, build docs
