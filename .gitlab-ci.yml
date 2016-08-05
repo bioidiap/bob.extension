@@ -22,6 +22,7 @@ stages:
 .build_template: &build_job
   stage: build
   script:
+    - pwd
     - git clean -ffdx
     - source ${CONDA_FOLDER}/bin/activate `cat ${CONDA_FOLDER}/envs/latest-devel-${PYTHON_VER}.txt`
     - which python
@@ -62,6 +63,7 @@ stages:
 .test_template: &test_job
   stage: test
   script:
+    - pwd
     - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
     - ./bin/coverage run --source=${CI_PROJECT_NAME} ./bin/nosetests -sv
     - ./bin/sphinx-build -b doctest doc sphinx
