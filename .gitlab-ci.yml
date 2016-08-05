@@ -29,6 +29,15 @@ stages:
     - python bootstrap-buildout.py
     - ./bin/buildout
     - ./bin/sphinx-build -b html doc sphinx
+  artifacts:
+    expire_in: 2 hours
+    paths:
+      - .installed.cfg
+      - parts/
+      - bin/
+      - eggs/
+      - develop-eggs/
+      - sphinx/
 
 
 # Template for building on a Linux machine
@@ -165,19 +174,19 @@ wheels_macosx_27:
 
 
 # Mac OSX + Python 3.4: Builds, test, build docs
-build_macosx_34:
-  <<: *macosx_build_job
-  variables:
-    <<: *macosx_variables
-    PYTHON_VER: "3.4"
-  tags:
-    - beat-macosx
-
-test_macosx_34:
-  <<: *test_job
-  tags:
-    - beat-macosx
-
+#build_macosx_34:
+#  <<: *macosx_build_job
+#  variables:
+#    <<: *macosx_variables
+#    PYTHON_VER: "3.4"
+#  tags:
+#    - beat-macosx
+#
+#test_macosx_34:
+#  <<: *test_job
+#  tags:
+#    - beat-macosx
+#
 
 # Mac OSX + Python 3.5: Builds, test, build docs
 build_macosx_35:
