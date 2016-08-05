@@ -192,8 +192,6 @@ build_macosx_34:
   variables:
     <<: *macosx_variables
     PYTHON_VER: "3.4"
-  dependencies:
-    - build_macosx_34
   tags:
     - beat-macosx
 
