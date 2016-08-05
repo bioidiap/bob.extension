@@ -164,11 +164,15 @@ build_macosx_27:
 
 test_macosx_27:
   <<: *test_job
+  dependencies:
+    - build_macosx_27
   tags:
     - beat-macosx
 
 wheels_macosx_27:
   <<: *wheels_py27_job
+  dependencies:
+    - build_macosx_27
   tags:
     - beat-macosx
 
@@ -199,15 +203,21 @@ build_macosx_35:
 
 test_macosx_35:
   <<: *test_job
+  dependencies:
+    - build_macosx_35
   tags:
     - beat-macosx
 
 wheels_macosx_35:
   <<: *wheels_py3_job
+  dependencies:
+    - build_macosx_35
   tags:
     - beat-macosx
 
 docs_macosx_35:
   <<: *docs_job
+  dependencies:
+    - build_macosx_35
   tags:
     - beat-macosx
