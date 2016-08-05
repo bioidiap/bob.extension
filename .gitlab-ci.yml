@@ -134,13 +134,13 @@ build_linux_34:
   variables:
     <<: *linux_variables
     PYTHON_VER: "3.4"
-  dependencies:
-    - build_linux_34
   tags:
     - lidiap2015
 
 test_linux_34:
   <<: *test_job
+  dependencies:
+    - build_linux_34
   tags:
     - lidiap2015
 
