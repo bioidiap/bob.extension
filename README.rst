@@ -35,17 +35,14 @@ interpreter inside that distribution, bootstrap and buildout this package::
   $ ./bin/buildout
 
 
-Documentation
--------------
+Contact
+-------
 
-For further documentation on this package, please read the `Stable Version`_ or
-the `Latest Version`_ of the documentation.  For a list of tutorials on this or
-the other packages ob Bob_, or information on submitting issues, asking
-questions and starting discussions, please visit its website.
+For questions or reporting issues to this software package, contact our
+`development mailing list`_.
 
 
 .. Place your references here:
 .. _bob: https://www.idiap.ch/software/bob
 .. _binary installation: https://gitlab.idiap.ch/bob/bob/wikis/Binary-Installation
-.. _stable version: http://pythonhosted.org/bob.extension/index.html
-.. _latest version: https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master/index.html
+.. _development mailing list: https://groups.google.com/forum/?fromgroups#!forum/bob-devel
