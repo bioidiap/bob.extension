@@ -38,9 +38,9 @@ if sphinx.__version__ >= "1.0":
   extensions.append('sphinx.ext.viewcode')
 
 if sphinx.__version__ >= "1.4":
-  extensions.append(sphinx.ext.imgmath')
+  extensions.append('sphinx.ext.imgmath')
 else:
-  extensions.append(sphinx.ext.pngmath')
+  extensions.append('sphinx.ext.pngmath')
 
 # Always includes todos
 todo_include_todos = True
