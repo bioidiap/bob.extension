@@ -118,14 +118,14 @@ build_linux_27:
     <<: *linux_variables
     PYTHON_VER: "2.7"
   tags:
-    - lidiap2015
+    - conda-linux
 
 test_linux_27:
   <<: *test_job
   dependencies:
     - build_linux_27
   tags:
-    - lidiap2015
+    - conda-linux
 
 
 # Linux + Python 3.4: Builds and tests
@@ -135,14 +135,14 @@ build_linux_34:
     <<: *linux_variables
     PYTHON_VER: "3.4"
   tags:
-    - lidiap2015
+    - conda-linux
 
 test_linux_34:
   <<: *test_job
   dependencies:
     - build_linux_34
   tags:
-    - lidiap2015
+    - conda-linux
 
 
 # Linux + Python 3.5: Builds and tests
@@ -152,14 +152,14 @@ build_linux_35:
     <<: *linux_variables
     PYTHON_VER: "3.5"
   tags:
-    - lidiap2015
+    - conda-linux
 
 test_linux_35:
   <<: *test_job
   dependencies:
     - build_linux_35
   tags:
-    - lidiap2015
+    - conda-linux
 
 
 # Mac OSX + Python 2.7: Builds, tests and uploads the wheel
@@ -169,21 +169,21 @@ build_macosx_27:
     <<: *macosx_variables
     PYTHON_VER: "2.7"
   tags:
-    - beat-macosx
+    - conda-macosx
 
 test_macosx_27:
   <<: *test_job
   dependencies:
     - build_macosx_27
   tags:
-    - beat-macosx
+    - conda-macosx
 
 wheels_macosx_27:
   <<: *wheels_py27_job
   dependencies:
     - build_macosx_27
   tags:
-    - beat-macosx
+    - conda-macosx
 
 
 # Mac OSX + Python 3.4: Builds and tests
@@ -193,14 +193,14 @@ build_macosx_34:
     <<: *macosx_variables
     PYTHON_VER: "3.4"
   tags:
-    - beat-macosx
+    - conda-macosx
 
 test_macosx_34:
   <<: *test_job
   dependencies:
     - build_macosx_34
   tags:
-    - beat-macosx
+    - conda-macosx
 
 
 # Mac OSX + Python 3.5: Builds, tests, uploads the wheel and the latest docs
@@ -210,25 +210,25 @@ build_macosx_35:
     <<: *macosx_variables
     PYTHON_VER: "3.5"
   tags:
-    - beat-macosx
+    - conda-macosx
 
 test_macosx_35:
   <<: *test_job
   dependencies:
     - build_macosx_35
   tags:
-    - beat-macosx
+    - conda-macosx
 
 wheels_macosx_35:
   <<: *wheels_py3_job
   dependencies:
     - build_macosx_35
   tags:
-    - beat-macosx
+    - conda-macosx
 
 docs_macosx_35:
   <<: *docs_job
   dependencies:
     - build_macosx_35
   tags:
-    - beat-macosx
+    - conda-macosx
