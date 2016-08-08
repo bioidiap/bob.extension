@@ -11,10 +11,8 @@ PYTHON_VER=$2
 PREFIX=`pwd`/build-env
 
 # Clones the conda dev environment to use
-echo ${CONDA_FOLDER}/bin/conda create --prefix ${PREFIX} --clone `cat
-${CONDA_FOLDER}/envs/latest-devel-${PYTHON_VER}.txt` --offline --yes --quiet
-${CONDA_FOLDER}/bin/conda create --prefix ${PREFIX} --clone `cat
-${CONDA_FOLDER}/envs/latest-devel-${PYTHON_VER}.txt` --offline --yes --quiet
+echo ${CONDA_FOLDER}/bin/conda create --prefix ${PREFIX} --clone `cat ${CONDA_FOLDER}/envs/latest-devel-${PYTHON_VER}.txt` --offline --yes
+${CONDA_FOLDER}/bin/conda create --prefix ${PREFIX} --clone `cat ${CONDA_FOLDER}/envs/latest-devel-${PYTHON_VER}.txt` --offline --yes
 
 # Install this package's dependencies
 echo source ${CONDA_FOLDER}/bin/activate `pwd`/build-env
