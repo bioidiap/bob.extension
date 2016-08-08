@@ -188,9 +188,14 @@ package-z
       nose.tools.eq_(result, expected)
 
     # test idiap server
-    os.environ["BOB_DOCUMENTATION_SERVER"] = "https://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
+    os.environ["BOB_DOCUMENTATION_SERVER"] = "http://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
     result = link_documentation(additional_packages, stringio(f))
-    expected = {'http://docs.python.org/%d.%d' % sys.version_info[:2] : None, 'http://matplotlib.sourceforge.net' : None, 'https://www.idiap.ch/software/bob/docs/latest/bioidiap/bob.extension/master' : None, 'https://www.idiap.ch/software/bob/docs/latest/idiap/gridtk/master' : None}
+    expected = {
+        'http://docs.python.org/%d.%d' % sys.version_info[:2]: None,
+        'http://matplotlib.sourceforge.net': None,
+        'http://www.idiap.ch/software/bob/docs/latest/bob/bob.extension/master': None,
+        'http://www.idiap.ch/software/bob/docs/latest/idiap/gridtk/master': None,
+        }
     nose.tools.eq_(result, expected)
 
   finally:
