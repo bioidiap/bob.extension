@@ -188,7 +188,7 @@ package-z
       nose.tools.eq_(result, expected)
 
     # test idiap server
-    os.environ["BOB_DOCUMENTATION_SERVER"] = "http://www.idiap.ch/software/bob/docs/latest/bioidiap/%s/master"
+    os.environ["BOB_DOCUMENTATION_SERVER"] = "http://www.idiap.ch/software/bob/docs/latest/bob/%s/master"
     result = link_documentation(additional_packages, stringio(f))
     expected = {
         'http://docs.python.org/%d.%d' % sys.version_info[:2]: None,
