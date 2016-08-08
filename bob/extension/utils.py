@@ -491,18 +491,6 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     else:
       server = "https://pythonhosted.org/%s"
 
-  # HACK: some packages are in the 'idiap' directory of the local documentation server
-  # so, we replace 'bioidiap' with 'idiap' for those packages,
-  # which should affect only the case when the BOB_DOCUMENTATION_SERVER env is set
-  for idiap_doc in ('gridtk', 'facereclib'):
-    if idiap_doc in packages:
-      idiap_manual = server.replace('bioidiap', 'idiap') % idiap_doc
-      # gridtk mapping
-      print ("Adding intersphinx source %s" % idiap_manual)
-      mapping[idiap_manual] = None
-      packages.remove(idiap_doc)
-
-
   # check if the packages have documentation on pythonhosted.org
   for p in packages:
     # generate URL

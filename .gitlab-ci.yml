@@ -67,6 +67,11 @@ stages:
     - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
     - ./bin/coverage run --source=${CI_PROJECT_NAME} ./bin/nosetests -sv
     - ./bin/sphinx-build -b doctest doc sphinx
+
+
+# Template for testing on a Mac OSX machine
+.test_mac_template: &macosx_test_job
+  <<: *test_job
   variables:
     MACOSX_DEPLOYMENT_TARGET: "10.9"
     CFLAGS: "-pthread"
@@ -105,8 +110,13 @@ stages:
   stage: docs
   only:
     - master
-    - tags
+  variables:
+    BOB_DOCUMENTATION_SERVER: "http://www.idiap.ch/software/bob/docs/latest/bob/%s/master/"
   script:
+    - ./bin/python bootstrap-buildout.py
+    - ./bin/buildout -o
+    - rm -rf sphinx
+    - ./bin/sphinx-build -b html doc sphinx
     - ./scripts/upload-sphinx.sh
 
 
@@ -174,7 +184,7 @@ build_macosx_27:
     - conda-macosx
 
 test_macosx_27:
-  <<: *test_job
+  <<: *macosx_test_job
   dependencies:
     - build_macosx_27
   tags:
@@ -198,7 +208,7 @@ build_macosx_34:
     - conda-macosx
 
 test_macosx_34:
-  <<: *test_job
+  <<: *macosx_test_job
   dependencies:
     - build_macosx_34
   tags:
@@ -215,7 +225,7 @@ build_macosx_35:
     - conda-macosx
 
 test_macosx_35:
-  <<: *test_job
+  <<: *macosx_test_job
   dependencies:
     - build_macosx_35
   tags:
