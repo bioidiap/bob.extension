@@ -181,20 +181,34 @@ package-z
       pass
 
     # test pypi packages
-    additional_packages = ['python', 'matplotlib', 'bob.extension', 'gridtk', 'other.bob.package']
-    if "BOB_DOCUMENTATION_SERVER" not in os.environ:
-      result = link_documentation(additional_packages, stringio(f))
-      expected = {'http://docs.python.org/%d.%d' % sys.version_info[:2] : None, 'http://matplotlib.sourceforge.net' : None, 'https://pythonhosted.org/setuptools' : None, 'https://pythonhosted.org/bob.extension' : None, 'https://pythonhosted.org/gridtk' : None}
-      nose.tools.eq_(result, expected)
+    additional_packages = [
+        'python',
+        'matplotlib',
+        'bob.extension',
+        'gridtk',
+        'other.bob.package',
+        ]
+
+    # test linkage to pythonhosted.org
+    result = link_documentation(additional_packages, stringio(f))
+    expected = {
+        'http://docs.python.org/%d.%d' % sys.version_info[:2] : None,
+        'http://matplotlib.sourceforge.net' : None,
+        'https://pythonhosted.org/setuptools' : None,
+        'https://pythonhosted.org/bob.extension' : None,
+        'https://pythonhosted.org/gridtk' : None,
+        }
+    nose.tools.eq_(result, expected)
 
     # test idiap server
-    os.environ["BOB_DOCUMENTATION_SERVER"] = "http://www.idiap.ch/software/bob/docs/latest/bob/%s/master"
+    server = "https://www.idiap.ch/software/bob/docs/latest/bob/%s/master"
+    os.environ["BOB_DOCUMENTATION_SERVER"] = server
     result = link_documentation(additional_packages, stringio(f))
     expected = {
         'http://docs.python.org/%d.%d' % sys.version_info[:2]: None,
         'http://matplotlib.sourceforge.net': None,
-        'http://www.idiap.ch/software/bob/docs/latest/bob/bob.extension/master': None,
-        'http://www.idiap.ch/software/bob/docs/latest/idiap/gridtk/master': None,
+        server % 'bob.extension': None,
+        server % 'gridtk': None,
         }
     nose.tools.eq_(result, expected)
 

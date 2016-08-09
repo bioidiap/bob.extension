@@ -484,6 +484,13 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     mapping[matplotlib_manual] = None
     packages.remove('matplotlib')
 
+  if 'setuptools' in packages: #get the right url
+    setuptools_manual = "https://setuptools.readthedocs.io/en/latest/"
+    print ("Adding intersphinx source %s" % setuptools_manual)
+    mapping[setuptools_manual] = None
+    packages.remove('setuptools')
+
+
   # get the server for the other packages
   if server is None:
     if "BOB_DOCUMENTATION_SERVER" in os.environ:
@@ -491,7 +498,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     else:
       server = "https://pythonhosted.org/%s"
 
-  # check if the packages have documentation on pythonhosted.org
+  # check if the packages have documentation on the server
   for p in packages:
     # generate URL
     url = server % p.split()[0]
