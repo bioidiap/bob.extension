@@ -18,7 +18,7 @@ stages:
 
 # Global variables
 variables:
-  CONDA_PREFIX: build-dev
+  CONDA_PREFIX: env
 
 
 # Template for the build stage
