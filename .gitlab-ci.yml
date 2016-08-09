@@ -38,7 +38,7 @@ variables:
   after_script:
     - rm -rf ${CONDA_PREFIX}
   artifacts:
-    expire_in: 2 hours
+    expire_in: 1 day
     paths:
       - bootstrap-conda.sh
       - ${CI_PROJECT_NAME}.egg-info/
