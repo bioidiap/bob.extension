@@ -78,6 +78,7 @@ variables:
   script:
     - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
     - ./bin/coverage run --source=${CI_PROJECT_NAME} ./bin/nosetests -sv
+    - ./bin/coverage report
     - ./bin/sphinx-build -b doctest doc sphinx
   after_script:
     - rm -rf ${CONDA_PREFIX}
