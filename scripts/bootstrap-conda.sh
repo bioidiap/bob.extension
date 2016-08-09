@@ -27,8 +27,8 @@ run_cmd() {
 
 # Clones the conda dev environment to use
 if [ ! -d ${PREFIX} ]; then
-  echo "[++] Bootstrapping (offline) conda installation at ${PREFIX}..."
-  run_cmd ${CONDA_FOLDER}/bin/conda create --prefix ${PREFIX} --clone `cat ${CONDA_FOLDER}/envs/latest-devel-${PYTHON_VERSION}.txt` --yes
+  echo "[++] Bootstrapping (clone) conda installation at ${PREFIX}..."
+  run_cmd ${CONDA_FOLDER}/bin/conda create --prefix ${PREFIX} --clone `cat ${CONDA_FOLDER}/envs/latest-devel-${PYTHON_VERSION}.txt` --offline --yes
 else
   echo "[!!] Prefix directory ${PREFIX} exists, not re-installing..."
 fi
