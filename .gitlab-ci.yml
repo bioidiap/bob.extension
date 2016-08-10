@@ -76,8 +76,8 @@ variables:
     - ./bootstrap-conda.sh ${CONDA_FOLDER} ${PYTHON_VER} ${CONDA_PREFIX}
     - ./bin/buildout -o
   script:
-    - ./bin/python -c 'from bob.extension import get_config; print(get_config())'
-    - ./bin/coverage run --source=${CI_PROJECT_NAME} ./bin/nosetests -sv
+    - ./bin/python -c "from ${CI_PROJECT_NAME} import get_config; print(get_config())"
+    - ./bin/coverage run --source=${CI_PROJECT_NAME} ./bin/nosetests -sv ${CI_PROJECT_NAME}
     - ./bin/coverage report
     - ./bin/sphinx-build -b doctest doc sphinx
   after_script:
