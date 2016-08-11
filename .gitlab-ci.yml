@@ -53,6 +53,7 @@ variables:
     <<: *build_variables
     CONDA_FOLDER: "/local/conda"
     CFLAGS: "-coverage"
+    CXXFLAGS: "-D_GLIBCXX_USE_CXX11_ABI=0 -coverage"
 
 
 # Template for building on a Mac OSX machine
@@ -63,6 +64,7 @@ variables:
     CONDA_FOLDER: "/opt/conda"
     MACOSX_DEPLOYMENT_TARGET: "10.9"
     CFLAGS: "-pthread -coverage"
+    CXXFLAGS: "-D_GLIBCXX_USE_CXX11_ABI=0 -pthread -coverage"
 
 
 # Template for the test stage - re-install from uploaded wheels
