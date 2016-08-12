@@ -515,11 +515,5 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
         # notice mapping is not updated here, as the URL does not exist
     except URLError as exc:
       print ("Requesting URL %s did not succeed; are you offline? The error was %s" % (url, exc))
-      if 'BAD_SIGNATURE' in str(exc):
-        # SSL connection could not be established by the client
-        # See: https://secure.idiap.ch/bugzilla5/show_bug.cgi?id=12681
-        # See: https://gitlab.idiap.ch/bob/bob.extension/issues/17
-        # in this case and to circumvent the bug above, we keep the entry
-        mapping[url] = None
 
   return mapping
