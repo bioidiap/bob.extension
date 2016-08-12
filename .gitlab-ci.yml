@@ -95,7 +95,7 @@ variables:
     - master
     - tags
   before_script:
-    - curl --silent https://gitlab.idiap.ch/bob/bob/snippets/8/raw | tr -d '\r' > upload-sphinx.sh
+    - curl --silent https://gitlab.idiap.ch/bob/bob/snippets/8/raw | tr -d '\r' > upload-wheel.sh
     - chmod 755 upload-wheel.sh
   script:
     - ./upload-wheel.sh
