@@ -52,7 +52,7 @@ variables:
   variables: &linux_build_variables
     <<: *build_variables
     CONDA_FOLDER: "/local/conda"
-    CFLAGS: "-coverage"
+    CFLAGS: "-D_GLIBCXX_USE_CXX11_ABI=0 -coverage"
     CXXFLAGS: "-D_GLIBCXX_USE_CXX11_ABI=0 -coverage"
 
 
@@ -64,7 +64,8 @@ variables:
     CONDA_FOLDER: "/opt/conda"
     MACOSX_DEPLOYMENT_TARGET: "10.9"
     CFLAGS: "-pthread -coverage"
-    CXXFLAGS: "-D_GLIBCXX_USE_CXX11_ABI=0 -pthread -coverage"
+    CXXFLAGS: "-pthread -coverage"
+    LDFLAGS: "-lpthread"
 
 
 # Template for the test stage - re-install from uploaded wheels
