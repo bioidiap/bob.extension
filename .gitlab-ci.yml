@@ -17,6 +17,11 @@ stages:
 variables:
   TEST_CHANNEL: file://idiap/group/torch5spro/bob_master_conda_channel
 
+# Global caching
+cache:
+  key: "$CI_BUILD_REF_NAME" # per branch cache
+  paths:
+    - miniconda/
 
 # Template for the build stage
 # Needs to run on all supported architectures, platforms and python versions
@@ -70,7 +75,7 @@ variables:
     - ./bootstrap-conda.sh miniconda ${PYTHON_VER}
     - mv miniconda_bak/conda-bld miniconda/
   script:
-    - miniconda/bin/conda build --test `miniconda/bin/conda build --output --python=${PYTHON_VER} .conda-recipe`
+    - miniconda/bin/conda build --test miniconda/conda-bld/linux-64/${CI_PROJECT_NAME}-master-py*
 
 .test_linux_template: &linux_test_job
   <<: *test_job
