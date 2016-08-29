@@ -11,7 +11,7 @@ fi
 BASEDIR=$1
 PYTHON_VERSION=$2
 CONDA=${BASEDIR}/bin/conda
-MINICONDA=${HOME}/Downloads/miniconda.sh
+MINICONDA=miniconda.sh
 
 if [ "$(uname)" == "Darwin" ]; then
   ARCH="MacOSX-x86_64"
@@ -36,6 +36,7 @@ if [ ! -x ${CONDA} ]; then
 
   echo "[>>] Creating root environment and setting basic options..."
   bash ${MINICONDA} -b -p ${BASEDIR}
+  touch ${BASEDIR}/.condarc
   ${CONDA} config --set show_channel_urls True
   ${CONDA} install --yes -n root conda-build sphinx
   ${CONDA} config --add channels conda-forge
