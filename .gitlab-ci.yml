@@ -34,7 +34,8 @@ variables:
   artifacts:
     expire_in: 1 day
     paths:
-      - miniconda/
+      - miniconda/conda-bld/linux-64
+      - miniconda/conda-bld/osx-64
       - sphinx/
 
 # Template for building on a Linux machine
@@ -64,6 +65,8 @@ variables:
 # Needs to run on all supported architectures, platforms and python versions
 .test_template: &test_job
   stage: test
+  before_script:
+    - ./bootstrap-conda.sh miniconda ${PYTHON_VER}
   script:
     - miniconda/bin/conda build --test `conda build --output --python=${PYTHON_VER} .conda-recipe`
 
@@ -105,6 +108,8 @@ variables:
 # architectures (Linux and Mac OSX 64-bit)
 .upload_template: &upload_job
   stage: upload
+  before_script:
+    - ./bootstrap-conda.sh miniconda 2.7
   only:
     - conda-ci
 
