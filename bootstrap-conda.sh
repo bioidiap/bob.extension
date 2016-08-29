@@ -36,15 +36,15 @@ if [ ! -x ${CONDA} ]; then
 
   echo "[>>] Creating root environment and setting basic options..."
   bash ${MINICONDA} -b -p ${BASEDIR}
-  touch ${BASEDIR}/.condarc
-  ${CONDA} config --set show_channel_urls True
-  ${CONDA} install --yes -n root conda-build sphinx
-  ${CONDA} config --add channels conda-forge
-  ${CONDA} config --add channels ${TEST_CHANNEL}
 fi
 
 echo "[>>] Updating conda in the root environment..."
-${CONDA} update --yes -n root conda
+touch ${BASEDIR}/.condarc
+${CONDA} config --set show_channel_urls True
+${CONDA} install --override-channels -c defaults --yes -n root conda-build sphinx sphinx_rtd_theme
+${CONDA} update --override-channels -c defaults --yes -n root conda
+${CONDA} config --add channels conda-forge
+${CONDA} config --add channels ${TEST_CHANNEL}
 ${CONDA} info
 
 # Function for running command and echoing results
