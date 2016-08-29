@@ -142,7 +142,7 @@ build_linux_27:
     PYTHON_VER: "2.7"
 
 test_linux_27:
-  <<: *test_job
+  <<: *linux_test_job
   variables:
     <<: *linux_build_variables
     PYTHON_VER: "2.7"
@@ -162,7 +162,7 @@ build_linux_34:
     PYTHON_VER: "3.4"
 
 test_linux_34:
-  <<: *test_job
+  <<: *linux_test_job
   variables:
     <<: *linux_build_variables
     PYTHON_VER: "3.4"
@@ -182,7 +182,7 @@ build_linux35:
     PYTHON_VER: "3.5"
 
 test_linux35:
-  <<: *test_job
+  <<: *linux_test_job
   variables:
     <<: *linux_build_variables
     PYTHON_VER: "3.5"
@@ -207,7 +207,7 @@ upload_linux35:
 #     PYTHON_VER: "2.7"
 
 # test_macosx_27:
-#   <<: *test_job
+#   <<: *mac_test_job
 #   variables:
 #     <<: *macosx_build_variables
 #     PYTHON_VER: "2.7"
@@ -227,7 +227,7 @@ upload_linux35:
 #     PYTHON_VER: "3.4"
 
 # test_macosx_34:
-#   <<: *test_job
+#   <<: *mac_test_job
 #   variables:
 #     <<: *macosx_build_variables
 #     PYTHON_VER: "3.4"
@@ -247,7 +247,7 @@ upload_linux35:
 #     PYTHON_VER: "3.5"
 
 # test_macosx35:
-#   <<: *test_job
+#   <<: *mac_test_job
 #   variables:
 #     <<: *macosx_build_variables
 #     PYTHON_VER: "3.5"
