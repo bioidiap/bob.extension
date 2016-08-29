@@ -17,17 +17,13 @@ stages:
 variables:
   TEST_CHANNEL: file://idiap/group/torch5spro/bob_master_conda_channel
 
-# Global caching
-cache:
-  key: "$CI_BUILD_REF_NAME" # per branch cache
-  paths:
-    - miniconda/
 
 # Template for the build stage
 # Needs to run on all supported architectures, platforms and python versions
 .build_template: &build_job
   stage: build
   before_script:
+    - git clean -ffdx
     - ./bootstrap-conda.sh miniconda ${PYTHON_VER}
   variables: &build_variables
     BOB_DOCUMENTATION_SERVER: "http://www.idiap.ch/software/bob/docs/latest/bob/%s/master/"
