@@ -50,6 +50,7 @@ cache:
     <<: *build_variables
     CFLAGS: "-D_GLIBCXX_USE_CXX11_ABI=0 -coverage"
     CXXFLAGS: "-D_GLIBCXX_USE_CXX11_ABI=0 -coverage"
+    LINUXMAC: linux-64
   tags:
     - conda-linux
 
@@ -62,6 +63,7 @@ cache:
     CFLAGS: "-pthread -coverage"
     CXXFLAGS: "-pthread -coverage"
     LDFLAGS: "-lpthread"
+    LINUXMAC: osx-64
   tags:
     - conda-macosx
 
@@ -74,18 +76,16 @@ cache:
     - mv miniconda miniconda_bak
     - ./bootstrap-conda.sh miniconda ${PYTHON_VER}
     - mv miniconda_bak/conda-bld miniconda/
+  script:
+    - miniconda/bin/conda build --test --python=${PYTHON_VER} miniconda/conda-bld/${LINUXMAC}/${CI_PROJECT_NAME}-master-py*
 
 .test_linux_template: &linux_test_job
   <<: *test_job
-  script:
-    - miniconda/bin/conda build --test --python=${PYTHON_VER} miniconda/conda-bld/linux-64/${CI_PROJECT_NAME}-master-py*
   tags:
     - conda-linux
 
 .test_mac_template: &mac_test_job
   <<: *test_job
-  script:
-    - miniconda/bin/conda build --test --python=${PYTHON_VER} miniconda/conda-bld/osx-64/${CI_PROJECT_NAME}-master-py*
   tags:
     - conda-macosx
 
@@ -119,22 +119,19 @@ cache:
   stage: upload
   before_script:
     - ./bootstrap-conda.sh miniconda 2.7
+  script:
+    - rsync miniconda/conda-bld/${LINUXMAC} /idiap/group/torch5spro/bob_master_conda_channel
+    - miniconda/bin/conda index /idiap/group/torch5spro/bob_master_conda_channel/${LINUXMAC}
   only:
     - conda-ci
 
 .upload_linux_template: &linux_upload_job
   <<: *upload_job
-  script:
-    - rsync miniconda/conda-bld/linux-64 /idiap/group/torch5spro/bob_master_conda_channel
-    - miniconda/bin/conda index /idiap/group/torch5spro/bob_master_conda_channel/linux-64
   tags:
     - conda-linux
 
 .upload_mac_template: &macosx_upload_job
   <<: *upload_job
-  script:
-    - rsync miniconda/conda-bld/osx-64 /idiap/group/torch5spro/bob_master_conda_channel
-    - miniconda/bin/conda index /idiap/group/torch5spro/bob_master_conda_channel/osx-64
   tags:
     - conda-macosx
 
@@ -158,6 +155,8 @@ test_linux_27:
 
 upload_linux_27:
   <<: *linux_upload_job
+  variables:
+    <<: *linux_build_variables
   dependencies:
     - build_linux_27
 
@@ -178,6 +177,8 @@ test_linux_34:
 
 upload_linux_34:
   <<: *linux_upload_job
+  variables:
+    <<: *linux_build_variables
   dependencies:
     - build_linux_34
 
@@ -203,6 +204,8 @@ docs_linux35:
 
 upload_linux35:
   <<: *linux_upload_job
+  variables:
+    <<: *linux_build_variables
   dependencies:
     - build_linux35
 
@@ -223,6 +226,8 @@ upload_linux35:
 
 # upload_macosx_27:
 #   <<: *macosx_upload_job
+#   variables:
+#     <<: *macosx_build_variables
 #   dependencies:
 #     - build_macosx_27
 
@@ -243,6 +248,8 @@ upload_linux35:
 
 # upload_macosx_34:
 #   <<: *macosx_upload_job
+#   variables:
+#     <<: *macosx_build_variables
 #   dependencies:
 #     - build_macosx_34
 
@@ -263,5 +270,7 @@ upload_linux35:
 
 # upload_macosx35:
 #   <<: *macosx_upload_job
+#   variables:
+#     <<: *macosx_build_variables
 #   dependencies:
 #     - build_macosx35
