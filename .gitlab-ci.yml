@@ -74,16 +74,18 @@ cache:
     - mv miniconda miniconda_bak
     - ./bootstrap-conda.sh miniconda ${PYTHON_VER}
     - mv miniconda_bak/conda-bld miniconda/
-  script:
-    - miniconda/bin/conda build --test miniconda/conda-bld/linux-64/${CI_PROJECT_NAME}-master-py*
 
 .test_linux_template: &linux_test_job
   <<: *test_job
+  script:
+    - miniconda/bin/conda build --test miniconda/conda-bld/linux-64/${CI_PROJECT_NAME}-master-py*
   tags:
     - conda-linux
 
 .test_mac_template: &mac_test_job
   <<: *test_job
+  script:
+    - miniconda/bin/conda build --test miniconda/conda-bld/osx-64/${CI_PROJECT_NAME}-master-py*
   tags:
     - conda-macosx
 
