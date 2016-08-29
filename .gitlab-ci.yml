@@ -28,7 +28,6 @@ cache:
 .build_template: &build_job
   stage: build
   before_script:
-    - git clean -ffdx
     - ./bootstrap-conda.sh miniconda ${PYTHON_VER}
   variables: &build_variables
     BOB_DOCUMENTATION_SERVER: "http://www.idiap.ch/software/bob/docs/latest/bob/%s/master/"
