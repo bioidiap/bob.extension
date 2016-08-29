@@ -70,7 +70,7 @@ variables:
     - ./bootstrap-conda.sh miniconda ${PYTHON_VER}
     - mv miniconda_bak/conda-bld miniconda/
   script:
-    - miniconda/bin/conda build --test `conda build --output --python=${PYTHON_VER} .conda-recipe`
+    - miniconda/bin/conda build --test `miniconda/bin/conda build --output --python=${PYTHON_VER} .conda-recipe`
 
 .test_linux_template: &linux_test_job
   <<: *test_job
