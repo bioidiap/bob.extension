@@ -30,7 +30,7 @@ if [ ! -x ${CONDA} ]; then
   if [ ! -x ${MINICONDA} ]; then
     mkdir -pv `dirname ${MINICONDA}`
     echo "[>>] Downloading `basename ${MINICONDA}` -> ${MINICONDA}..."
-    curl --progress-bar https://repo.continuum.io/miniconda/Miniconda${PYK}-latest-${ARCH}.sh --output ${MINICONDA}
+    curl --silent https://repo.continuum.io/miniconda/Miniconda${PYK}-latest-${ARCH}.sh --output ${MINICONDA}
     chmod 755 ${MINICONDA}
   fi
 
@@ -41,8 +41,8 @@ fi
 echo "[>>] Updating conda in the root environment..."
 touch ${BASEDIR}/.condarc
 ${CONDA} config --set show_channel_urls True
-${CONDA} install --override-channels -c defaults --yes -n root conda-build sphinx sphinx_rtd_theme
-${CONDA} update --override-channels -c defaults --yes -n root conda
+${CONDA} install --override-channels -c defaults --yes --quiet -n root conda-build sphinx sphinx_rtd_theme
+${CONDA} update --override-channels -c defaults --yes --quiet -n root conda
 ${CONDA} config --add channels conda-forge
 ${CONDA} config --add channels ${TEST_CHANNEL}
 ${CONDA} info
