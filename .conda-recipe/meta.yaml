@@ -16,7 +16,7 @@ build:
   script_env:
     - CFLAGS
     - CXXFLAGS
-    - LDFLAGS
+    - LDFLAGS  # [osx]
     - MACOSX_DEPLOYMENT_TARGET  # [osx]
 
 requirements:
