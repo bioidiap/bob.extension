@@ -117,7 +117,7 @@ variables:
   tags:
     - conda-linux
 
-.upload_mac_template: &mac_upload_job
+.upload_mac_template: &macosx_upload_job
   <<: *upload_job
   script:
     - rsync miniconda/conda-bld/osx-64 /idiap/group/torch5spro/bob_master_conda_channel
@@ -131,7 +131,7 @@ variables:
 # Linux + Python 2.7: Build, test, and upload
 build_linux_27:
   <<: *linux_build_job
-  variables: &linux_build_variables
+  variables:
     <<: *linux_build_variables
     PYTHON_VER: "2.7"
 
@@ -149,7 +149,7 @@ upload_linux_27:
 # Linux + Python 3.4: Build, test, and upload
 build_linux_34:
   <<: *linux_build_job
-  variables: &linux_build_variables
+  variables:
     <<: *linux_build_variables
     PYTHON_VER: "3.4"
 
@@ -167,7 +167,7 @@ upload_linux_34:
 # Linux + Python 3.5: Build, test, docs, and upload
 build_linux35:
   <<: *linux_build_job
-  variables: &linux_build_variables
+  variables:
     <<: *linux_build_variables
     PYTHON_VER: "3.5"
 
@@ -188,55 +188,55 @@ upload_linux35:
     - build_linux35
 
 # MacOSX + Python 2.7: Build, test, and upload
-build_mac_27:
-  <<: *mac_build_job
-  variables: &mac_build_variables
-    <<: *mac_build_variables
+build_macosx_27:
+  <<: *macosx_build_job
+  variables:
+    <<: *macosx_build_variables
     PYTHON_VER: "2.7"
 
-test_mac_27:
+test_macosx_27:
   <<: *test_job
-  variables: *mac_build_variables
+  variables: *macosx_build_variables
   dependencies:
-    - build_mac_27
+    - build_macosx_27
 
-upload_mac_27:
-  <<: *mac_upload_job
+upload_macosx_27:
+  <<: *macosx_upload_job
   dependencies:
-    - build_mac_27
+    - build_macosx_27
 
 # MacOSX + Python 3.4: Build, test, and upload
-build_mac_34:
-  <<: *mac_build_job
-  variables: &mac_build_variables
-    <<: *mac_build_variables
+build_macosx_34:
+  <<: *macosx_build_job
+  variables:
+    <<: *macosx_build_variables
     PYTHON_VER: "3.4"
 
-test_mac_34:
+test_macosx_34:
   <<: *test_job
-  variables: *mac_build_variables
+  variables: *macosx_build_variables
   dependencies:
-    - build_mac_34
+    - build_macosx_34
 
-upload_mac_34:
-  <<: *mac_upload_job
+upload_macosx_34:
+  <<: *macosx_upload_job
   dependencies:
-    - build_mac_34
+    - build_macosx_34
 
 # MacOSX + Python 3.5: Build, test, and upload
-build_mac35:
-  <<: *mac_build_job
-  variables: &mac_build_variables
-    <<: *mac_build_variables
+build_macosx35:
+  <<: *macosx_build_job
+  variables:
+    <<: *macosx_build_variables
     PYTHON_VER: "3.5"
 
-test_mac35:
+test_macosx35:
   <<: *test_job
-  variables: *mac_build_variables
+  variables: *macosx_build_variables
   dependencies:
-    - build_mac35
+    - build_macosx35
 
-upload_mac35:
-  <<: *mac_upload_job
+upload_macosx35:
+  <<: *macosx_upload_job
   dependencies:
-    - build_mac35
+    - build_macosx35
