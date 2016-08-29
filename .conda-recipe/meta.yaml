@@ -1,0 +1,65 @@
+{% set version = "master" %}
+
+package:
+  name: bob.extension
+  version: {{ version }}
+
+source:
+  git_url: ../
+
+build:
+  entry_points:
+    - bob_new_version.py = bob.extension.scripts:new_version
+    - bob_dependecy_graph.py = bob.extension.scripts:dependency_graph
+  number: 0
+  skip: true  # [win]
+  script_env:
+    - CFLAGS
+    - CXXFLAGS
+    - LDFLAGS
+    - MACOSX_DEPLOYMENT_TARGET  # [osx]
+
+requirements:
+  build:
+    - python
+    - setuptools
+
+  run:
+    - python
+    - setuptools
+
+test:
+  requires:
+    - nose
+    - boost
+    - cmake
+    - pkg-config
+    - freetype
+    - libblitz
+    - numpy
+    - coverage
+    - sphinx
+
+  imports:
+    - bob
+    - bob.extension
+    - bob.extension.scripts
+
+  commands:
+    - bob_new_version.py --help
+    - bob_dependecy_graph.py --help
+    - bob_dbmanage.py all download --force || true
+    - python -c "from bob.extension import get_config; print(get_config())"
+    - coverage run --source=bob.extension `which nosetests` -sv bob.extension  # [not osx]
+    - DYLD_FALLBACK_LIBRARY_PATH=$PREFIX/lib coverage run --source=bob.extension nosetests -sv bob.extension  # [osx]
+    - coverage report
+    - sphinx-build -b doctest $SRC_DIR/../../../doc $SRC_DIR/../../../sphinx
+
+about:
+  home: http://gitlab.idiap.ch/bob/bob.extension
+  license: Modified BSD License (3-clause)
+  summary: Building of Python/C++ extensions for Bob
+
+extra:
+  recipe-maintainers:
+    - 183amir

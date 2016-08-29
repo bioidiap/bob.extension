@@ -24,13 +24,11 @@ variables:
   stage: build
   before_script:
     - git clean -ffdx
-    - curl --silent https://gitlab.idiap.ch/bob/bob/snippets/7/raw | tr -d '\r' > bootstrap-conda.sh
-    - chmod 755 ./bootstrap-conda.sh
     - ./bootstrap-conda.sh miniconda ${PYTHON_VER}
   variables: &build_variables
     BOB_DOCUMENTATION_SERVER: "http://www.idiap.ch/software/bob/docs/latest/bob/%s/master/"
   script:
-    - miniconda/bin/conda build --build-only --python=${PYTHON_VER} .conda-recipe/
+    - miniconda/bin/conda build --no-test --python=${PYTHON_VER} .conda-recipe/
     - miniconda/bin/sphinx-build doc sphinx
   artifacts:
     expire_in: 1 day
@@ -66,7 +64,7 @@ variables:
 .test_template: &test_job
   stage: test
   script:
-    - miniconda/bin/conda build --test .conda-recipe/
+    - miniconda/bin/conda build --test `conda build --output --python=${PYTHON_VER} .conda-recipe`
 
 .test_linux_template: &linux_test_job
   <<: *test_job
@@ -137,7 +135,9 @@ build_linux_27:
 
 test_linux_27:
   <<: *test_job
-  variables: *linux_build_variables
+  variables:
+    <<: *linux_build_variables
+    PYTHON_VER: "2.7"
   dependencies:
     - build_linux_27
 
@@ -155,7 +155,9 @@ build_linux_34:
 
 test_linux_34:
   <<: *test_job
-  variables: *linux_build_variables
+  variables:
+    <<: *linux_build_variables
+    PYTHON_VER: "3.4"
   dependencies:
     - build_linux_34
 
@@ -173,7 +175,9 @@ build_linux35:
 
 test_linux35:
   <<: *test_job
-  variables: *linux_build_variables
+  variables:
+    <<: *linux_build_variables
+    PYTHON_VER: "3.5"
   dependencies:
     - build_linux35
 
@@ -196,7 +200,9 @@ build_macosx_27:
 
 test_macosx_27:
   <<: *test_job
-  variables: *macosx_build_variables
+  variables:
+    <<: *macosx_build_variables
+    PYTHON_VER: "2.7"
   dependencies:
     - build_macosx_27
 
@@ -214,7 +220,9 @@ build_macosx_34:
 
 test_macosx_34:
   <<: *test_job
-  variables: *macosx_build_variables
+  variables:
+    <<: *macosx_build_variables
+    PYTHON_VER: "3.4"
   dependencies:
     - build_macosx_34
 
@@ -232,7 +240,9 @@ build_macosx35:
 
 test_macosx35:
   <<: *test_job
-  variables: *macosx_build_variables
+  variables:
+    <<: *macosx_build_variables
+    PYTHON_VER: "3.5"
   dependencies:
     - build_macosx35
 
