@@ -89,7 +89,7 @@ variables:
 .docs_template: &docs_job
   stage: docs
   only:
-    - master
+    - conda-ci
   before_script:
     - curl --silent https://gitlab.idiap.ch/bob/bob/snippets/9/raw | tr -d '\r' > upload-sphinx.sh
     - chmod 755 upload-sphinx.sh
@@ -113,7 +113,9 @@ variables:
 .upload_template: &upload_job
   stage: upload
   before_script:
+    - mv miniconda miniconda_bak
     - ./bootstrap-conda.sh miniconda 2.7
+    - mv miniconda_bak/conda-bld miniconda/
   script:
     - rsync miniconda/conda-bld/${LINUXMAC} /idiap/group/torch5spro/bob_master_conda_channel
     - miniconda/bin/conda index /idiap/group/torch5spro/bob_master_conda_channel/${LINUXMAC}
