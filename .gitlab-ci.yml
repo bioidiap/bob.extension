@@ -192,62 +192,62 @@ upload_linux35:
   dependencies:
     - build_linux35
 
-# MacOSX + Python 2.7: Build, test, and upload
-build_macosx_27:
-  <<: *macosx_build_job
-  variables:
-    <<: *macosx_build_variables
-    PYTHON_VER: "2.7"
+# # MacOSX + Python 2.7: Build, test, and upload
+# build_macosx_27:
+#   <<: *macosx_build_job
+#   variables:
+#     <<: *macosx_build_variables
+#     PYTHON_VER: "2.7"
 
-test_macosx_27:
-  <<: *test_job
-  variables:
-    <<: *macosx_build_variables
-    PYTHON_VER: "2.7"
-  dependencies:
-    - build_macosx_27
+# test_macosx_27:
+#   <<: *test_job
+#   variables:
+#     <<: *macosx_build_variables
+#     PYTHON_VER: "2.7"
+#   dependencies:
+#     - build_macosx_27
 
-upload_macosx_27:
-  <<: *macosx_upload_job
-  dependencies:
-    - build_macosx_27
+# upload_macosx_27:
+#   <<: *macosx_upload_job
+#   dependencies:
+#     - build_macosx_27
 
-# MacOSX + Python 3.4: Build, test, and upload
-build_macosx_34:
-  <<: *macosx_build_job
-  variables:
-    <<: *macosx_build_variables
-    PYTHON_VER: "3.4"
+# # MacOSX + Python 3.4: Build, test, and upload
+# build_macosx_34:
+#   <<: *macosx_build_job
+#   variables:
+#     <<: *macosx_build_variables
+#     PYTHON_VER: "3.4"
 
-test_macosx_34:
-  <<: *test_job
-  variables:
-    <<: *macosx_build_variables
-    PYTHON_VER: "3.4"
-  dependencies:
-    - build_macosx_34
+# test_macosx_34:
+#   <<: *test_job
+#   variables:
+#     <<: *macosx_build_variables
+#     PYTHON_VER: "3.4"
+#   dependencies:
+#     - build_macosx_34
 
-upload_macosx_34:
-  <<: *macosx_upload_job
-  dependencies:
-    - build_macosx_34
+# upload_macosx_34:
+#   <<: *macosx_upload_job
+#   dependencies:
+#     - build_macosx_34
 
-# MacOSX + Python 3.5: Build, test, and upload
-build_macosx35:
-  <<: *macosx_build_job
-  variables:
-    <<: *macosx_build_variables
-    PYTHON_VER: "3.5"
+# # MacOSX + Python 3.5: Build, test, and upload
+# build_macosx35:
+#   <<: *macosx_build_job
+#   variables:
+#     <<: *macosx_build_variables
+#     PYTHON_VER: "3.5"
 
-test_macosx35:
-  <<: *test_job
-  variables:
-    <<: *macosx_build_variables
-    PYTHON_VER: "3.5"
-  dependencies:
-    - build_macosx35
+# test_macosx35:
+#   <<: *test_job
+#   variables:
+#     <<: *macosx_build_variables
+#     PYTHON_VER: "3.5"
+#   dependencies:
+#     - build_macosx35
 
-upload_macosx35:
-  <<: *macosx_upload_job
-  dependencies:
-    - build_macosx35
+# upload_macosx35:
+#   <<: *macosx_upload_job
+#   dependencies:
+#     - build_macosx35
