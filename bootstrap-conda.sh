@@ -44,6 +44,7 @@ ${CONDA} config --set show_channel_urls True
 ${CONDA} install --override-channels -c defaults --yes --quiet -n root conda-build sphinx sphinx_rtd_theme
 ${CONDA} update --override-channels -c defaults --yes --quiet -n root conda
 ${CONDA} config --add channels conda-forge
+${CONDA} config --add channels defaults
 ${CONDA} config --add channels ${TEST_CHANNEL}
 ${CONDA} info
 
