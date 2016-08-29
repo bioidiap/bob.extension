@@ -28,7 +28,8 @@ variables:
   variables: &build_variables
     BOB_DOCUMENTATION_SERVER: "http://www.idiap.ch/software/bob/docs/latest/bob/%s/master/"
   script:
-    - miniconda/bin/conda build --no-test --python=${PYTHON_VER} .conda-recipe/
+    - miniconda/bin/conda build --no-test --python=${PYTHON_VER} .conda-recipe
+    - miniconda/bin/conda install -n root --yes ${CI_PROJECT_NAME}
     - miniconda/bin/sphinx-build doc sphinx
   artifacts:
     expire_in: 1 day
