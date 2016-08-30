@@ -38,7 +38,6 @@ cache:
   artifacts:
     expire_in: 1 day
     paths:
-      - miniconda.sh
       - miniconda/conda-bld/linux-64
       - miniconda/conda-bld/osx-64
       - sphinx/
