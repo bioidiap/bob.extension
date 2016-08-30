@@ -17,6 +17,11 @@ stages:
 variables:
   TEST_CHANNEL: file://idiap/group/torch5spro/bob_master_conda_channel
 
+# Global cache
+cache:
+  key: "$CI_PROJECT_NAMESPACE/$CI_BUILD_NAME" # per group name and build name
+  paths:
+    miniconda.sh
 
 # Template for the build stage
 # Needs to run on all supported architectures, platforms and python versions
@@ -90,7 +95,7 @@ variables:
 .docs_template: &docs_job
   stage: docs
   only:
-    - conda-ci
+    - master
   before_script:
     - curl --silent https://gitlab.idiap.ch/bob/bob/snippets/9/raw | tr -d '\r' > upload-sphinx.sh
     - chmod 755 upload-sphinx.sh
@@ -118,7 +123,7 @@ variables:
     - ./bootstrap-conda.sh miniconda 2.7
     - mv miniconda_bak/conda-bld miniconda/
   script:
-    - rsync -a miniconda/conda-bld/${LINUXMAC} /idiap/group/torch5spro/bob_master_conda_channel
+    - rsync -r miniconda/conda-bld/${LINUXMAC} /idiap/group/torch5spro/bob_master_conda_channel
     - miniconda/bin/conda index /idiap/group/torch5spro/bob_master_conda_channel/${LINUXMAC}
     - chmod -R a+rwX /idiap/group/torch5spro/bob_master_conda_channel || true
   only:
