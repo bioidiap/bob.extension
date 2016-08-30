@@ -21,7 +21,7 @@ variables:
 cache:
   key: "$CI_PROJECT_NAMESPACE/$CI_BUILD_NAME" # per group name and build name
   paths:
-    miniconda.sh
+    - miniconda.sh
 
 # Template for the build stage
 # Needs to run on all supported architectures, platforms and python versions
