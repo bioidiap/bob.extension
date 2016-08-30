@@ -50,10 +50,10 @@ test:
     - bob_dependecy_graph.py --help
     - bob_dbmanage.py all download --force || true
     - python -c "from bob.extension import get_config; print(get_config())"
-    - coverage run --source=bob.extension `which nosetests` -sv bob.extension  # [not osx]
-    - DYLD_FALLBACK_LIBRARY_PATH=$PREFIX/lib coverage run --source=bob.extension nosetests -sv bob.extension  # [osx]
-    - coverage report
-    - sphinx-build -b doctest $SRC_DIR/../../../doc $SRC_DIR/../../../sphinx
+    # - coverage run --source=bob.extension `which nosetests` -sv bob.extension  # [not osx]
+    # - DYLD_FALLBACK_LIBRARY_PATH=$PREFIX/lib coverage run --source=bob.extension nosetests -sv bob.extension  # [osx]
+    # - coverage report
+    # - sphinx-build -b doctest $SRC_DIR/../../../doc $SRC_DIR/../../../sphinx
 
 about:
   home: http://gitlab.idiap.ch/bob/bob.extension
