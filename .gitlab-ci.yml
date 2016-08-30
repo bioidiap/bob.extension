@@ -34,6 +34,7 @@ variables:
   artifacts:
     expire_in: 1 day
     paths:
+      - miniconda.sh
       - miniconda/conda-bld/linux-64
       - miniconda/conda-bld/osx-64
       - sphinx/
@@ -117,8 +118,9 @@ variables:
     - ./bootstrap-conda.sh miniconda 2.7
     - mv miniconda_bak/conda-bld miniconda/
   script:
-    - rsync miniconda/conda-bld/${LINUXMAC} /idiap/group/torch5spro/bob_master_conda_channel
+    - rsync -a miniconda/conda-bld/${LINUXMAC} /idiap/group/torch5spro/bob_master_conda_channel
     - miniconda/bin/conda index /idiap/group/torch5spro/bob_master_conda_channel/${LINUXMAC}
+    - chmod -R a+rwX /idiap/group/torch5spro/bob_master_conda_channel || true
   only:
     - conda-ci
 
@@ -135,49 +137,49 @@ variables:
 # Different combinations. docs only happens in Python 3.5 and Linux
 # -------------------------------------------------------------------
 
-# Linux + Python 2.7: Build, test, and upload
-build_linux_27:
-  <<: *linux_build_job
-  variables:
-    <<: *linux_build_variables
-    PYTHON_VER: "2.7"
+# # Linux + Python 2.7: Build, test, and upload
+# build_linux_27:
+#   <<: *linux_build_job
+#   variables:
+#     <<: *linux_build_variables
+#     PYTHON_VER: "2.7"
 
-test_linux_27:
-  <<: *linux_test_job
-  variables:
-    <<: *linux_build_variables
-    PYTHON_VER: "2.7"
-  dependencies:
-    - build_linux_27
+# test_linux_27:
+#   <<: *linux_test_job
+#   variables:
+#     <<: *linux_build_variables
+#     PYTHON_VER: "2.7"
+#   dependencies:
+#     - build_linux_27
 
-upload_linux_27:
-  <<: *linux_upload_job
-  variables:
-    <<: *linux_build_variables
-  dependencies:
-    - build_linux_27
+# upload_linux_27:
+#   <<: *linux_upload_job
+#   variables:
+#     <<: *linux_build_variables
+#   dependencies:
+#     - build_linux_27
 
-# Linux + Python 3.4: Build, test, and upload
-build_linux_34:
-  <<: *linux_build_job
-  variables:
-    <<: *linux_build_variables
-    PYTHON_VER: "3.4"
+# # Linux + Python 3.4: Build, test, and upload
+# build_linux_34:
+#   <<: *linux_build_job
+#   variables:
+#     <<: *linux_build_variables
+#     PYTHON_VER: "3.4"
 
-test_linux_34:
-  <<: *linux_test_job
-  variables:
-    <<: *linux_build_variables
-    PYTHON_VER: "3.4"
-  dependencies:
-    - build_linux_34
+# test_linux_34:
+#   <<: *linux_test_job
+#   variables:
+#     <<: *linux_build_variables
+#     PYTHON_VER: "3.4"
+#   dependencies:
+#     - build_linux_34
 
-upload_linux_34:
-  <<: *linux_upload_job
-  variables:
-    <<: *linux_build_variables
-  dependencies:
-    - build_linux_34
+# upload_linux_34:
+#   <<: *linux_upload_job
+#   variables:
+#     <<: *linux_build_variables
+#   dependencies:
+#     - build_linux_34
 
 # Linux + Python 3.5: Build, test, docs, and upload
 build_linux35:
