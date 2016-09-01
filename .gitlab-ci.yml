@@ -6,6 +6,8 @@
 # CI instructions (only change if you know what you're doing)
 # -------------------------------------------------------------------
 
+image: bob.admin:latest
+
 # Definition of our build pipeline
 stages:
   - build
@@ -50,8 +52,6 @@ cache:
     CFLAGS: "-D_GLIBCXX_USE_CXX11_ABI=0 -coverage"
     CXXFLAGS: "-D_GLIBCXX_USE_CXX11_ABI=0 -coverage"
     LINUXMAC: linux-64
-  tags:
-    - conda-linux
 
 # Template for building on a Mac OSX machine
 .build_mac_template: &macosx_build_job
@@ -63,8 +63,6 @@ cache:
     CXXFLAGS: "-pthread -coverage"
     LDFLAGS: "-lpthread"
     LINUXMAC: osx-64
-  tags:
-    - conda-macosx
 
 
 # Template for the test stage - re-install from uploaded wheels
@@ -80,13 +78,9 @@ cache:
 
 .test_linux_template: &linux_test_job
   <<: *test_job
-  tags:
-    - conda-linux
 
 .test_mac_template: &mac_test_job
   <<: *test_job
-  tags:
-    - conda-macosx
 
 # Template for (latest) documentation upload stage
 # Only one real job needs to do this
