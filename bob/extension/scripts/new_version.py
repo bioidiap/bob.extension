@@ -87,9 +87,9 @@ def _update_readme(version = None):
   with open("README.rst") as read:
     with open(".README.rst", 'w') as write:
       for line in read:
-        if "?branch=" in line:
-          pos = line.find("?branch=")
-          line = line[:pos] + "?branch=%s\n" % ("v%s"%version if version is not None else "master")
+        if "/master" in line and "gitlab" in line:
+          line = line.replace("/master", "/v%s" % version \
+              if version is not None else "/master")
         write.write(line)
   os.rename(".README.rst", "README.rst")
 
