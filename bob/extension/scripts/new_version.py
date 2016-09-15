@@ -75,21 +75,21 @@ import subprocess
 import shutil
 import tempfile
 import logging
+import re
 
 import argparse
 from distutils.version import StrictVersion as Version
 
 logger = logging.getLogger("bob.extension")
 
-
 def _update_readme(version = None):
   # replace the travis badge in the README.rst with the given version
   with open("README.rst") as read:
     with open(".README.rst", 'w') as write:
       for line in read:
-        if "?branch=" in line:
-          pos = line.find("?branch=")
-          line = line[:pos] + "?branch=%s\n" % ("v%s"%version if version is not None else "master")
+        if BRANCH_RE.search(line) is not None and "gitlab" in line:
+          replacement = "/v%s" % version if version is not None else "master"
+          line = BRANCH_RE.sub(replacement, line)
         write.write(line)
   os.rename(".README.rst", "README.rst")
 
