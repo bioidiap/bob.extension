@@ -280,11 +280,12 @@ def main(command_line_options = None):
       if not args.dry_run:
         with open('recipe/meta.yaml') as f:
           doc = f.read()
-        import re
-        doc = re.sub(r'\{\%\s?set\s?version\s?=\s?".*"\s?\%\s?\}', '{% set version = "' + str(args.stable_version) + '" %}', doc, count=1)
+        doc = re.sub(r'\{\s?%\s?set\s?version\s?=\s?".*"\s?%\s?\}', '{% set version = "' + str(args.stable_version) + '" %}', doc, count=1)
         doc = re.sub(r'\s+number\:\s?[0-9]+', '\n  number: 0', doc, count=1)
+        doc = re.sub(r'\{\s?%\s?set\s?build_number\s?=\s?"[0-9]+"\s?%\s?\}', '{% set build_number = "0" %}', doc, count=1)
         doc = re.sub(r'\s+md5\:.*', '\n  md5: {}'.format(md5), doc, count=1)
         doc = re.sub(r'\s+url\:.*', '\n  url: {}'.format(url.replace(args.stable_version, '{{ version }}')), doc, count=1)
+        doc = re.sub(r'\s+home\:.*', '\n  home: https://www.idiap.ch/software/bob/', doc, count=1)
         with open('recipe/meta.yaml', 'w') as f:
           f.write(doc)
       run_commands(None,
