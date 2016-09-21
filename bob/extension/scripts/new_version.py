@@ -234,7 +234,7 @@ def main(command_line_options = None):
   if 'pypi' in args.steps:
     print ("\nUploading version '%s' to PyPI" % args.stable_version)
     # update version on git and add a tag
-    run_commands(None, [python_cmd, 'setup.py', 'register'], [python_cmd, 'setup.py', 'sdist', '--formats', 'zip', 'upload'])
+    run_commands(None, [python_cmd, 'setup.py', 'sdist', '--formats', 'zip', 'upload'])
 
 
   if 'docs' in args.steps:
