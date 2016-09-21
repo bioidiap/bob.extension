@@ -84,6 +84,7 @@ logger = logging.getLogger("bob.extension")
 
 def _update_readme(version = None):
   # replace the travis badge in the README.rst with the given version
+  BRANCH_RE = re.compile(r'/(master|(v\d+\.\d+\.\d+([abc]\d+)?))')
   with open("README.rst") as read:
     with open(".README.rst", 'w') as write:
       for line in read:
@@ -234,7 +235,7 @@ def main(command_line_options = None):
   if 'pypi' in args.steps:
     print ("\nUploading version '%s' to PyPI" % args.stable_version)
     # update version on git and add a tag
-    run_commands(None, [python_cmd, 'setup.py', 'register'], [python_cmd, 'setup.py', 'sdist', '--formats', 'zip', 'upload'])
+    run_commands(None, [python_cmd, 'setup.py', 'sdist', '--formats', 'zip', 'upload'])
 
 
   if 'docs' in args.steps:
