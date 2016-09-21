@@ -84,6 +84,7 @@ logger = logging.getLogger("bob.extension")
 
 def _update_readme(version = None):
   # replace the travis badge in the README.rst with the given version
+  BRANCH_RE = re.compile(r'/(master|(v\d+\.\d+\.\d+([abc]\d+)?))')
   with open("README.rst") as read:
     with open(".README.rst", 'w') as write:
       for line in read:
