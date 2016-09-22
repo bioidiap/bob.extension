@@ -89,7 +89,7 @@ def _update_readme(version = None):
     with open(".README.rst", 'w') as write:
       for line in read:
         if BRANCH_RE.search(line) is not None and "gitlab" in line:
-          replacement = "/v%s" % version if version is not None else "master"
+          replacement = "/v%s" % version if version is not None else "/master"
           line = BRANCH_RE.sub(replacement, line)
         write.write(line)
   os.rename(".README.rst", "README.rst")
