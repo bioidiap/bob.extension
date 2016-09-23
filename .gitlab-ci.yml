@@ -98,7 +98,7 @@ stages:
   script:
     - ./_ci/deploy.sh
   after_script:
-    - ./_ci/after_deply.sh
+    - ./_ci/after_deploy.sh
 
 
 # 2) Package specific instructions (you may tune this if needed)
@@ -123,6 +123,14 @@ test_linux_27:
 
 wheels_linux_27:
   <<: *wheels_job
+  variables: *linux_27_build_variables
+  dependencies:
+    - build_linux_27
+  tags:
+    - conda-linux
+
+deploy_linux_27:
+  <<: *deploy_job
   variables: *linux_27_build_variables
   dependencies:
     - build_linux_27
@@ -175,14 +183,6 @@ wheels_linux_35:
 
 docs_linux_35:
   <<: *docs_job
-  variables: *linux_35_build_variables
-  dependencies:
-    - build_linux_35
-  tags:
-    - conda-linux
-
-deploy_linux_35:
-  <<: *deploy_job
   variables: *linux_35_build_variables
   dependencies:
     - build_linux_35
