@@ -29,18 +29,10 @@ version, with the beta indicator 0, for example:
 -> automatic latest version: 2.1.7b0
 
 
-By default, this script executes five steps, in this order:
+By default, this script executes two steps, in this order:
 
   * tag: If given, the 'stable' version will be set and added to GitHub;
     and the version is tagged in GitHub and pushed.
-
-  * build: The package will be (re-)built with bin/buildout using the
-    provided build options.
-
-  * pypi: The 'stable' version (or the current version) will be registered
-    and uploaded to PyPI
-
-  * docs: The documentation will be generated and uploaded to PythonHosted
 
   * latest: The 'latest' version will be set and committed to GitHub
 
@@ -53,8 +45,8 @@ documentation.
 
 Examples:
 
-  Tags and deploy on PyPI my package with the stable version '2.0.0'. Update
-  my next package version to '2.0.1a0'. Do it verbosely ('-vv'):
+  Tags my package with the stable version '2.0.0'. Update my next package
+  version to '2.0.1a0'. Do it verbosely ('-vv'):
 
     %(prog)s --latest-version=2.0.1a0 --stable-version=2.0.0 -vv
 
@@ -124,7 +116,7 @@ def main(command_line_options = None):
   parser.add_argument("--latest-version", '-l', help = "The latest version for the package; if not specified, it is guessed from the current version")
   parser.add_argument("--stable-version", '-s', help = "The stable version for the package; if not specified, it is guessed from the current version")
   parser.add_argument("--build-options", '-b', nargs='+', default = [], help = "Add options to build your package")
-  parser.add_argument("--steps", nargs = "+", choices = ['tag', 'build', 'pypi', 'docs', 'latest', 'conda-forge'], default = ['tag', 'build', 'pypi', 'docs', 'latest', 'conda-forge'], help = "Select the steps that you want to execute")
+  parser.add_argument("--steps", nargs = "+", choices = ['tag', 'build', 'pypi', 'docs', 'latest', 'conda-forge'], default = ['tag', 'latest'], help = "Select the steps that you want to execute")
   parser.add_argument("--dry-run", '-q', action = 'store_true', help = "Only print the actions, but do not execute them")
   parser.add_argument("--keep-going", '-f', action = 'store_true', help = "Run all steps, even if some of them fail. HANDLE THIS FLAG WITH CARE!")
   parser.add_argument("--verbose", '-v', action = 'store_true', help = "Print more information")
