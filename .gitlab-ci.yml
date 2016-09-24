@@ -1,12 +1,7 @@
-# This build file is defined in two parts: 1) a generic set of instructions you
-# probably **don't** need to change and 2) a part you may have to tune to your
-# project. It heavily uses template features from YAML to help you in only
-# changing a minimal part of it and avoid code duplication to a maximum while
-# still providing a nice pipeline display on your package.
+# This build file heavily uses template features from YAML so it is generic
+# enough for any Bob project. Don't modify it unless you know what you're
+# doing.
 
-
-# 1) Generic instructions (only change if you know what you're doing)
-# -------------------------------------------------------------------
 
 # Definition of our build pipeline
 stages:
@@ -17,33 +12,39 @@ stages:
   - deploy
 
 
+# ---------
+# Templates
+# ---------
+
 # Template for the build stage
 # Needs to run on all supported architectures, platforms and python versions
 .build_template: &build_job
   stage: build
   before_script:
     - git clean -ffdx
-    - curl --silent "https://gitlab.idiap.ch/bob/bob.admin/raw/master/gitlab/install.sh" > install.sh
-    - chmod 755 ./install.sh
-    - ./install.sh _ci
+    - mkdir _ci
+    - curl --silent "https://gitlab.idiap.ch/bob/bob.admin/raw/master/gitlab/install.sh" > _ci/install.sh
+    - chmod 755 _ci/install.sh
+    - ./_ci/install.sh _ci #updates
     - ./_ci/before_build.sh
   script:
     - ./_ci/build.sh
   after_script:
     - ./_ci/after_build.sh
   artifacts:
-    expire_in: 1 day
+    expire_in: 1 week
     paths:
       - _ci/
       - dist/
       - sphinx/
 
 
-# Template for the test stage - re-install from uploaded wheels
+# Template for the test stage - re-installs from uploaded wheels
 # Needs to run on all supported architectures, platforms and python versions
 .test_template: &test_job
   stage: test
   before_script:
+    - ./_ci/install.sh #updates
     - ./_ci/before_test.sh
   script:
     - ./_ci/test.sh
@@ -52,9 +53,7 @@ stages:
 
 
 # Template for the wheel uploading stage
-# Needs to run against one combination of python 2.x and 3.x if it is a python
-# only package, otherwise, needs to run in both pythons to all supported
-# architectures (Linux and Mac OSX 64-bit)
+# Needs to run against one supported architecture, platform and python version
 .wheels_template: &wheels_job
   stage: wheels
   environment: intranet
@@ -62,6 +61,7 @@ stages:
     - master
     - /^v\d+\.\d+\.\d+([abc]\d*)?$/  # PEP-440 compliant version (tags)
   before_script:
+    - ./_ci/install.sh #updates
     - ./_ci/before_wheels.sh
   script:
     - ./_ci/wheels.sh
@@ -77,6 +77,7 @@ stages:
   only:
     - master
   before_script:
+    - ./_ci/install.sh #updates
     - ./_ci/before_docs.sh
   script:
     - ./_ci/docs.sh
@@ -84,8 +85,10 @@ stages:
     - ./_ci/after_docs.sh
 
 
-# Template for the pypi stage - re-install from uploaded wheels
-# Needs to run on a single architecture
+# Template for the deployment stage - re-installs from uploaded wheels
+# Needs to run on a single architecture only
+# Will deploy your package to PyPI and other required services
+# Only runs for tags
 .deploy_template: &deploy_job
   stage: deploy
   environment: internet
@@ -94,6 +97,7 @@ stages:
   except:
     - branches
   before_script:
+    - ./_ci/install.sh #updates
     - ./_ci/before_deploy.sh
   script:
     - ./_ci/deploy.sh
@@ -101,10 +105,11 @@ stages:
     - ./_ci/after_deploy.sh
 
 
-# 2) Package specific instructions (you may tune this if needed)
-# --------------------------------------------------------------
+# -------------
+# Build Targets
+# -------------
 
-# Linux + Python 2.7: Builds, tests, uploads wheel
+# Linux + Python 2.7: Builds, tests, uploads wheel and deploys (if needed)
 build_linux_27:
   <<: *build_job
   variables: &linux_27_build_variables
@@ -156,7 +161,7 @@ test_linux_34:
     - conda-linux
 
 
-# Linux + Python 3.5: Builds, tests, uploads wheel and deploys
+# Linux + Python 3.5: Builds, tests and uploads wheel
 build_linux_35:
   <<: *build_job
   variables: &linux_35_build_variables
