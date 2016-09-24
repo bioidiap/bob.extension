@@ -44,7 +44,7 @@ stages:
 .test_template: &test_job
   stage: test
   before_script:
-    - ./_ci/install.sh #updates
+    - ./_ci/install.sh _ci #updates
     - ./_ci/before_test.sh
   script:
     - ./_ci/test.sh
@@ -61,7 +61,7 @@ stages:
     - master
     - /^v\d+\.\d+\.\d+([abc]\d*)?$/  # PEP-440 compliant version (tags)
   before_script:
-    - ./_ci/install.sh #updates
+    - ./_ci/install.sh _ci #updates
     - ./_ci/before_wheels.sh
   script:
     - ./_ci/wheels.sh
@@ -77,7 +77,7 @@ stages:
   only:
     - master
   before_script:
-    - ./_ci/install.sh #updates
+    - ./_ci/install.sh _ci #updates
     - ./_ci/before_docs.sh
   script:
     - ./_ci/docs.sh
@@ -97,7 +97,7 @@ stages:
   except:
     - branches
   before_script:
-    - ./_ci/install.sh #updates
+    - ./_ci/install.sh _ci #updates
     - ./_ci/before_deploy.sh
   script:
     - ./_ci/deploy.sh
