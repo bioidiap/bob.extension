@@ -261,7 +261,7 @@ It can be simply set up:
              .
 
    [sources]
-   bob.blitz = git git@gitlab.idiap.ch:bob/bob.blitz
+   bob.blitz = git https://gitlab.idiap.ch/bob/bob.blitz
 
    ...
 
