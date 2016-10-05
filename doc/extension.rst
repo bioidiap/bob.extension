@@ -232,8 +232,12 @@ To generate a Library, simply add it in the list of ``ext_modules``:
     ...
   )
 
-Again, we use the overloaded library class :py:class:`bob.blitz.extension.Library` instead of the :py:class:`bob.extension.Library`, but the parameters are identical, and identical to the ones of the :py:class:`bob.extension.Extension`.
-To avoid later complications, you should follow the guidelines for libraries in bob packages:
+Again, we use the overloaded library class
+:py:class:`bob.blitz.extension.Library` instead of the
+:py:class:`bob.extension.Library`, but the parameters are identical, and
+identical to the ones of the :py:class:`bob.extension.Extension`.  To avoid
+later complications, you should follow the guidelines for libraries in bob
+packages:
 
 1. The name of the C++ library need to be identical to the name of your package (replacing the '.' by '_').
    Also, the package name need to be part of it.

@@ -86,10 +86,15 @@ Pure-Python packages are the most common.
 They contain code that is exclusively written in Python.
 This contrasts to packages that are written in a mixture of Python and C/C++, which are explained in more detail below.
 
-The package you cloned above is a pure-Python example package and contains all elements to get you started.
-It defines a single library module called ``bob.example.project``, which declares a simple script, called ``version.py`` that prints out the version of the dependent library :ref:`bob.blitz <bob.blitz>`.
-When you clone the package, you will not find any executable as ``buildout`` needs to check all dependencies and install missing ones before you can execute anything.
-Particularly, it inspects the ``setup.py`` file in the root directory of the package, which contains all required information to build the package, all of which is contained in the ``setup`` function:
+The package you cloned above is a pure-Python example package and contains all
+elements to get you started.  It defines a single library module called
+``bob.example.project``, which declares a simple script, called ``version.py``
+that prints out the version of the dependent library :ref:`bob.blitz`.  When
+you clone the package, you will not find any executable as ``buildout`` needs
+to check all dependencies and install missing ones before you can execute
+anything.  Particularly, it inspects the ``setup.py`` file in the root
+directory of the package, which contains all required information to build the
+package, all of which is contained in the ``setup`` function:
 
 .. code-block:: python
 
