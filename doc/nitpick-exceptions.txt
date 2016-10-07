@@ -1,0 +1,17 @@
+# we don't link against setuptools manual
+py:class setuptools.extension.Extension
+py:class distutils.extension.Extension
+py:class setuptools.command.build_ext.build_ext
+py:class distutils.command.build_ext
+py:mod distutils.version.LooseVersion
+
+# ignores various c-types (not important)
+c:type message
+c:type ret
+c:type o
+
+# ignores functions that don't exist in Python 3.x C-API
+c:func PyInt_Check
+c:func PyInt_AS_LONG
+c:func PyString_Check
+c:func PyString_AS_STRING

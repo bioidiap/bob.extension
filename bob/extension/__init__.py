@@ -26,19 +26,26 @@ __version__ = pkg_resources.require(__name__)[0].version
 def check_packages(packages):
   """Checks if the requirements for the given packages are satisfied.
 
-  Raises a :py:class:`RuntimeError` in case requirements are not satisfied.
-  This means either not finding a package if no version number is specified or
-  verifying that the package version does not match the required version by the
-  builder.
+  Parameters:
 
-  Package requirements can be set like this::
+    :py:class:`list` of :py:class:`str`: Each representing a requirement that
+       must be statistfied. Package requirements can be set like this::
 
-    "pkg > VERSION"
+         "pkg > VERSION"
 
-  In this case, the package version should be greater than the given version
-  number. Comparisons are done using :py:mod:`distutils.version.LooseVersion`.
-  You can use other comparators such as ``<``, ``<=``, ``>=`` or ``==``. If no
-  version number is given, then we only require that the package is installed.
+       In this case, the package version should be greater than the given
+       version number. Comparisons are done using
+       :py:mod:`distutils.version.LooseVersion`.  You can use other comparators
+       such as ``<``, ``<=``, ``>=`` or ``==``. If no version number is given,
+       then we only require that the package is installed.
+
+
+  Raises:
+
+    ``RuntimeError``: in case requirements are not satisfied. This means either
+      not finding a package if no version number is specified or verifying that
+      the package version does not match the required version by the builder.
+
   """
 
   from re import split
