@@ -9,3 +9,9 @@ py:mod distutils.version.LooseVersion
 c:type message
 c:type ret
 c:type o
+
+# ignores functions that don't exist in Python 3.x C-API
+c:func PyInt_Check
+c:func PyInt_AS_LONG
+c:func PyString_Check
+c:func PyString_AS_STRING

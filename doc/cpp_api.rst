@@ -30,16 +30,22 @@ Particularly, we provide three preprocessor directives:
 These preprocessor directives will catch any C++ exception that is raised inside the C/C++ code that you bind to python and translate them into proper Python exceptions.
 
 .. warning::
-   These directives will only be active in **release** mode, when compiling with ``debug = true``, they will not do anything.
-   This is in order to support C++ debuggers like ``gdb`` or ``gdb-python`` to be able to handle these exceptions.
+   These directives will only be active in **release** mode, when compiling
+   with ``debug = true``, they will not do anything.  This is in order to
+   support C++ debuggers like ``gdb`` or ``gdb-python`` to be able to handle
+   these exceptions.
 
 Additionally, we added some preprocessor directives that help in the bindings:
 
 .. c:macro:: PyBob_NumberCheck(PyObject* o)
 
-   Checks if the given object ``o`` is a number, i.e., an int, a long, a float or a complex.
+   Checks if the given object ``o`` is a number, i.e., an int, a long, a float
+   or a complex.
 
-After including the above mentioned header, we also re-define the functions :c:func:`PyInt_Check`, :c:func:`PyInt_AS_LONG`, :c:func:`PyString_Check` and :c:func:`PyString_AS_STRING` (which don't exist in the bindings for Python3) so that they can be used in bindings for both Python2 and Python3.
+After including the above mentioned header, we also re-define the functions
+:c:func:`PyInt_Check`, :c:func:`PyInt_AS_LONG`, :c:func:`PyString_Check` and
+:c:func:`PyString_AS_STRING` (which doesn't exist in the bindings for Python3)
+so that they can be used in bindings for both Python2 and Python3.
 
 .. _cpp_api:
 
@@ -197,7 +203,8 @@ Variables Documentation
 
 .. cpp:class:: bob::extension::VariableDoc
 
-   To document a variable (either a stand-alone function or a member function of a class), you should use the :cpp:class:`bob::extension::VariableDoc`.
+   To document a variable (either a stand-alone function or a member function
+   of a class), you should use the :cpp:class:`bob::extension::VariableDoc`.
 
    .. cpp:function:: bob::extension::VariableDoc(\
         const char* const variable_name,\
@@ -206,9 +213,10 @@ Variables Documentation
         const char* const long_description = NULL\
       )
 
-      In the constructor, you specify the variable name, its type and a short description.
-      The structure is identical to the :cpp:func:`FunctionDoc::add_parameter` function.
-      If wanted, you can define a longer description as well.
+      In the constructor, you specify the variable name, its type and a short
+      description. The structure is identical to the
+      :cpp:func:`FunctionDoc::add_parameter` function. If wanted, you can
+      define a longer description as well.
 
 
    .. cpp:function:: char* name() const
@@ -218,8 +226,10 @@ Variables Documentation
 
    .. cpp:function:: char* doc(const unsigned alignment = 72) const
 
-      Generates and returns the documentation string, which is composed of the information provided in the constructor.
-      The free text in the documentation is aligned to ``alignment`` characters, by default 72, so that it can be viewed correctly inside of an 80-character Python console.
+      Generates and returns the documentation string, which is composed of the
+      information provided in the constructor. The free text in the
+      documentation is aligned to ``alignment`` characters, by default 72, so
+      that it can be viewed correctly inside of an 80-character Python console.
 
 
 Class Documentation
