@@ -479,7 +479,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     packages.remove('scipy')
 
   if 'matplotlib' in packages:
-    matplotlib_manual = "http://matplotlib.sourceforge.net"
+    matplotlib_manual = "http://matplotlib.org"
     print ("Adding intersphinx source %s" % matplotlib_manual)
     mapping[matplotlib_manual] = None
     packages.remove('matplotlib')
