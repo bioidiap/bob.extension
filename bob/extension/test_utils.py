@@ -197,7 +197,7 @@ package-z
     result = link_documentation(additional_packages, stringio(f))
     expected = [
         'http://docs.python.org/%d.%d' % sys.version_info[:2],
-        'http://matplotlib.sourceforge.net',
+        'http://matplotlib.org',
         'https://setuptools.readthedocs.io/en/latest/',
         server % 'bob.extension',
         server % 'gridtk',
@@ -210,7 +210,7 @@ package-z
     result = link_documentation(additional_packages, stringio(f))
     expected = [
         'http://docs.python.org/%d.%d' % sys.version_info[:2],
-        'http://matplotlib.sourceforge.net',
+        'http://matplotlib.org',
         'https://setuptools.readthedocs.io/en/latest/',
         server % 'bob.extension',
         server % 'gridtk',
