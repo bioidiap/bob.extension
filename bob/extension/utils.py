@@ -454,7 +454,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
         numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.0'
     except ImportError:
       numpy_version = '1.9.1'
-    numpy_manual = 'http://docs.scipy.org/doc/numpy-%s' % numpy_version
+    numpy_manual = 'https://docs.scipy.org/doc/numpy-%s' % numpy_version
 
     # numpy mapping
     print ("Adding intersphinx source %s" % numpy_manual)
@@ -471,7 +471,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
         scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.0'
     except ImportError:
       scipy_version = '0.16.1'
-    scipy_manual = 'http://docs.scipy.org/doc/scipy-%s/reference' % scipy_version
+    scipy_manual = 'https://docs.scipy.org/doc/scipy-%s/reference' % scipy_version
 
     # numpy mapping
     print ("Adding intersphinx source %s" % scipy_manual)
