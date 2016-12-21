@@ -69,7 +69,7 @@ Function Documentation
 
 .. cpp:class:: bob::extension::FunctionDoc
 
-   To document a function (either a stand-alone function or a member function of a class), you should use the :cpp:class:`bob::extension::FunctionDoc`.
+   To document a function (either a stand-alone function or a member function of a class), you should use the :cpp:func:`bob::extension::FunctionDoc`.
 
    .. cpp:function:: bob::extension::FunctionDoc(\
         const char* const function_name,\
@@ -204,7 +204,7 @@ Variables Documentation
 .. cpp:class:: bob::extension::VariableDoc
 
    To document a variable (either a stand-alone function or a member function
-   of a class), you should use the :cpp:class:`bob::extension::VariableDoc`.
+   of a class), you should use the :cpp:func:`bob::extension::VariableDoc`.
 
    .. cpp:function:: bob::extension::VariableDoc(\
         const char* const variable_name,\
@@ -237,7 +237,7 @@ Class Documentation
 
 .. cpp:class:: bob::extension::ClassDoc
 
-   To document a class including its constructor, you should use the :cpp:class:`bob::extension::ClassDoc`.
+   To document a class including its constructor, you should use the :cpp:func:`bob::extension::ClassDoc`.
 
    .. cpp:function:: bob::extension::ClassDoc(\
         const char* const class_name,\
