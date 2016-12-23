@@ -6,6 +6,9 @@
  |project| Satellite Package Development and Maintenance
 =========================================================
 
+.. note::
+   This guide assumes that you have installed |project| following the instruction on https://www.idiap.ch/software/bob/install.
+
 This tutorial explains how to build and distribute `Python`-based working environments for |project|.
 By following these instructions you will be able to:
 
@@ -21,7 +24,7 @@ This is a great way to release code for laboratory exercises or for a particular
 
 .. note::
   The core of our strategy is based on standard tools for *defining* and *deploying* Python packages.
-  If you are not familiar with Python's ``setuptools``, ``distutils`` or PyPI, it can be beneficial to `learn about those <https://docs.python.org/2/distutils/>`_ before you start.
+  If you are not familiar with Python's ``setuptools``, ``distutils`` or PyPI, it can be beneficial to `learn about those <https://docs.python.org/distutils/>`_ before you start.
   Python's `Setuptools`_ and `Distutils`_ are mechanisms to *define and distribute* Python code in a packaged format, optionally through `PyPI`_, a web-based Python package index and distribution portal.
 
   `zc.buildout`_ is a tool to *deploy* Python packages locally, automatically setting up and encapsulating your work environment.
@@ -35,11 +38,11 @@ Fire-up a shell window and than do this:
 
 .. code-block:: sh
 
-  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/examples/bob.example.project.tar.bz2
+  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/bob/extension/data/bob.example.project.tar.bz2
   $ tar -xjf bob.example.project.tar.bz2
   $ cd bob.example.project
 
-We now recommend you read the file ``README.rst``, which is written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ format, situated at the root of the just downloaded material.
+We now recommend you read the file ``README.rst``, which is written in `reStructuredText <http://www.sphinx-doc.org/en/stable/rest.html>`_ format, situated at the root of the just downloaded material.
 It contains important information on other functionality such as document generation and unit testing, which will not be covered on this introductory material.
 
 The anatomy of a minimal package should look like the following:
@@ -117,7 +120,7 @@ package, all of which is contained in the ``setup`` function:
   )
 
 In detail, it defines the name and the version of this package, which files belong to the package (those files are automatically collected by the ``find_packages`` function), other packages that we depend on, namespaces (see below) and console scripts.
-The full set of options can be inspected in the `Setuptools documentation <http://pythonhosted.org/setuptools/setuptools.html>`_.
+The full set of options can be inspected in the `Setuptools documentation <https://setuptools.readthedocs.io>`_.
 
 To be able to use the package, we first need to build it.
 Here is how to go from nothing to everything:
@@ -150,7 +153,7 @@ Here is how to go from nothing to everything:
   If you just want to get things rolling, using ``python bootstrap-buildout.py`` will, in most cases, do the right thing.
 
 .. note::
-   When you have installed an older version of |project| -- i.e. |project| v1.x, you might need to uninstall it first, see https://gitlab.idiap.ch/bob/bob/wikis/Installation.
+   When you have installed an older version of |project| -- i.e. |project| v1.x, you might need to uninstall it first, see https://www.idiap.ch/software/bob/install.
 
 
 
@@ -161,40 +164,7 @@ Here is how to go from nothing to everything:
   **Using Bob 2.0 at Idiap**
 
   At Idiap_, we provide a pre-installed version of the latest stable version of the packages.
-  To use these packages, you just have to bootstrap your package with the following command:
-
-  .. code-block:: sh
-
-     $ /idiap/group/torch5spro/releases/bob-stable/py27/bin/python bootstrap-buildout.py
-
-  or
-
-  .. code-block:: sh
-
-     $ /idiap/group/torch5spro/releases/bob-stable/py34/bin/python bootstrap-buildout.py
-
-  if you prefer Python 3.
-
-  On the other hand, when you want to use the latest (unstable) versions of the |project| packages in your satellite package, you might want to use:
-
-  .. code-block:: sh
-
-    $ /idiap/group/torch5spro/nightlies/last/bob/linux-x86_64-release/bin/python bootstrap-buildout.py
-
-  .. warning::
-     This python version is replaced every night.
-     Do not use it in any over-night calculations.
-
-  Sometimes, you don't want to use the packages that are published on PyPI_, but the latest (nightly compiled) versions of all our packages.
-  In this case, use:
-
-  .. code-block:: sh
-
-    $ ./bin/buildout buildout:find-links=https://www.idiap.ch/software/bob/packages/nightlies/last buildout:prefer-final=false
-
-  .. note::
-     You can freely mix the all possible ways to obtain packages.
-     For example, you can use the ``bob-stable`` installations, and hand-select some packages to be downloaded from PyPI_ or from the nightlies packages (see above), e.g., using ``mr.developer`` (see below).
+  To use it, refer to: `Using Bob at Idiap <https://gitlab.idiap.ch/bob/bob/wikis/Using-Bob-at-Idiap>`_
 
 
 Using buildout
@@ -206,20 +176,19 @@ Let's have a look inside it:
 
 .. code-block:: guess
 
+   ; vim: set fileencoding=utf-8 :
+
    [buildout]
    parts = scripts
+   develop = .
    eggs = bob.example.project
    extensions = bob.buildout
-
-   develop = .
-
-   ; options for bob.buildout
-   debug = true
-   verbose = true
    newest = false
+   verbose = true
 
    [scripts]
    recipe = bob.buildout:scripts
+   dependent-scripts = true
 
 It is organized in several *sections*, which are indicated by ``[]``, where the default section ``[buildout]`` is always required.
 Some of the entries need attention.
@@ -293,27 +262,16 @@ Finally, buildout will perform the following steps:
 4. It will populate the ``./bin`` directory with all the ``console_scripts`` that you have specified in the ``setup.py``.
 In our example, this is ``./bin/version.py``.
 
+.. note::
+
+    One thing to note in package development is that when you
+    change the entry points in ``setup.py`` of a package, you need to
+    run ``./bin/buildout`` again.
+
 Your local environment
 ======================
 
-After buildout has finished, you should now be able to execute ``./bin/version.py``:
-
-.. code-block:: sh
-
-   $ ./bin/version.py
-   bob.blitz: 2.0.5 [api=0x0201] ([PATH]/eggs/bob.blitz-2.0.5-py2.7-linux-x86_64.egg)
-   * C/C++ dependencies:
-     - Blitz++: 0.10
-     - Boost: 1.55.0
-     - Compiler: {'version': '4.9.2', 'name': 'gcc'}
-     - NumPy: {'abi': '0x01000009', 'api': '0x00000009'}
-     - Python: 2.7.9
-   * Python dependencies:
-     - bob.extension: 2.0.7 ([PATH]/bob.example.project/eggs/bob.extension-2.0.7-py2.7.egg)
-     - numpy: 1.8.2 (/usr/lib/python2.7/dist-packages)
-     - setuptools: 15.1 ([PATH]/bob.example.project/eggs/setuptools-15.1-py2.7.egg)
-
-Also, when using the newly generated ``./bin/python`` script, you can access all packages that you have developed, including your own package:
+After buildout has finished, you should now be able to execute the newly generated ``./bin/python`` and access all packages that you have developed, including your own package:
 
 .. code-block:: guess
 
@@ -329,10 +287,15 @@ Also, when using the newly generated ``./bin/python`` script, you can access all
      - numpy: 1.8.2 (/usr/lib/python2.7/dist-packages)
      - setuptools: 15.1 ([PATH]/bob.example.project/eggs/setuptools-15.1-py2.7.egg)
 
+
+.. note::
+     For a more complete guide to ``buildout``, please refer to our :doc:`buildout`.
+
+
 Everything is now setup for you to continue the development of this package.
 Modify all required files to setup your own package name, description and dependencies.
 Start adding files to your library (or libraries) and, if you wish, make this package available in a place with public access to make your research public.
-We recommend using GitHub.
+We recommend using Gitlab or GitHub.
 Optionally, `drop-us a message <https://groups.google.com/d/forum/bob-devel>`_ talking about the availability of this package so we can add it to the growing list of `Satellite Packages`_.
 
 
@@ -388,7 +351,7 @@ Once you have edited both ``doc/conf.py`` and ``doc/index.rst`` you can run the 
 
 .. code-block:: sh
 
-  $ ./bin/sphinx-build doc sphinx
+  $ ./bin/sphinx-build -n doc sphinx
   ...
 
 This example generates the output of the sphinx processing in the directory ``sphinx``.
@@ -413,7 +376,7 @@ To run the test units on your package call:
 
 .. code-block:: sh
 
-  $ ./bin/nosetests -v
+  $ ./bin/nosetests -sv
   bob.example.library.test.test_reverse ... ok
 
   ----------------------------------------------------------------------

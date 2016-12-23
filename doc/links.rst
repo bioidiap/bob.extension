@@ -17,7 +17,7 @@
 .. _python: http://www.python.org
 .. _pypi: http://pypi.python.org
 .. _satellite packages: https://gitlab.idiap.ch/bob/bob/wikis/Packages
-.. _setuptools: http://trac.edgewall.org/wiki/setuptools
+.. _setuptools: https://setuptools.readthedocs.io
 .. _sphinx: http://sphinx.pocoo.org
 .. _zc.buildout: http://pypi.python.org/pypi/zc.buildout/
 .. _mr.developer: http://pypi.python.org/pypi/mr.developer/
