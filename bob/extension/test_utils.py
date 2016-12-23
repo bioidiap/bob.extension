@@ -196,7 +196,7 @@ package-z
     os.environ["BOB_DOCUMENTATION_SERVER"] = server
     result = link_documentation(additional_packages, stringio(f))
     expected = [
-        'http://docs.python.org/%d.%d' % sys.version_info[:2],
+        'https://docs.python.org/%d.%d' % sys.version_info[:2],
         'http://matplotlib.org',
         'https://setuptools.readthedocs.io/en/latest/',
         server % 'bob.extension',
@@ -209,7 +209,7 @@ package-z
     os.environ["BOB_DOCUMENTATION_SERVER"] = server
     result = link_documentation(additional_packages, stringio(f))
     expected = [
-        'http://docs.python.org/%d.%d' % sys.version_info[:2],
+        'https://docs.python.org/%d.%d' % sys.version_info[:2],
         'http://matplotlib.org',
         'https://setuptools.readthedocs.io/en/latest/',
         server % 'bob.extension',

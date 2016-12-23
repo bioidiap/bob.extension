@@ -439,7 +439,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   # standard documentation: Python
   mapping = {}
   if 'python' in packages:
-    python_manual = 'http://docs.python.org/%d.%d' % sys.version_info[:2]
+    python_manual = 'https://docs.python.org/%d.%d' % sys.version_info[:2]
     print ("Adding intersphinx source %s" % python_manual)
     mapping[python_manual] = None
     packages.remove('python')
