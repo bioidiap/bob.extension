@@ -1,29 +1,61 @@
+.. vim: set fileencoding=utf-8 :
+.. Fri Dec 23 13:41:36 CET 2016
+
+.. image:: http://img.shields.io/badge/docs-stable-yellow.png
+   :target: http://pythonhosted.org/bob.example.extension/index.html
+.. image:: http://img.shields.io/badge/docs-latest-orange.png
+   :target: https://www.idiap.ch/software/bob/docs/latest/bob/bob.example.extension/master/index.html
+.. image:: https://gitlab.idiap.ch/bob/bob.example.extension/badges/master/build.svg
+   :target: https://gitlab.idiap.ch/bob/bob.example.extension/commits/master
+.. image:: https://img.shields.io/badge/gitlab-project-0000c0.svg
+   :target: https://gitlab.idiap.ch/bob/bob.example.extension
+.. image:: http://img.shields.io/pypi/v/bob.example.extension.png
+   :target: https://pypi.python.org/pypi/bob.example.extension
+.. image:: http://img.shields.io/pypi/dm/bob.example.extension.png
+   :target: https://pypi.python.org/pypi/bob.example.extension
+
+
+============================
 Example buildout environment
 ============================
 
-This simple example demonstrates how to wrap Bob-based scripts on buildout
+This package is part of the signal-processing and machine learning toolbox
+Bob_. This simple example demonstrates how to wrap Bob-based scripts on buildout
 environments. This may be useful for homework assignments, tests or as a way to
 distribute code to reproduce your publication. In summary, if you need to give
 out code to others, we recommend you do it following this template so your code
 can be tested, documented and run in an orderly fashion.
 
+
 Installation
 ------------
 
-.. note::
+Follow our `installation`_ instructions. Then, using the Python interpreter
+provided by the distribution, bootstrap and buildout this package::
 
-  To follow these instructions locally you will need a local copy of this
-  package. For that, you can use the gitlab tarball API to download the
-  package::
+  $ python bootstrap-buildout.py
+  $ ./bin/buildout
 
-    $ wget --no-check-certificate https://gitlab.idiap.ch/bob/bob.project.example/tarball/master -O- | tar xz
-    $ mv idiap-bob.project* bob.project.example
 
 Documentation and Further Information
 -------------------------------------
 
 Please refer to the latest Bob user guide, accessing from the `Bob website
-<http://www.idiap.ch/software/bob/>`_ for how to create your own packages based on
-this example. In particular, the Section entitled `Organize Your Work in
-Satellite Packages <http://www.idiap.ch/software/bob/docs/releases/last/sphinx/html/OrganizeYourCode.html>`_
+<http://www.idiap.ch/software/bob>`_ for how to create your own packages based
+on this example. In particular, the Section entitled `Bob Satellite Package
+Development and Maintenance
+<https://pythonhosted.org/bob.extension/guide.html>`_
 contains details on how to setup, build and roll out your code.
+
+
+Contact
+-------
+
+For questions or reporting issues to this software package, contact our
+development `mailing list`_.
+
+
+.. Place your references here:
+.. _bob: https://www.idiap.ch/software/bob
+.. _installation: https://www.idiap.ch/software/bob/install
+.. _mailing list: https://www.idiap.ch/software/bob/discuss

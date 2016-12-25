@@ -7,7 +7,7 @@
 .. _bob's website: https://www.idiap.ch/software/bob
 .. _bob: https://www.idiap.ch/software/bob
 .. _c++: http://www2.research.att.com/~bs/C++.html
-.. _distutils: http://docs.python.org/distutils/
+.. _distutils: https://docs.python.org/distutils/
 .. _git: http://git-scm.com/
 .. _gitlab: http://gitlab.idiap.ch/
 .. _idiap: http://www.idiap.ch
@@ -16,8 +16,8 @@
 .. _pep 386: http://www.python.org/dev/peps/pep-0386/
 .. _python: http://www.python.org
 .. _pypi: http://pypi.python.org
-.. _satellite packages: https://gitlab.idiap.ch/bob/bob/wikis/Packages
-.. _setuptools: http://trac.edgewall.org/wiki/setuptools
+.. _satellite packages: https://www.idiap.ch/software/bob/packages
+.. _setuptools: https://setuptools.readthedocs.io
 .. _sphinx: http://sphinx.pocoo.org
 .. _zc.buildout: http://pypi.python.org/pypi/zc.buildout/
 .. _mr.developer: http://pypi.python.org/pypi/mr.developer/

@@ -23,7 +23,7 @@ You can check it out by:
 
 .. code-block:: sh
 
-  $ wget https://gitlab.idiap.ch/bo/bob.extension/raw/master/examples/bob.example.extension.tar.bz2
+  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/bob/extension/data/bob.example.extension.tar.bz2
   $ tar -xjf bob.example.extension.tar.bz2
   $ cd bob.example.extension
 
@@ -109,7 +109,7 @@ By default, when using boost you should at least add the ``system`` module, i.e.
     ...
   )
 
-Other modules and options can be set manually using `the standard options for Python extensions <http://docs.python.org/2/extending/building.html>`_.
+Other modules and options can be set manually using `the standard options for Python extensions <https://docs.python.org/2/extending/building.html>`_.
 
 Most of the bob packages come with pure C++ code and Python bindings, where we commonly use the `Python C-API <https://docs.python.org/2/extending/index.html>`_ for the bindings.
 When your library compiles and links against the pure C++ code, you can simply use the ``bob_packages`` as above.
