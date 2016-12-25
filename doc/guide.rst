@@ -7,7 +7,7 @@
 =========================================================
 
 .. note::
-   This guide assumes that you have installed |project| following the instruction on https://www.idiap.ch/software/bob/install.
+   This guide assumes that you have installed |project| following the instructions on https://www.idiap.ch/software/bob/install.
 
 This tutorial explains how to build and distribute `Python`-based working environments for |project|.
 By following these instructions you will be able to:
@@ -42,7 +42,7 @@ Fire-up a shell window and than do this:
   $ tar -xjf bob.example.project.tar.bz2
   $ cd bob.example.project
 
-We now recommend you read the file ``README.rst``, which is written in `reStructuredText <http://www.sphinx-doc.org/en/stable/rest.html>`_ format, situated at the root of the just downloaded material.
+We now recommend you read the file ``README.rst``, which is written in `reStructuredText <http://docutils.sourceforge.net/rst.html>`_ format (see also `reStructuredText Primer <http://www.sphinx-doc.org/en/stable/rest.html>`_), situated at the root of the just downloaded material.
 It contains important information on other functionality such as document generation and unit testing, which will not be covered on this introductory material.
 
 The anatomy of a minimal package should look like the following:
@@ -170,7 +170,7 @@ Here is how to go from nothing to everything:
 Using buildout
 ==============
 
-Buildout has set up you local environment with packages that it finds from different sources.
+Buildout (see :doc:`buildout`) has set up you local environment with packages that it finds from different sources.
 It is initialized by the ``buildout.cfg`` file, which is part of the package that you unzipped above.
 Let's have a look inside it:
 
@@ -185,6 +185,7 @@ Let's have a look inside it:
    extensions = bob.buildout
    newest = false
    verbose = true
+   debug = false
 
    [scripts]
    recipe = bob.buildout:scripts
@@ -205,8 +206,8 @@ Some of the entries need attention.
 * The next entry is the ``develop`` list.
   There, you can list directories that contain Python packages, which will be build in exactly the order that you specified there.
   With this option, you can tell buildout particularly, in which directories it should look for some packages.
-  Note that the ``develop``ed packages are not automatically included into the ``eggs``.
-  Of course, you need to develop the current package, which is stored in ``.`` i.e, the current directory.
+  Note that the ``develop`` packages are not automatically included into the ``eggs``.
+  Of course, you need to develop the current package, which is stored in ``.``, i.e, the current directory.
 
 The remaining options define, how the packages are build.
 For example, the ``debug`` flag defined, how the :ref:`C++ code <extension-c++>` in all the packages is built.
@@ -271,7 +272,24 @@ In our example, this is ``./bin/version.py``.
 Your local environment
 ======================
 
-After buildout has finished, you should now be able to execute the newly generated ``./bin/python`` and access all packages that you have developed, including your own package:
+After buildout has finished, you should now be able to execute ``./bin/version.py``:
+
+.. code-block:: sh
+
+   $ ./bin/version.py
+   bob.blitz: 2.0.5 [api=0x0201] ([PATH]/eggs/bob.blitz-2.0.5-py2.7-linux-x86_64.egg)
+   * C/C++ dependencies:
+     - Blitz++: 0.10
+     - Boost: 1.55.0
+     - Compiler: {'version': '4.9.2', 'name': 'gcc'}
+     - NumPy: {'abi': '0x01000009', 'api': '0x00000009'}
+     - Python: 2.7.9
+   * Python dependencies:
+     - bob.extension: 2.0.7 ([PATH]/bob.example.project/eggs/bob.extension-2.0.7-py2.7.egg)
+     - numpy: 1.8.2 (/usr/lib/python2.7/dist-packages)
+     - setuptools: 15.1 ([PATH]/bob.example.project/eggs/setuptools-15.1-py2.7.egg)
+
+Also, when using the newly generated ``./bin/python`` script, you can access all packages that you have developed, including your own package:
 
 .. code-block:: guess
 
@@ -286,10 +304,6 @@ After buildout has finished, you should now be able to execute the newly generat
      - bob.extension: 2.0.7 ([PATH]/bob.example.project/eggs/bob.extension-2.0.7-py2.7.egg)
      - numpy: 1.8.2 (/usr/lib/python2.7/dist-packages)
      - setuptools: 15.1 ([PATH]/bob.example.project/eggs/setuptools-15.1-py2.7.egg)
-
-
-.. note::
-     For a more complete guide to ``buildout``, please refer to our :doc:`buildout`.
 
 
 Everything is now setup for you to continue the development of this package.

@@ -6,8 +6,7 @@ installed on the current environment. `Our custom buildout
 extension <https://pypi.python.org/pypi/bob.buildout>`__ will hook-in
 externally compiled software from that configuration file.
 
-For any of the supported installation methods the key-idea is always the
-same: for every project, you create a new environment that contains the
+The key-idea is that for every project, you create a new environment that contains the
 packages you need for the task. A project may be a product you are
 working on or a research paper, for you which you will publish
 reproducible results. Each environment will be isolated so there is low
@@ -44,17 +43,18 @@ packages you would like to work with, but it generally looks like this:
     [buildout]
     parts = scripts
     extensions = bob.buildout
-    prefer-final = false
+    prefer-final = true
     ; use prefer-final = false **only** to get betas and pre-releases
     eggs = bob.io.image
            bob.learn.linear
 
     ; options for bob.buildout
     debug = false
-    ; debug = false will compile bob packages in release mode
+    ; debug = true will compile bob packages in debug mode
     verbose = true
+    ; verbose = true will make the build process more verbose
     newest = false
-    ; newest = false to avoid re-installing new versions of packages
+    ; newest = true will install the newest version of all packages
 
     [scripts]
     recipe = bob.buildout:scripts
@@ -78,7 +78,7 @@ download and install packages (and dependencies) locally:
 
 .. note::
 
-    you can specify a different config file with the ``-c`` option:
+    Buildout by default looks for ``buildout.cfg`` in your current folder and uses that configuration file. You can specify a different config file with the ``-c`` option:
 
     .. code:: sh
 
@@ -119,15 +119,15 @@ places them into the ./src directory. It can be simply set up:
 
     auto-checkout = *
 
-    ; the order that you develop things matter. Dependencies should be first
+    ; The order that you develop things matter: dependencies should be first.
     develop = src/bob.blitz
 
     [sources]
     bob.blitz = git git@gitlab.idiap.ch:bob/bob.blitz
-    ; you can also specify a branch
+    ; You can also specify a branch
     ; bob.blitz = git git@gitlab.idiap.ch:bob/bob.blitz branch=mybranch01
     ; Note: all sources will be checked out even if they are not in "develop ="
-    ;You can also develop a local package (localized in your file system)
+    ; You can also develop a local package (localized in your file system)
     bob.pkg = fs bob.pkg full-path=/path/to/bob.pkg
     ...
 
@@ -145,40 +145,32 @@ yourself.
     again, it will not update your sources. You have to do that
     manually.
 
-Order of eggs, develop
-----------------------
+Order of packages in ``eggs`` and ``develop``
+---------------------------------------------
 
-When private packages (ones that can' t be found at the PyPy) are
-installed, the order in which they are listed in the eggs and develop is
-important. E.g. I want to use package ``bob.bio.vein``. It has a
-dependency to the ``bob.bio.db``, that isn't public yet. Whereas the
-``bob.bio.db`` is dependent on the ``bob.db.biowave_test``, that for the
-moment also isn't located in the PyPy. The correct order to add these
-dependencies in the eggs is:
+The order of packages that you list in ``eggs`` and ``develop`` are important and dependencies should be listed first.
+Especially, when you want to use a private package and is not available through `pypi`_.
+For example, you want to use the ``bob.bio.vein`` package and it has a dependency on ``bob.bio.base`` which is not published on `pypi`_.
+Also, ``bob.bio.base`` depends on ``bob.db.base`` which is not published on `pypi`_ either.
+The correct order to add these dependencies would be:
 
-::
+.. code:: ini
 
-    eggs = bob.db.biowave_test
-           bob.bio.db
+    eggs = bob.db.base
+           bob.bio.base
            bob.bio.vein
     ...
-    develop = src/bob.db.biowave_test
-              src/bob.bio.db
+    develop = src/bob.db.base
+              src/bob.bio.base
               src/bob.bio.vein
 
-First, the installer *gets to know* packages order in the beginning of the
-list. If one would list packages in different order, lets say,
-``bob.bio.vein`` first, then the installer would notice, that it has a
-dependency on a package (``bob.bio.db``) which can't be found in the
-PyPy and an **error** would be raised:
+If you do not specify them in order, you might face with some errors like this::
 
-::
+   Could not find index page for 'bob.bio.base' (maybe misspelled?)
 
-   Couldn't find index page for 'bob.bio.db' (maybe misspelled?)
-
-If you see such errors, that means, that the ``eggs``, ``develop`` and
-``sources`` needs to be appended with the missing packages (**of course,
+If you see such errors, you may need to add the missing package to ``eggs`` and ``develop`` and ``sources`` (**of course,
 respecting the order of dependencies**).
+
 
 Hooking-in privately compiled externals
 ---------------------------------------

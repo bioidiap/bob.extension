@@ -23,7 +23,7 @@ You can check it out by:
 
 .. code-block:: sh
 
-  $ wget https://gitlab.idiap.ch/bo/bob.extension/raw/master/examples/bob.example.extension.tar.bz2
+  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/bob/extension/data/bob.example.extension.tar.bz2
   $ tar -xjf bob.example.extension.tar.bz2
   $ cd bob.example.extension
 
