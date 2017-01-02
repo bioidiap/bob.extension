@@ -97,7 +97,6 @@ cache:
 .docs_linux_template: &linux_docs_job
   <<: *docs_job
   tags:
-    - conda-linux
     - docker
 
 .docs_mac_template: &mac_docs_job
@@ -125,7 +124,6 @@ cache:
 .upload_linux_template: &linux_upload_job
   <<: *upload_job
   tags:
-    - conda-linux
     - docker
 
 .upload_mac_template: &macosx_upload_job
