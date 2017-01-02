@@ -6,7 +6,7 @@
 # CI instructions (only change if you know what you're doing)
 # -------------------------------------------------------------------
 
-image: bob.admin:latest
+image: condaforge/linux-anvil
 
 # Definition of our build pipeline
 stages:
@@ -98,6 +98,7 @@ cache:
   <<: *docs_job
   tags:
     - conda-linux
+    - docker
 
 .docs_mac_template: &mac_docs_job
   <<: *test_job
@@ -125,6 +126,7 @@ cache:
   <<: *upload_job
   tags:
     - conda-linux
+    - docker
 
 .upload_mac_template: &macosx_upload_job
   <<: *upload_job
@@ -178,7 +180,7 @@ cache:
 #   dependencies:
 #     - build_linux_34
 
-# Linux + Python 3.5: Build, test, docs, and upload
+# Linux + Python 3.5: Build, test
 build_linux35:
   <<: *linux_build_job
   variables:
@@ -190,18 +192,6 @@ test_linux35:
   variables:
     <<: *linux_build_variables
     PYTHON_VER: "3.5"
-  dependencies:
-    - build_linux35
-
-docs_linux35:
-  <<: *linux_docs_job
-  dependencies:
-    - build_linux35
-
-upload_linux35:
-  <<: *linux_upload_job
-  variables:
-    <<: *linux_build_variables
   dependencies:
     - build_linux35
 
