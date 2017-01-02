@@ -45,7 +45,6 @@ ${CONDA} install --override-channels -c defaults --yes --quiet -n root conda-bui
 ${CONDA} update --override-channels -c defaults --yes --quiet -n root conda
 ${CONDA} config --add channels conda-forge
 ${CONDA} config --add channels defaults
-${CONDA} config --add channels ${TEST_CHANNEL}
 ${CONDA} info
 
 # Function for running command and echoing results

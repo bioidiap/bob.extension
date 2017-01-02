@@ -1,32 +1,14 @@
-# This build file heavily uses template features from YAML to help you in only
-# changing a minimal part of it and avoid code duplication to a maximum while
-# still providing a nice pipeline display on your package.
-
-
-# CI instructions (only change if you know what you're doing)
-# -------------------------------------------------------------------
-
 image: condaforge/linux-anvil
 
-# Definition of our build pipeline
 stages:
   - build
   - test
-  - docs
-  - upload
 
-# Global variables
-variables:
-  TEST_CHANNEL: file://idiap/group/torch5spro/bob_master_conda_channel
-
-# Global cache
 cache:
   key: "$CI_PROJECT_NAMESPACE/$CI_BUILD_NAME" # per group name and build name
   paths:
     - miniconda.sh
 
-# Template for the build stage
-# Needs to run on all supported architectures, platforms and python versions
 .build_template: &build_job
   stage: build
   before_script:
@@ -53,18 +35,6 @@ cache:
     CXXFLAGS: "-D_GLIBCXX_USE_CXX11_ABI=0 -coverage"
     LINUXMAC: linux-64
 
-# Template for building on a Mac OSX machine
-.build_mac_template: &macosx_build_job
-  <<: *build_job
-  variables: &macosx_build_variables
-    <<: *build_variables
-    MACOSX_DEPLOYMENT_TARGET: "10.9"
-    CFLAGS: "-pthread -coverage"
-    CXXFLAGS: "-pthread -coverage"
-    LDFLAGS: "-lpthread"
-    LINUXMAC: osx-64
-
-
 # Template for the test stage - re-install from uploaded wheels
 # Needs to run on all supported architectures, platforms and python versions
 .test_template: &test_job
@@ -79,104 +49,6 @@ cache:
 .test_linux_template: &linux_test_job
   <<: *test_job
 
-.test_mac_template: &mac_test_job
-  <<: *test_job
-
-# Template for (latest) documentation upload stage
-# Only one real job needs to do this
-.docs_template: &docs_job
-  stage: docs
-  only:
-    - master
-  before_script:
-    - curl --silent https://gitlab.idiap.ch/bob/bob/snippets/9/raw | tr -d '\r' > upload-sphinx.sh
-    - chmod 755 upload-sphinx.sh
-  script:
-    - ./upload-sphinx.sh
-
-.docs_linux_template: &linux_docs_job
-  <<: *docs_job
-  tags:
-    - docker
-
-.docs_mac_template: &mac_docs_job
-  <<: *test_job
-  tags:
-    - conda-macosx
-
-
-# Template for the package uploading stage
-# Needs to run against all combination of python and all supported
-# architectures (Linux and Mac OSX 64-bit)
-.upload_template: &upload_job
-  stage: upload
-  before_script:
-    - mv miniconda miniconda_bak
-    - ./bootstrap-conda.sh miniconda 2.7
-    - mv miniconda_bak/conda-bld miniconda/
-  script:
-    - rsync -r miniconda/conda-bld/${LINUXMAC} /idiap/group/torch5spro/bob_master_conda_channel
-    - miniconda/bin/conda index /idiap/group/torch5spro/bob_master_conda_channel/${LINUXMAC}
-    - chmod -R a+rwX /idiap/group/torch5spro/bob_master_conda_channel || true
-  only:
-    - conda-ci
-
-.upload_linux_template: &linux_upload_job
-  <<: *upload_job
-  tags:
-    - docker
-
-.upload_mac_template: &macosx_upload_job
-  <<: *upload_job
-  tags:
-    - conda-macosx
-
-# Different combinations. docs only happens in Python 3.5 and Linux
-# -------------------------------------------------------------------
-
-# # Linux + Python 2.7: Build, test, and upload
-# build_linux_27:
-#   <<: *linux_build_job
-#   variables:
-#     <<: *linux_build_variables
-#     PYTHON_VER: "2.7"
-
-# test_linux_27:
-#   <<: *linux_test_job
-#   variables:
-#     <<: *linux_build_variables
-#     PYTHON_VER: "2.7"
-#   dependencies:
-#     - build_linux_27
-
-# upload_linux_27:
-#   <<: *linux_upload_job
-#   variables:
-#     <<: *linux_build_variables
-#   dependencies:
-#     - build_linux_27
-
-# # Linux + Python 3.4: Build, test, and upload
-# build_linux_34:
-#   <<: *linux_build_job
-#   variables:
-#     <<: *linux_build_variables
-#     PYTHON_VER: "3.4"
-
-# test_linux_34:
-#   <<: *linux_test_job
-#   variables:
-#     <<: *linux_build_variables
-#     PYTHON_VER: "3.4"
-#   dependencies:
-#     - build_linux_34
-
-# upload_linux_34:
-#   <<: *linux_upload_job
-#   variables:
-#     <<: *linux_build_variables
-#   dependencies:
-#     - build_linux_34
 
 # Linux + Python 3.5: Build, test
 build_linux35:
@@ -184,6 +56,8 @@ build_linux35:
   variables:
     <<: *linux_build_variables
     PYTHON_VER: "3.5"
+  tags:
+    - docker
 
 test_linux35:
   <<: *linux_test_job
@@ -192,69 +66,5 @@ test_linux35:
     PYTHON_VER: "3.5"
   dependencies:
     - build_linux35
-
-# # MacOSX + Python 2.7: Build, test, and upload
-# build_macosx_27:
-#   <<: *macosx_build_job
-#   variables:
-#     <<: *macosx_build_variables
-#     PYTHON_VER: "2.7"
-
-# test_macosx_27:
-#   <<: *mac_test_job
-#   variables:
-#     <<: *macosx_build_variables
-#     PYTHON_VER: "2.7"
-#   dependencies:
-#     - build_macosx_27
-
-# upload_macosx_27:
-#   <<: *macosx_upload_job
-#   variables:
-#     <<: *macosx_build_variables
-#   dependencies:
-#     - build_macosx_27
-
-# # MacOSX + Python 3.4: Build, test, and upload
-# build_macosx_34:
-#   <<: *macosx_build_job
-#   variables:
-#     <<: *macosx_build_variables
-#     PYTHON_VER: "3.4"
-
-# test_macosx_34:
-#   <<: *mac_test_job
-#   variables:
-#     <<: *macosx_build_variables
-#     PYTHON_VER: "3.4"
-#   dependencies:
-#     - build_macosx_34
-
-# upload_macosx_34:
-#   <<: *macosx_upload_job
-#   variables:
-#     <<: *macosx_build_variables
-#   dependencies:
-#     - build_macosx_34
-
-# # MacOSX + Python 3.5: Build, test, and upload
-# build_macosx35:
-#   <<: *macosx_build_job
-#   variables:
-#     <<: *macosx_build_variables
-#     PYTHON_VER: "3.5"
-
-# test_macosx35:
-#   <<: *mac_test_job
-#   variables:
-#     <<: *macosx_build_variables
-#     PYTHON_VER: "3.5"
-#   dependencies:
-#     - build_macosx35
-
-# upload_macosx35:
-#   <<: *macosx_upload_job
-#   variables:
-#     <<: *macosx_build_variables
-#   dependencies:
-#     - build_macosx35
+  tags:
+    - docker
