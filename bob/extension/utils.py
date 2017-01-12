@@ -512,10 +512,12 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
 
       try:
         # otherwise, urlopen will fail
-        if url.startswith('file://'): url += 'objects.inv'
+        if url.startswith('file://'):
+          f = urllib.urlopen(urllib.Request(url + 'objects.inv'))
+        else:
+          f = urllib.urlopen(urllib.Request(url))
 
         # request url
-        f = urllib.urlopen(urllib.Request(url))
         print("Found documentation on %s; adding intersphinx source" % url)
         mapping[url] = None
         break #inner loop, for server, as we found a candidate!
