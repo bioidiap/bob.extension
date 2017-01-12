@@ -514,17 +514,21 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
       try:
         # request url
         f = urllib.urlopen(urllib.Request(url))
-        print ("Found documentation on %s; adding intersphinx source" % url)
+        print("Found documentation on %s; adding intersphinx source" % url)
         mapping[url] = None
         break #inner loop, for server, as we found a candidate!
 
       except HTTPError as exc:
         if exc.code != 404:
           # url request failed with a something else than 404 Error
-          print ("Requesting URL %s returned error %s" % (url, exc))
+          print("Requesting URL %s returned error: %s" % (url, exc))
           # notice mapping is not updated here, as the URL does not exist
 
       except URLError as exc:
-        print ("Requesting URL %s did not succeed (maybe offline?). The error was %s" % (url, exc))
+        print("Requesting URL %s did not succeed (maybe offline?). " \
+            "The error was: %s" % (url, exc))
+
+      except IOError as exc:
+        print ("Path %s does not exist. The error was: %s" % (url, exc))
 
   return mapping
