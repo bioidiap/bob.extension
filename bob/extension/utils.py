@@ -441,8 +441,8 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   if 'python' in packages:
     python_manual = 'https://docs.python.org/%d.%d' % sys.version_info[:2]
     print ("Adding intersphinx source %s" % python_manual)
-    mapping[python_manual] = None
-    packages.remove('python')
+    mapping['python'] = (python_manual, None)
+    packages = [k for k in packages if k != 'python']
 
   if 'numpy' in packages:
     try:
@@ -458,8 +458,8 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
 
     # numpy mapping
     print ("Adding intersphinx source %s" % numpy_manual)
-    mapping[numpy_manual]  = None
-    packages.remove('numpy')
+    mapping['numpy'] = (numpy_manual, None)
+    packages = [k for k in packages if k != 'numpy']
 
   if 'scipy' in packages:
     try:
@@ -473,22 +473,22 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
       scipy_version = '0.16.1'
     scipy_manual = 'https://docs.scipy.org/doc/scipy-%s/reference' % scipy_version
 
-    # numpy mapping
+    # scipy mapping
     print ("Adding intersphinx source %s" % scipy_manual)
-    mapping[scipy_manual]  = None
-    packages.remove('scipy')
+    mapping['scipy'] = (scipy_manual, None)
+    packages = [k for k in packages if k != 'scipy']
 
   if 'matplotlib' in packages:
     matplotlib_manual = "http://matplotlib.org"
     print ("Adding intersphinx source %s" % matplotlib_manual)
-    mapping[matplotlib_manual] = None
-    packages.remove('matplotlib')
+    mapping['matplotlib'] = (matplotlib_manual, None)
+    packages = [k for k in packages if k != 'matplotlib']
 
   if 'setuptools' in packages: #get the right url
     setuptools_manual = "https://setuptools.readthedocs.io/en/latest/"
     print ("Adding intersphinx source %s" % setuptools_manual)
-    mapping[setuptools_manual] = None
-    packages.remove('setuptools')
+    mapping['setuptools'] = (setuptools_manual, None)
+    packages = [k for k in packages if k != 'setuptools']
 
 
   # get the server for the other packages
@@ -506,6 +506,8 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
 
   # check if the packages have documentation on the server
   for p in packages:
+    if p in mapping: continue #do not add twice...
+
     for s in server:
       # generate URL
       url = s % p.split()[0]
@@ -514,12 +516,13 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
         # otherwise, urlopen will fail
         if url.startswith('file://'):
           f = urllib.urlopen(urllib.Request(url + 'objects.inv'))
+          url = url[7:] #intersphinx does not like file://
         else:
           f = urllib.urlopen(urllib.Request(url))
 
         # request url
-        print("Found documentation on %s; adding intersphinx source" % url)
-        mapping[url] = None
+        print("Found documentation for %s on %s; adding intersphinx source" % (p, url))
+        mapping[p] = (url, None)
         break #inner loop, for server, as we found a candidate!
 
       except HTTPError as exc:
