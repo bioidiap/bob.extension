@@ -500,7 +500,10 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
 
   # if server is shell array, then make it a list
   if server.startswith("("):
-    server = server.strip('()').split()
+    # transforms "(file:///path/to/dir  https://example.com/dir| http://bla )"
+    # into ["file:///path/to/dir", "https://example.com/dir", "http://bla"]
+    # so, trim parenthesis and splits by white space
+    server = re.split(r'[|\s]+', server.strip('() '))
   else:
     # otherwise, just make it a list with a single element
     server = [server]
