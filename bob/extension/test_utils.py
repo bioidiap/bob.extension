@@ -159,7 +159,7 @@ package-z
       result = link_documentation(['numpy'], None)
       assert len(result) == 1
       key = list(result.keys())[0]
-      assert '/numpy' in key
+      assert 'numpy' in key
     except ImportError:
       pass
 
@@ -168,8 +168,8 @@ package-z
       result = link_documentation(['scipy'], None)
       assert len(result) == 1
       key = list(result.keys())[0]
-      assert '/scipy' in key
-      assert '/reference' in key
+      assert 'scipy' in key
+      assert 'reference' in key
     except ImportError:
       pass
 
@@ -178,7 +178,7 @@ package-z
       result = link_documentation(['matplotlib'], None)
       assert len(result) == 1
       key = list(result.keys())[0]
-      assert '/matplotlib' in key
+      assert 'matplotlib' in key
     except ImportError:
       pass
 
