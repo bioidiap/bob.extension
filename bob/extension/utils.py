@@ -498,22 +498,33 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     else:
       server = "https://pythonhosted.org/%s"
 
+  # if server is shell array, then make it a list
+  if server.startswith("("):
+    server = server.strip('()').split()
+  else:
+    # otherwise, just make it a list with a single element
+    server = [server]
+
   # check if the packages have documentation on the server
   for p in packages:
-    # generate URL
-    url = server % p.split()[0]
+    for s in server:
+      # generate URL
+      url = s % p.split()[0]
 
-    try:
-      # request url
-      f = urllib.urlopen(urllib.Request(url))
-      print ("Found documentation on %s; adding intersphinx source" % url)
-      mapping[url] = None
-    except HTTPError as exc:
-      if exc.code != 404:
-        # url request failed with a something else than 404 Error
-        print ("Requesting URL %s returned error %s" % (url, exc))
-        # notice mapping is not updated here, as the URL does not exist
-    except URLError as exc:
-      print ("Requesting URL %s did not succeed; are you offline? The error was %s" % (url, exc))
+      try:
+        # request url
+        f = urllib.urlopen(urllib.Request(url))
+        print ("Found documentation on %s; adding intersphinx source" % url)
+        mapping[url] = None
+        break #inner loop, for server, as we found a candidate!
+
+      except HTTPError as exc:
+        if exc.code != 404:
+          # url request failed with a something else than 404 Error
+          print ("Requesting URL %s returned error %s" % (url, exc))
+          # notice mapping is not updated here, as the URL does not exist
+
+      except URLError as exc:
+        print ("Requesting URL %s did not succeed (maybe offline?). The error was %s" % (url, exc))
 
   return mapping
