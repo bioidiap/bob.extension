@@ -169,7 +169,6 @@ package-z
       assert len(result) == 1
       key = list(result.keys())[0]
       assert 'scipy' in key
-      assert 'reference' in key
     except ImportError:
       pass
 
@@ -202,7 +201,8 @@ package-z
         server % 'bob.extension',
         server % 'gridtk',
         ]
-    nose.tools.eq_(sorted(result.keys()), sorted(expected))
+    result = [k[0] for k in result.values()]
+    nose.tools.eq_(sorted(result), sorted(expected))
 
     # test idiap server
     server = "https://www.idiap.ch/software/bob/docs/latest/bob/%s/master"
