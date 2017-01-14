@@ -1,17 +1,17 @@
 .. vim: set fileencoding=utf-8 :
 .. Fri Dec 23 13:41:36 CET 2016
 
-.. image:: http://img.shields.io/badge/docs-stable-yellow.png
+.. image:: http://img.shields.io/badge/docs-stable-yellow.svg
    :target: http://pythonhosted.org/bob.example.extension/index.html
-.. image:: http://img.shields.io/badge/docs-latest-orange.png
+.. image:: http://img.shields.io/badge/docs-latest-orange.svg
    :target: https://www.idiap.ch/software/bob/docs/latest/bob/bob.example.extension/master/index.html
 .. image:: https://gitlab.idiap.ch/bob/bob.example.extension/badges/master/build.svg
    :target: https://gitlab.idiap.ch/bob/bob.example.extension/commits/master
 .. image:: https://img.shields.io/badge/gitlab-project-0000c0.svg
    :target: https://gitlab.idiap.ch/bob/bob.example.extension
-.. image:: http://img.shields.io/pypi/v/bob.example.extension.png
+.. image:: http://img.shields.io/pypi/v/bob.example.extension.svg
    :target: https://pypi.python.org/pypi/bob.example.extension
-.. image:: http://img.shields.io/pypi/dm/bob.example.extension.png
+.. image:: http://img.shields.io/pypi/dm/bob.example.extension.svg
    :target: https://pypi.python.org/pypi/bob.example.extension
 
 
