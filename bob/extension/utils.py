@@ -432,11 +432,12 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
 
   # collect packages are automatically included in the list of indexes
   packages = []
+  version_re = re.compile(r'\s*[\<\>=]+\s*')
   if requirements_file is not None:
     if not isinstance(requirements_file, str) or \
         os.path.exists(requirements_file):
       requirements = load_requirements(requirements_file)
-      packages += [re.split(r'\s*[\<\>=]*\s*',k)[0] for k in requirements]
+      packages += [version_re.split(k)[0] for k in requirements]
   packages += additional_packages
 
 
@@ -514,7 +515,10 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   # transforms "(file:///path/to/dir  https://example.com/dir| http://bla )"
   # into ["file:///path/to/dir", "https://example.com/dir", "http://bla"]
   # so, trim eventual parenthesis/white-spaces and splits by white space or |
-  server = re.split(r'[|\s]+', server.strip('() '))
+  if server.strip():
+    server = re.split(r'[|\s]+', server.strip('() '))
+  else:
+    server = []
 
   # check if the packages have documentation on the server
   for p in packages:

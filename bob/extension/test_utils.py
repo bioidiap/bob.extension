@@ -191,12 +191,12 @@ package-z
         ]
 
     # test linkage to pythonhosted.org
-    server = "https://pythonhosted.org/%s"
+    server = "https://pythonhosted.org/%s/"
     os.environ["BOB_DOCUMENTATION_SERVER"] = server
     result = link_documentation(additional_packages, stringio(f))
     expected = [
-        'https://docs.python.org/%d.%d' % sys.version_info[:2],
-        'http://matplotlib.org',
+        'https://docs.python.org/%d.%d/' % sys.version_info[:2],
+        'http://matplotlib.org/',
         'https://setuptools.readthedocs.io/en/latest/',
         server % 'bob.extension',
         server % 'gridtk',
@@ -205,12 +205,12 @@ package-z
     nose.tools.eq_(sorted(result), sorted(expected))
 
     # test idiap server
-    server = "https://www.idiap.ch/software/bob/docs/latest/bob/%s/master"
+    server = "https://www.idiap.ch/software/bob/docs/latest/bob/%s/master/"
     os.environ["BOB_DOCUMENTATION_SERVER"] = server
     result = link_documentation(additional_packages, stringio(f))
     expected = [
-        'https://docs.python.org/%d.%d' % sys.version_info[:2],
-        'http://matplotlib.org',
+        'https://docs.python.org/%d.%d/' % sys.version_info[:2],
+        'http://matplotlib.org/',
         'https://setuptools.readthedocs.io/en/latest/',
         server % 'bob.extension',
         server % 'gridtk',
