@@ -466,10 +466,10 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
         ver = '.'.join(ver.split('.')[:-1]) + '.x'
       else:
         ver = '.'.join(ver.split('.')[:-1]) + '.0'
-      _add_index('numpy', 'https://docs.scipy.org/doc/numpy-%s' % ver)
+      _add_index('numpy', 'https://docs.scipy.org/doc/numpy-%s/' % ver)
 
     except ImportError:
-      _add_index('numpy', 'https://docs.scipy.org/doc/numpy')
+      _add_index('numpy', 'https://docs.scipy.org/doc/numpy/')
 
 
   def _add_scipy_index():
@@ -482,25 +482,25 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
         ver = '.'.join(ver.split('.')[:-1]) + '.x'
       else:
         ver = '.'.join(ver.split('.')[:-1]) + '.0'
-      _add_index('scipy', 'https://docs.scipy.org/doc/scipy-%s/reference' % ver)
+      _add_index('scipy', 'https://docs.scipy.org/doc/scipy-%s/reference/' % ver)
 
     except ImportError:
-      _add_index('scipy', 'https://docs.scipy.org/doc/scipy/reference')
+      _add_index('scipy', 'https://docs.scipy.org/doc/scipy/reference/')
 
 
   mapping = {}
 
   # add indexes for common packages used in Bob
-  _add_index('python', 'https://docs.python.org/%d.%d' % sys.version_info[:2])
+  _add_index('python', 'https://docs.python.org/%d.%d/' % sys.version_info[:2])
   _add_numpy_index()
   _add_scipy_index()
-  _add_index('matplotlib', 'http://matplotlib.org')
-  _add_index('setuptools', 'https://setuptools.readthedocs.io/en/latest')
-  _add_index('six', 'https://pythonhosted.org/six')
-  _add_index('sqlalchemy', 'https://docs.sqlalchemy.org/en/latest')
-  _add_index('docopt', 'http://docopt.readthedocs.io/en/latest')
-  _add_index('scikit-image', 'http://scikit-image.org/docs/dev')
-  _add_index('pillow', 'http://pillow.readthedocs.io/en/latest')
+  _add_index('matplotlib', 'http://matplotlib.org/')
+  _add_index('setuptools', 'https://setuptools.readthedocs.io/en/latest/')
+  _add_index('six', 'https://pythonhosted.org/six/')
+  _add_index('sqlalchemy', 'https://docs.sqlalchemy.org/en/latest/')
+  _add_index('docopt', 'http://docopt.readthedocs.io/en/latest/')
+  _add_index('scikit-image', 'http://scikit-image.org/docs/dev/')
+  _add_index('pillow', 'http://pillow.readthedocs.io/en/latest/')
 
 
   # get the server for the other packages
