@@ -436,7 +436,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     if not isinstance(requirements_file, str) or \
         os.path.exists(requirements_file):
       requirements = load_requirements(requirements_file)
-      packages += [re.split(r'\s*[\<\>=]*\s*',k)[0] for k in x]
+      packages += [re.split(r'\s*[\<\>=]*\s*',k)[0] for k in requirements]
   packages += additional_packages
 
 
