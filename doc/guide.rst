@@ -486,44 +486,46 @@ Here is a set of steps we recommend you follow when releasing a new version of y
    In this fictitious representation, the ``master`` branch continue under development, but one can see older branches don't receive much attention anymore.
 
    Here is an example for creating a branch at gitlab (many of our satellite packages are hosted there).
-   Let's create a branch called ``1.1``::
+   Let's create a branch called ``1.1``:
 
    .. code-block:: sh
 
-     $ git branch 1.1
-     $ git checkout 1.1
-     $ git push origin 1.1
+      $ git branch 1.1
+      $ git checkout 1.1
+      $ git push origin 1.1
 
 3. When you decide to release something publicly, we recommend you **tag** the version of the package on your repository, so you have a marker to what code you actually published on PyPI.
-   Tagging on gitlab would go like this::
+   Tagging on gitlab would go like this:
 
    .. code-block:: sh
 
-     $ git tag v1.1.0
-     $ git push && git push --tags
+      $ git tag v1.1.0
+      $ git push && git push --tags
 
    Notice use prefix tag names with ``v``.
 
 4. Finally, after branching and tagging, it is time for you to publish your new package on PyPI.
-   When the package is ready and you have tested it, just do the following::
+   When the package is ready and you have tested it, just do the following:
 
    .. code-block:: sh
 
-     $ ./bin/python setup.py register #if you modified your setup.py or README.rst
-     $ ./bin/python setup.py sdist --formats zip upload
+      $ ./bin/python setup.py register #if you modified your setup.py or README.rst
+      $ ./bin/python setup.py sdist --formats zip upload
 
-    .. note::
-      You can also check the .zip file that will be uploaded to PyPI before actually uploading it.
-      Just call:
+   .. note::
+
+      You can also check the .zip file that will be uploaded to PyPI before
+      actually uploading it. Just call:
 
       .. code-block:: sh
 
-        $ ./bin/python setup.py sdist --formats zip
+         $ ./bin/python setup.py sdist --formats zip
 
       and check what was put into the ``dist`` directory.
 
    .. note::
-      To be able to upload a package to PyPI_ you have to register at the web page using a user name and password.
+      To be able to upload a package to PyPI_ you have to register at the web
+      page using a user name and password.
 
 5. Announce the update on the relevant channels.
 
@@ -536,11 +538,12 @@ More detailed information are given `here <http://pythonhosted.org/an_example_py
 
 .. code-block:: sh
 
-  $ ./bin/python setup.py build_sphinx --source-dir=doc --build-dir=build/doc --all-files
-  $ ./bin/python setup.py upload_docs --upload-dir=build/doc/html
+   $ ./bin/python setup.py build_sphinx --source-dir=doc --build-dir=build/doc --all-files
+   $ ./bin/python setup.py upload_docs --upload-dir=build/doc/html
 
-The link to the documentation will automatically be added to the PyPI page of your package.
-Usually it is a good idea to check the documentation after building and before uploading.
+The link to the documentation will automatically be added to the PyPI page of
+your package.  Usually it is a good idea to check the documentation after
+building and before uploading.
 
 
 Change the Version of your Satellite Package
