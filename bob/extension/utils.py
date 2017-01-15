@@ -429,66 +429,78 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     HTTPError = error.HTTPError
     URLError = error.URLError
 
-  # collect packages
+
+  # collect packages are automatically included in the list of indexes
   packages = []
   if requirements_file is not None:
-    if not isinstance(requirements_file, str) or os.path.exists(requirements_file):
-      packages += load_requirements(requirements_file)
+    if not isinstance(requirements_file, str) or \
+        os.path.exists(requirements_file):
+      requirements = load_requirements(requirements_file)
+      packages += [re.split(r'\s*[\<\>=]*\s*',k)[0] for k in x]
   packages += additional_packages
 
-  # standard documentation: Python
-  mapping = {}
-  if 'python' in packages:
-    python_manual = 'https://docs.python.org/%d.%d' % sys.version_info[:2]
-    print ("Adding intersphinx source %s" % python_manual)
-    mapping['python'] = (python_manual, None)
-    packages = [k for k in packages if k != 'python']
 
-  if 'numpy' in packages:
+  def _add_index(name, addr, packages=packages):
+    """Helper to add a new doc index to the intersphinx catalog
+
+    Parameters:
+
+      name (str): Name of the package that will be added to the catalog
+      addr (str): The URL (except the ``objects.inv`` file), that will be added
+
+    """
+
+    if name in packages:
+      print ("Adding intersphinx source for `%s': %s" % (name, addr))
+      mapping[name] = (addr, None)
+      packages = [k for k in packages if k != name]
+
+
+  def _add_numpy_index():
+    """Helper to add the numpy manual"""
+
     try:
       import numpy
-      numpy_version = numpy.version.version
-      if smaller_than(numpy_version, '1.5.z'):
-        numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.x'
+      ver = numpy.version.version
+      if smaller_than(ver, '1.5.z'):
+        ver = '.'.join(ver.split('.')[:-1]) + '.x'
       else:
-        numpy_version = '.'.join(numpy_version.split('.')[:-1]) + '.0'
+        ver = '.'.join(ver.split('.')[:-1]) + '.0'
+      _add_index('numpy', 'https://docs.scipy.org/doc/numpy-%s' % ver)
+
     except ImportError:
-      numpy_version = '1.9.1'
-    numpy_manual = 'https://docs.scipy.org/doc/numpy-%s' % numpy_version
+      _add_index('numpy', 'https://docs.scipy.org/doc/numpy')
 
-    # numpy mapping
-    print ("Adding intersphinx source %s" % numpy_manual)
-    mapping['numpy'] = (numpy_manual, None)
-    packages = [k for k in packages if k != 'numpy']
 
-  if 'scipy' in packages:
+  def _add_scipy_index():
+    """Helper to add the scipy manual"""
+
     try:
       import scipy
-      scipy_version = scipy.version.version
-      if smaller_than(scipy_version, '0.9.0'):
-        scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.x'
+      ver = scipy.version.version
+      if smaller_than(ver, '0.9.0'):
+        ver = '.'.join(ver.split('.')[:-1]) + '.x'
       else:
-        scipy_version = '.'.join(scipy_version.split('.')[:-1]) + '.0'
+        ver = '.'.join(ver.split('.')[:-1]) + '.0'
+      _add_index('scipy', 'https://docs.scipy.org/doc/scipy-%s/reference' % ver)
+
     except ImportError:
-      scipy_version = '0.16.1'
-    scipy_manual = 'https://docs.scipy.org/doc/scipy-%s/reference' % scipy_version
+      _add_index('scipy', 'https://docs.scipy.org/doc/scipy/reference')
 
-    # scipy mapping
-    print ("Adding intersphinx source %s" % scipy_manual)
-    mapping['scipy'] = (scipy_manual, None)
-    packages = [k for k in packages if k != 'scipy']
 
-  if 'matplotlib' in packages:
-    matplotlib_manual = "http://matplotlib.org"
-    print ("Adding intersphinx source %s" % matplotlib_manual)
-    mapping['matplotlib'] = (matplotlib_manual, None)
-    packages = [k for k in packages if k != 'matplotlib']
+  mapping = {}
 
-  if 'setuptools' in packages: #get the right url
-    setuptools_manual = "https://setuptools.readthedocs.io/en/latest/"
-    print ("Adding intersphinx source %s" % setuptools_manual)
-    mapping['setuptools'] = (setuptools_manual, None)
-    packages = [k for k in packages if k != 'setuptools']
+  # add indexes for common packages used in Bob
+  _add_index('python', 'https://docs.python.org/%d.%d' % sys.version_info[:2])
+  _add_numpy_index()
+  _add_scipy_index()
+  _add_index('matplotlib', 'http://matplotlib.org')
+  _add_index('setuptools', 'https://setuptools.readthedocs.io/en/latest')
+  _add_index('six', 'https://pythonhosted.org/six')
+  _add_index('sqlalchemy', 'https://docs.sqlalchemy.org/en/latest')
+  _add_index('docopt', 'http://docopt.readthedocs.io/en/latest')
+  _add_index('scikit-image', 'http://scikit-image.org/docs/dev')
+  _add_index('pillow', 'http://pillow.readthedocs.io/en/latest')
 
 
   # get the server for the other packages
