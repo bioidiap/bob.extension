@@ -60,6 +60,13 @@ packages you would like to work with, but it generally looks like this:
     recipe = bob.buildout:scripts
     dependent-scripts = true
 
+
+.. warning::
+
+    Compiling packages in debug mode (``debug = true``) will make them very
+    slow. You should only use this option when you are developing and not for
+    running experiments or production.
+
 Notice the ``eggs`` entry inside the ``buildout`` section. It defines
 all python packages you will directly use on this environment. In this
 case, I only need the functionality of loading image files, machines and
@@ -100,6 +107,37 @@ the prescribed functionality available. Run a test:
     >>> import bob.learn.linear
     >>> print(bob.learn.linear.get_config())
     ...
+
+
+A Minimal Example
+-------------------
+
+
+Let's assume that `bob`_ is installed following our `Bob's installation`_
+instructions. Now you want to use several other `satellite packages`_ such as
+``bob.bio.spear``, ``bob.bio.gmm``, and ``bob.db.voxforge``. Here is a minimal
+configuration file that will get you started:
+
+.. code:: ini
+
+    [buildout]
+    parts = scripts
+    extensions = bob.buildout
+    prefer-final = true
+    eggs = bob.bio.spear
+           bob.bio.gmm
+           bob.db.voxforge
+
+    debug = false
+    verbose = true
+    newest = false
+
+    [scripts]
+    recipe = bob.buildout:scripts
+    dependent-scripts = true
+
+In most cases, only the ``eggs`` section needs to be modified.
+
 
 Using mr.developer
 ------------------
@@ -144,6 +182,7 @@ yourself.
     checkedout. If you change your sources and run ``./bin/buildout``
     again, it will not update your sources. You have to do that
     manually.
+
 
 Order of packages in ``eggs`` and ``develop``
 ---------------------------------------------
