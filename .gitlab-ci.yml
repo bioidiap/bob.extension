@@ -121,8 +121,6 @@ conda_intranet_linux_27:
     - conda config --add channels ${UPLOAD_URL}
     - conda config --add channels ${UPLOAD_URL}/label/beta
     - conda config --set ssl_verify false
-    - conda install --quiet --yes curl
-    - conda update -n root --yes conda conda-build
     - conda clean --lock
     - conda info
   after_script:
