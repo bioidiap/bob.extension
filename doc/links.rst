@@ -6,6 +6,7 @@
 
 .. _bob's website: https://www.idiap.ch/software/bob
 .. _bob: https://www.idiap.ch/software/bob
+.. _bob's installation: https://www.idiap.ch/software/bob/install
 .. _c++: http://www2.research.att.com/~bs/C++.html
 .. _distutils: https://docs.python.org/distutils/
 .. _git: http://git-scm.com/
