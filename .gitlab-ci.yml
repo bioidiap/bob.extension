@@ -89,19 +89,11 @@ stages:
 .conda_template: &conda_job
   stage: conda
   variables: &conda_variables
-    CONDA_ENVS_PATH: "conda-env"
-    CONDA_BLD_PATH: "conda-env"
     UPLOAD_URL: "http://www.idiap.ch/software/bob/conda"
     CONDA_NPY: "111"
     PYTHONUNBUFFERED: "1"
     gcc_version: 4.8.5
     libgcc_version: 4.8.5
-  cache:
-    key: "$CI_RUNNER_TAGS"
-    paths:
-      - conda-env/.pkgs/*.tar.bz2
-      - conda-env/.pkgs/urls.txt
-      - conda-env/src_cache
   before_script: &conda_before_script
     - export PATH=/opt/miniconda/bin:$PATH
     - export BOB_PACKAGE_VERSION=`cat version.txt`
@@ -117,11 +109,6 @@ stages:
   script:
     - conda-build --python=${PYTHON_VERSION} conda.recipe
   image: continuumio/conda_builder_linux
-  artifacts:
-    paths:
-      - conda-env/${OS_SLUG}
-    expire_in: 1 week
-    when: always
 
 conda_intranet_linux_27:
   <<: *conda_job
