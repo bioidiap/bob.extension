@@ -1,0 +1,64 @@
+{% set version = environ.get('BOB_PACKAGE_VERSION') %}
+
+package:
+  name: bob.extension
+  version: {{ version }}
+
+source:
+  path: ../
+
+build:
+  entry_points:
+    - bob_new_version.py = bob.extension.scripts:new_version
+    - bob_dependecy_graph.py = bob.extension.scripts:dependency_graph
+  number: {{ environ.get('BOB_BUILD_NUMBER') }}
+  skip: true  # [win]
+  script: python setup.py install --single-version-externally-managed --record record.txt
+
+requirements:
+  build:
+    - toolchain
+    - python
+    - setuptools
+
+  run:
+    - python
+    - setuptools
+
+test:
+  requires:
+    - nose
+    - boost
+    - cmake
+    - pkg-config
+    - freetype
+    - libblitz
+    - numpy
+    - sphinx_rtd_theme
+    - sphinx
+    - toolchain
+    - gcc {{ environ.get('gcc_version', '') }}
+    - libgcc {{ environ.get('libgcc_version', '') }}
+
+  imports:
+    - bob
+    - bob.extension
+    - bob.extension.scripts
+
+  commands:
+    - bob_new_version.py --help
+    - bob_dependecy_graph.py --help
+    - export CXXFLAGS=${CXXFLAGS/-Wabi=2/}
+    - export CFLAGS="${CFLAGS} -pthread"  # [unix]
+    - export LDFLAGS="${LDFLAGS} -lpthread"  # [unix]
+    - nosetests -sv bob.extension  # [not osx]
+    - DYLD_FALLBACK_LIBRARY_PATH=$PREFIX/lib nosetests -sv bob.extension  # [osx]
+
+about:
+  home: https://www.idiap.ch/software/bob/
+  license: BSD 3-Clause
+  summary: Building of Python/C++ extensions for Bob
+
+extra:
+  recipe-maintainers:
+    - 183amir

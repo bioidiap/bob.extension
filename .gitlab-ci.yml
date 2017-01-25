@@ -9,6 +9,7 @@ stages:
   - test
   - docs
   - wheels
+  - conda
   - deploy
 
 
@@ -84,6 +85,100 @@ stages:
   after_script:
     - ./_ci/after_docs.sh
 
+# Template for the conda package creation stage
+.conda_template: &conda_job
+  stage: conda
+  variables: &conda_variables
+    CONDA_ENVS_PATH: "conda-env"
+    CONDA_BLD_PATH: "conda-env"
+    UPLOAD_URL: "http://www.idiap.ch/software/bob/conda"
+    CONDA_NPY: "111"
+    PYTHONUNBUFFERED: "1"
+    gcc_version: 4.8.5
+    libgcc_version: 4.8.5
+  cache:
+    key: "$CI_RUNNER_TAGS"
+    paths:
+      - conda-env/.pkgs/*.tar.bz2
+      - conda-env/.pkgs/urls.txt
+      - conda-env/src_cache
+  before_script: &conda_before_script
+    - export PATH=/opt/miniconda/bin:$PATH
+    - export BOB_PACKAGE_VERSION=`cat version.txt`
+    - conda config --set always_yes true
+    - conda config --set show_channel_urls true
+    - conda config --add channels defaults
+    - conda config --add channels ${UPLOAD_URL}
+    - conda config --set ssl_verify false
+    - conda install --quiet --yes curl
+    - conda update -n root --yes conda conda-build
+    - conda clean --lock
+    - conda info
+  script:
+    - conda-build --python=${PYTHON_VERSION} conda.recipe
+  image: continuumio/conda_builder_linux
+  artifacts:
+    paths:
+      - conda-env/${OS_SLUG}
+    expire_in: 1 week
+    when: always
+
+conda_intranet_linux_27:
+  <<: *conda_job
+  before_script:
+    - export PATH=/opt/miniconda/bin:$PATH
+    - export BOB_PACKAGE_VERSION=`cat version.txt`
+    - conda config --set always_yes true
+    - conda config --set show_channel_urls true
+    - conda config --add channels defaults
+    - conda config --add channels ${UPLOAD_URL}
+    - conda config --add channels ${UPLOAD_URL}/label/beta
+    - conda config --set ssl_verify false
+    - conda install --quiet --yes curl
+    - conda update -n root --yes conda conda-build
+    - conda clean --lock
+    - conda info
+  after_script:
+    - curl --location --silent --show-error --user "${DOCUSER}:${DOCPASS}" --upload-file `conda-build --python=${PYTHON_VERSION} conda.recipe --output` "${UPLOAD_URL}-upload/label/beta/${OS_SLUG}/"
+  variables:
+    <<: *conda_variables
+    PYTHON_VERSION: "2.7"
+    OS_SLUG: "linux-64"
+    BOB_BUILD_NUMBER: "0" # keep replacing the betas
+  tags:
+    - docker
+  environment: intranet
+  only:
+    - master
+    - condapackage
+  except:
+    - /^v\d+\.\d+\.\d+([abc]\d*)?$/  # PEP-440 compliant version (tags)
+
+conda_internet_linux_27:
+  <<: *conda_job
+  after_script:
+    - curl --location --silent --show-error --user "${DOCUSER}:${DOCPASS}" --upload-file `conda-build --python=${PYTHON_VERSION} conda.recipe --output` "${UPLOAD_URL}-upload/${OS_SLUG}/"
+  variables:
+    <<: *conda_variables
+    PYTHON_VERSION: "2.7"
+    OS_SLUG: "linux-64"
+    BOB_BUILD_NUMBER: "${CI_BUILD_ID}" # this needs to be incremented dynamically
+  tags:
+    - docker
+  environment: internet
+  only:
+    - /^v\d+\.\d+\.\d+([abc]\d*)?$/  # PEP-440 compliant version (tags)
+  except:
+    - branches
+
+# conda_macosx_35:
+#   <<: *conda_job
+#   variables:
+#     <<: *conda_variables
+#     PYTHON_VERSION: "3.5"
+#     OS_SLUG: "osx-64"
+#   tags:
+#     - conda-macosx
 
 # Template for the deployment stage - re-installs from uploaded wheels
 # Needs to run on a single architecture only
@@ -110,140 +205,140 @@ stages:
 # -------------
 
 # Linux + Python 2.7: Builds, tests, uploads wheel and deploys (if needed)
-build_linux_27:
-  <<: *build_job
-  variables: &linux_27_build_variables
-    PYTHON_VERSION: "2.7"
-    WHEEL_TAG: "py27"
-  tags:
-    - conda-linux
+# build_linux_27:
+#   <<: *build_job
+#   variables: &linux_27_build_variables
+#     PYTHON_VERSION: "2.7"
+#     WHEEL_TAG: "py27"
+#   tags:
+#     - conda-linux
 
-test_linux_27:
-  <<: *test_job
-  variables: *linux_27_build_variables
-  dependencies:
-    - build_linux_27
-  tags:
-    - conda-linux
+# test_linux_27:
+#   <<: *test_job
+#   variables: *linux_27_build_variables
+#   dependencies:
+#     - build_linux_27
+#   tags:
+#     - conda-linux
 
-wheels_linux_27:
-  <<: *wheels_job
-  variables: *linux_27_build_variables
-  dependencies:
-    - build_linux_27
-  tags:
-    - conda-linux
+# wheels_linux_27:
+#   <<: *wheels_job
+#   variables: *linux_27_build_variables
+#   dependencies:
+#     - build_linux_27
+#   tags:
+#     - conda-linux
 
-deploy_linux_27:
-  <<: *deploy_job
-  variables: *linux_27_build_variables
-  dependencies:
-    - build_linux_27
-  tags:
-    - conda-linux
-
-
-# Linux + Python 3.4: Builds and tests
-build_linux_34:
-  <<: *build_job
-  variables: &linux_34_build_variables
-    PYTHON_VERSION: "3.4"
-    WHEEL_TAG: "py3"
-  tags:
-    - conda-linux
-
-test_linux_34:
-  <<: *test_job
-  variables: *linux_34_build_variables
-  dependencies:
-    - build_linux_34
-  tags:
-    - conda-linux
+# deploy_linux_27:
+#   <<: *deploy_job
+#   variables: *linux_27_build_variables
+#   dependencies:
+#     - build_linux_27
+#   tags:
+#     - conda-linux
 
 
-# Linux + Python 3.5: Builds, tests and uploads wheel
-build_linux_35:
-  <<: *build_job
-  variables: &linux_35_build_variables
-    PYTHON_VERSION: "3.5"
-    WHEEL_TAG: "py3"
-  tags:
-    - conda-linux
+# # Linux + Python 3.4: Builds and tests
+# build_linux_34:
+#   <<: *build_job
+#   variables: &linux_34_build_variables
+#     PYTHON_VERSION: "3.4"
+#     WHEEL_TAG: "py3"
+#   tags:
+#     - conda-linux
 
-test_linux_35:
-  <<: *test_job
-  variables: *linux_35_build_variables
-  dependencies:
-    - build_linux_35
-  tags:
-    - conda-linux
-
-wheels_linux_35:
-  <<: *wheels_job
-  variables: *linux_35_build_variables
-  dependencies:
-    - build_linux_35
-  tags:
-    - conda-linux
-
-docs_linux_35:
-  <<: *docs_job
-  variables: *linux_35_build_variables
-  dependencies:
-    - build_linux_35
-  tags:
-    - conda-linux
+# test_linux_34:
+#   <<: *test_job
+#   variables: *linux_34_build_variables
+#   dependencies:
+#     - build_linux_34
+#   tags:
+#     - conda-linux
 
 
-# Mac OSX + Python 2.7: Builds and tests
-build_macosx_27:
-  <<: *build_job
-  variables: &macosx_27_build_variables
-    PYTHON_VERSION: "2.7"
-    WHEEL_TAG: "py27"
-  tags:
-    - conda-macosx
+# # Linux + Python 3.5: Builds, tests and uploads wheel
+# build_linux_35:
+#   <<: *build_job
+#   variables: &linux_35_build_variables
+#     PYTHON_VERSION: "3.5"
+#     WHEEL_TAG: "py3"
+#   tags:
+#     - conda-linux
 
-test_macosx_27:
-  <<: *test_job
-  variables: *macosx_27_build_variables
-  dependencies:
-    - build_macosx_27
-  tags:
-    - conda-macosx
+# test_linux_35:
+#   <<: *test_job
+#   variables: *linux_35_build_variables
+#   dependencies:
+#     - build_linux_35
+#   tags:
+#     - conda-linux
 
+# wheels_linux_35:
+#   <<: *wheels_job
+#   variables: *linux_35_build_variables
+#   dependencies:
+#     - build_linux_35
+#   tags:
+#     - conda-linux
 
-# Mac OSX + Python 3.4: Builds and tests
-build_macosx_34:
-  <<: *build_job
-  variables: &macosx_34_build_variables
-    PYTHON_VERSION: "3.4"
-    WHEEL_TAG: "py3"
-  tags:
-    - conda-macosx
-
-test_macosx_34:
-  <<: *test_job
-  variables: *macosx_34_build_variables
-  dependencies:
-    - build_macosx_34
-  tags:
-    - conda-macosx
+# docs_linux_35:
+#   <<: *docs_job
+#   variables: *linux_35_build_variables
+#   dependencies:
+#     - build_linux_35
+#   tags:
+#     - conda-linux
 
 
-# Mac OSX + Python 3.5: Builds and tests
-build_macosx_35:
-  <<: *build_job
-  variables: &macosx_35_build_variables
-    PYTHON_VERSION: "3.5"
-    WHEEL_TAG: "py3"
-  tags:
-    - conda-macosx
+# # Mac OSX + Python 2.7: Builds and tests
+# build_macosx_27:
+#   <<: *build_job
+#   variables: &macosx_27_build_variables
+#     PYTHON_VERSION: "2.7"
+#     WHEEL_TAG: "py27"
+#   tags:
+#     - conda-macosx
 
-test_macosx_35:
-  <<: *test_job
-  variables: *macosx_35_build_variables
-  dependencies:
-    - build_macosx_35
-  tags:
-    - conda-macosx
+# test_macosx_27:
+#   <<: *test_job
+#   variables: *macosx_27_build_variables
+#   dependencies:
+#     - build_macosx_27
+#   tags:
+#     - conda-macosx
+
+
+# # Mac OSX + Python 3.4: Builds and tests
+# build_macosx_34:
+#   <<: *build_job
+#   variables: &macosx_34_build_variables
+#     PYTHON_VERSION: "3.4"
+#     WHEEL_TAG: "py3"
+#   tags:
+#     - conda-macosx
+
+# test_macosx_34:
+#   <<: *test_job
+#   variables: *macosx_34_build_variables
+#   dependencies:
+#     - build_macosx_34
+#   tags:
+#     - conda-macosx
+
+
+# # Mac OSX + Python 3.5: Builds and tests
+# build_macosx_35:
+#   <<: *build_job
+#   variables: &macosx_35_build_variables
+#     PYTHON_VERSION: "3.5"
+#     WHEEL_TAG: "py3"
+#   tags:
+#     - conda-macosx
+
+# test_macosx_35:
+#   <<: *test_job
+#   variables: *macosx_35_build_variables
+#   dependencies:
+#     - build_macosx_35
+#   tags:
+#     - conda-macosx
