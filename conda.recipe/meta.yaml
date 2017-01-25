@@ -26,19 +26,19 @@ requirements:
     - setuptools
 
 test:
-  requires:
-    - nose
-    - boost
-    - cmake
-    - pkg-config
-    - freetype
-    - libblitz
-    - numpy
-    - sphinx_rtd_theme
-    - sphinx
-    - toolchain
-    - gcc {{ environ.get('gcc_version', '') }}
-    - libgcc {{ environ.get('libgcc_version', '') }}
+  # requires:
+    # - nose
+    # - boost
+    # - cmake
+    # - pkg-config
+    # - freetype
+    # - libblitz
+    # - numpy
+    # - sphinx_rtd_theme
+    # - sphinx
+    # - toolchain
+    # - gcc {{ environ.get('gcc_version', '') }}
+    # - libgcc {{ environ.get('libgcc_version', '') }}
 
   imports:
     - bob
@@ -48,11 +48,11 @@ test:
   commands:
     - bob_new_version.py --help
     - bob_dependecy_graph.py --help
-    - export CXXFLAGS=${CXXFLAGS/-Wabi=2/}
-    - export CFLAGS="${CFLAGS} -pthread"  # [unix]
-    - export LDFLAGS="${LDFLAGS} -lpthread"  # [unix]
-    - nosetests -sv bob.extension  # [not osx]
-    - DYLD_FALLBACK_LIBRARY_PATH=$PREFIX/lib nosetests -sv bob.extension  # [osx]
+    # - export CXXFLAGS=${CXXFLAGS/-Wabi=2/}
+    # - export CFLAGS="${CFLAGS} -pthread"  # [unix]
+    # - export LDFLAGS="${LDFLAGS} -lpthread"  # [unix]
+    # - nosetests -sv bob.extension  # [not osx]
+    # - DYLD_FALLBACK_LIBRARY_PATH=$PREFIX/lib nosetests -sv bob.extension  # [osx]
 
 about:
   home: https://www.idiap.ch/software/bob/
