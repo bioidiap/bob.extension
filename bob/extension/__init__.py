@@ -407,6 +407,11 @@ class Extension(DistutilsExtension):
       parameters['libraries'] += libs
       self.pkg_libraries += libs
 
+      # if used libraries require extra compilation flags, add them to the mix
+      parameters['extra_compile_args'].extend(
+          pkg.cflags_other().get('extra_compile_args', [])
+          )
+
       parameters['extra_link_args'] += pkg.other_libraries()
 
     # add the -isystem to all system include dirs
