@@ -106,8 +106,6 @@ stages:
     - conda update -n root --yes conda conda-build
     - conda clean --lock
     - conda info
-  script:
-    - conda-build --python=${PYTHON_VERSION} conda.recipe
   image: continuumio/conda_builder_linux
 
 conda_intranet_linux_27:
@@ -123,8 +121,8 @@ conda_intranet_linux_27:
     - conda config --set ssl_verify false
     - conda clean --lock
     - conda info
-  after_script:
-    - export PATH=/opt/miniconda/bin:$PATH
+  script:
+    - conda-build --python=${PYTHON_VERSION} conda.recipe
     - curl --location --silent --show-error --user "${DOCUSER}:${DOCPASS}" --upload-file `conda-build --python=${PYTHON_VERSION} conda.recipe --output` "${UPLOAD_URL}-upload/label/beta/${OS_SLUG}/"
   variables:
     <<: *conda_variables
@@ -142,8 +140,8 @@ conda_intranet_linux_27:
 
 conda_internet_linux_27:
   <<: *conda_job
-  after_script:
-    - export PATH=/opt/miniconda/bin:$PATH
+  script:
+    - conda-build --python=${PYTHON_VERSION} conda.recipe
     - curl --location --silent --show-error --user "${DOCUSER}:${DOCPASS}" --upload-file `conda-build --python=${PYTHON_VERSION} conda.recipe --output` "${UPLOAD_URL}-upload/${OS_SLUG}/"
   variables:
     <<: *conda_variables
