@@ -126,7 +126,7 @@ conda_intranet_linux_27:
   script:
     - conda-build --python=${PYTHON_VERSION} conda.recipe
     - curl --location --silent --show-error --user "${DOCUSER}:${DOCPASS}" --upload-file `conda-build --python=${PYTHON_VERSION} conda.recipe --output` "${UPLOAD_URL}-upload/label/beta/${OS_SLUG}/"
-    - # TODO: delete old beta packages
+    # TODO: delete old beta packages
   variables:
     <<: *conda_variables
     PYTHON_VERSION: "2.7"
