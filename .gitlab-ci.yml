@@ -112,7 +112,6 @@ conda_intranet_linux_27:
   <<: *conda_job
   before_script:
     - export PATH=/opt/miniconda/bin:$PATH
-    - export BOB_PACKAGE_VERSION=`cat version.txt`
     - conda config --set always_yes true
     - conda config --set show_channel_urls true
     - conda config --add channels defaults
@@ -121,14 +120,17 @@ conda_intranet_linux_27:
     - conda config --set ssl_verify false
     - conda clean --lock
     - conda info
+    - export BOB_PACKAGE_VERSION=`cat version.txt`
+    - ./channel_support.py ${UPLOAD_URL}/label/beta ${CI_PROJECT_NAME} ${BOB_PACKAGE_VERSION} ${PYTHON_VERSION} -u --log ./build_number.txt
+    - export BOB_BUILD_NUMBER=`head -n 1 build_number.txt`
   script:
     - conda-build --python=${PYTHON_VERSION} conda.recipe
     - curl --location --silent --show-error --user "${DOCUSER}:${DOCPASS}" --upload-file `conda-build --python=${PYTHON_VERSION} conda.recipe --output` "${UPLOAD_URL}-upload/label/beta/${OS_SLUG}/"
+    - # TODO: delete old beta packages
   variables:
     <<: *conda_variables
     PYTHON_VERSION: "2.7"
     OS_SLUG: "linux-64"
-    BOB_BUILD_NUMBER: "0" # keep replacing the betas
   tags:
     - docker
   environment: intranet
@@ -147,7 +149,6 @@ conda_internet_linux_27:
     <<: *conda_variables
     PYTHON_VERSION: "2.7"
     OS_SLUG: "linux-64"
-    BOB_BUILD_NUMBER: "${CI_BUILD_ID}" # this needs to be incremented dynamically
   tags:
     - docker
   environment: internet

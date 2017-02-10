@@ -4,20 +4,18 @@ package:
   name: bob.extension
   version: {{ version }}
 
-source:
-  path: ../
-
 build:
   entry_points:
     - bob_new_version.py = bob.extension.scripts:new_version
     - bob_dependecy_graph.py = bob.extension.scripts:dependency_graph
   number: {{ environ.get('BOB_BUILD_NUMBER') }}
-  skip: true  # [win]
-  script: python setup.py install --single-version-externally-managed --record record.txt
+  script:
+    - cp -R $RECIPE_DIR/../ .
+    - python setup.py install --single-version-externally-managed --record record.txt
 
 requirements:
   build:
-    - toolchain
+    - toolchain 2.3.0
     - python
     - setuptools
 
@@ -37,8 +35,8 @@ test:
     # - sphinx_rtd_theme
     # - sphinx
     # - toolchain
-    # - gcc {{ environ.get('gcc_version', '') }}
-    # - libgcc {{ environ.get('libgcc_version', '') }}
+    # - gcc
+    # - libgcc
 
   imports:
     - bob
