@@ -118,7 +118,7 @@ conda_intranet_linux_27:
     - conda config --add channels ${UPLOAD_URL}
     - conda config --add channels ${UPLOAD_URL}/label/beta
     - conda config --set ssl_verify false
-    - conda update -n root conda --yes
+    - conda update -n root conda --quiet --yes
     - conda clean --lock
     - conda info
     - export BOB_PACKAGE_VERSION=`cat version.txt`
