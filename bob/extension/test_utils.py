@@ -129,6 +129,7 @@ def test_find_packages():
 
 
 def test_documentation_generation():
+
   if sys.version_info[0] == 3:
     from io import StringIO as stringio
   else:
@@ -191,7 +192,7 @@ package-z
         ]
 
     # test linkage to pythonhosted.org
-    server = "https://pythonhosted.org/%s/"
+    server = "http://pythonhosted.org/%s/"
     os.environ["BOB_DOCUMENTATION_SERVER"] = server
     result = link_documentation(additional_packages, stringio(f))
     expected = [

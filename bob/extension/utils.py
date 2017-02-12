@@ -497,7 +497,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   _add_scipy_index()
   _add_index('matplotlib', 'http://matplotlib.org/')
   _add_index('setuptools', 'https://setuptools.readthedocs.io/en/latest/')
-  _add_index('six', 'https://pythonhosted.org/six/')
+  _add_index('six', 'http://pythonhosted.org/six/')
   _add_index('sqlalchemy', 'https://docs.sqlalchemy.org/en/latest/')
   _add_index('docopt', 'http://docopt.readthedocs.io/en/latest/')
   _add_index('scikit-image', 'http://scikit-image.org/docs/dev/')
@@ -509,7 +509,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     if "BOB_DOCUMENTATION_SERVER" in os.environ:
       server = os.environ["BOB_DOCUMENTATION_SERVER"]
     else:
-      server = "https://pythonhosted.org/%s"
+      server = "http://pythonhosted.org/%s"
 
   # array support for BOB_DOCUMENTATION_SERVER
   # transforms "(file:///path/to/dir  https://example.com/dir| http://bla )"
