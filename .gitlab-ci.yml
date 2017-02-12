@@ -92,8 +92,8 @@ stages:
     UPLOAD_URL: "http://www.idiap.ch/software/bob/conda"
     CONDA_NPY: "111"
     PYTHONUNBUFFERED: "1"
-    gcc_version: 4.8.5
-    libgcc_version: 4.8.5
+    CONDA_ENVS_PATH: "conda-env"
+    CONDA_BLD_PATH: "conda-env"
   before_script: &conda_before_script
     - export PATH=/opt/miniconda/bin:$PATH
     - export BOB_PACKAGE_VERSION=`cat version.txt`
@@ -107,6 +107,12 @@ stages:
     - conda clean --lock
     - conda info
   image: continuumio/conda_builder_linux
+  cache:
+    key: "$CI_BUILD_NAME"
+    paths:
+      - conda-env/.pkgs/*.tar.bz2
+      - conda-env/.pkgs/urls.txt
+      - conda-env/src_cache
 
 conda_intranet_linux_27:
   <<: *conda_job
