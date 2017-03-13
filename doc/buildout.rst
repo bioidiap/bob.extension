@@ -1,16 +1,15 @@
-By far, the easiest and best supported installation method for Bob
-packages uses `zc.buildout`_.
-Using buildout requires you define a configuration file, normally named
-``buildout.cfg``, which describes which packages are supposed to be
-installed on the current environment. `Our custom buildout
-extension <https://pypi.python.org/pypi/bob.buildout>`__ will hook-in
-externally compiled software from that configuration file.
+By far, the easiest and best supported installation method for Bob packages
+uses `zc.buildout`_.  Using buildout requires you define a configuration file,
+normally named ``buildout.cfg``, which describes which packages are supposed to
+be installed on the current environment. `Our custom buildout extension
+<https://pypi.python.org/pypi/bob.buildout>`__ will hook-in externally compiled
+software from that configuration file.
 
-The key-idea is that for every project, you create a new environment that contains the
-packages you need for the task. A project may be a product you are
-working on or a research paper, for you which you will publish
-reproducible results. Each environment will be isolated so there is low
-risk of interference between your projects.
+The key-idea is that for every project, you create a new environment that
+contains the packages you need for the task. A project may be a product you are
+working on or a research paper, for you which you will publish reproducible
+results. Each environment will be isolated so there is low risk of interference
+between your projects.
 
 .. note::
 
@@ -28,15 +27,8 @@ it:
     $ mkdir exp01
     $ cd exp01
 
-Download a stock bootstrap script for ``zc.buildout``:
-
-.. code:: sh
-
-    $ wget https://bootstrap.pypa.io/bootstrap-buildout.py
-
-Create ``buildout.cfg`` file, in the same folder as
-``bootstrap-buildout.py``. The contents will depend on which Bob
-packages you would like to work with, but it generally looks like this:
+Create ``buildout.cfg`` file. The contents will depend on which Bob packages
+you would like to work with, but it generally looks like this:
 
 .. code:: ini
 
@@ -75,13 +67,12 @@ packages: ``bob.io.image`` and ``bob.learn.linear``. Dependencies for
 those packages will be automatically managed, **as long as you keep**
 ``bob.buildout`` **in your list of** ``extensions``.
 
-Now, bootstrap your new environment and instruct ``zc.buildout`` to
-download and install packages (and dependencies) locally:
+Now, instruct ``zc.buildout`` to download and install packages (and
+dependencies) locally:
 
 .. code:: sh
 
-    $ python bootstrap-buildout.py
-    $ ./bin/buildout
+    $ buildout
 
 .. note::
 
@@ -89,7 +80,7 @@ download and install packages (and dependencies) locally:
 
     .. code:: sh
 
-        $ ./bin/buildout -c develop.cfg
+        $ buildout -c develop.cfg
 
 That is it! Once the buildout finishes, all packages have been
 downloaded and installed locally. Buildout will create a ``python``
@@ -178,10 +169,9 @@ yourself.
 
 .. note::
 
-    mr.developer will not update your sources if they are already
-    checkedout. If you change your sources and run ``./bin/buildout``
-    again, it will not update your sources. You have to do that
-    manually.
+    mr.developer will not update your sources if they are already checkedout.
+    If you change your sources and run ``buildout`` again, it will not update
+    your sources. You have to do that manually.
 
 
 Order of packages in ``eggs`` and ``develop``

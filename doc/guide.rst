@@ -122,18 +122,12 @@ package, all of which is contained in the ``setup`` function:
 In detail, it defines the name and the version of this package, which files belong to the package (those files are automatically collected by the ``find_packages`` function), other packages that we depend on, namespaces (see below) and console scripts.
 The full set of options can be inspected in the `Setuptools documentation <https://setuptools.readthedocs.io>`_.
 
-To be able to use the package, we first need to build it.
-Here is how to go from nothing to everything:
+To be able to use the package, we first need to build it.  Here is how to go
+from nothing to everything:
 
 .. code-block:: sh
 
-  $ python bootstrap-buildout.py
-  Creating directory '/home/user/bob.example.project/bin'.
-  Creating directory '/home/user/bob.example.project/parts'.
-  Creating directory '/home/user/bob.example.project/eggs'.
-  Creating directory '/home/user/bob.example.project/develop-eggs'.
-  Generated script '/home/user/bob.example.project/bin/buildout'.
-  $ ./bin/buildout
+  $ buildout
   Getting distribution for 'bob.buildout'.
   Got bob.buildout 2.0.0.
   Getting distribution for 'zc.recipe.egg>=2.0.0a3'.
@@ -247,10 +241,11 @@ Again, ``mr.developer`` does not automatically place the packages into the ``dev
 Running buildout
 ================
 
-Finally, running buildout is a two-step process, which is detailed above.
-The command line ``./bin/buildout`` will actually run buildout and build your local environment.
-All options in the buildout.cfg can be overwritten on command line, by specifying ``buildout:option=...``, where ``option`` can be any entry in the ``buildout.cfg``.
-Finally, buildout will perform the following steps:
+Finally, running buildout is a single step process, which is detailed above.
+The command line ``buildout`` will actually run buildout and build your local
+environment. All options in the buildout.cfg can be overwritten on command
+line, by specifying ``buildout:option=...``, where ``option`` can be any entry
+in the ``buildout.cfg``.  Finally, buildout will perform the following steps:
 
 1. It checks out the packages that you specified using ``mr.developer``.
 2. It develops all packages in the ``develop`` section.
@@ -267,7 +262,7 @@ In our example, this is ``./bin/version.py``.
 
     One thing to note in package development is that when you
     change the entry points in ``setup.py`` of a package, you need to
-    run ``./bin/buildout`` again.
+    run ``buildout`` again.
 
 Your local environment
 ======================

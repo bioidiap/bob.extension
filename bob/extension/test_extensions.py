@@ -31,15 +31,11 @@ def _run(package, run_call):
     with tarfile.open(tarball) as tar: tar.extractall(temp_dir)
     package_dir = os.path.join(temp_dir, "bob.example.%s" % package)
 
-    # bootstrap
-    subprocess.call([sys.executable, "bootstrap-buildout.py"], cwd=package_dir)
-    assert os.path.exists(os.path.join(package_dir, "bin", "buildout"))
-
     # buildout
     # if we have a setup.py in our current directory, we develop both (as we might be in the current source directory of bob.extension and use it),
     # otherwise we only develop the downloaded source package
     develop = '%s\n.'%os.getcwd() if os.path.exists("setup.py") else '.'
-    subprocess.call(['./bin/buildout', 'buildout:prefer-final=false', 'buildout:develop=%s'%develop], cwd=package_dir)
+    subprocess.call(['buildout', 'buildout:prefer-final=false', 'buildout:develop=%s'%develop], cwd=package_dir)
     assert os.path.exists(os.path.join(package_dir, "bin", "python"))
 
     # nosetests
