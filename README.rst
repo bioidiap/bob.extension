@@ -26,10 +26,9 @@ Installation
 ------------
 
 Follow our `installation`_ instructions. Then, using the Python interpreter
-inside that distribution, bootstrap and buildout this package::
+provided by the distribution, build this package with::
 
-  $ python bootstrap-buildout.py
-  $ ./bin/buildout
+  $ buildout
 
 
 Contact

@@ -31,10 +31,9 @@ Installation
 ------------
 
 Follow our `installation`_ instructions. Then, using the Python interpreter
-provided by the distribution, bootstrap and buildout this package::
+provided by the distribution, build this package with::
 
-  $ python bootstrap-buildout.py
-  $ ./bin/buildout
+  $ buildout
 
 
 Documentation and Further Information

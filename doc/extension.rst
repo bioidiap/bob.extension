@@ -139,13 +139,12 @@ Finally, the function ``reverse`` from the module ``_library`` is imported into 
 
 
 
-To compile your C++ Python bindings and the pure C++ libraries, you can follow the same instructions as shown above:
+To compile your C++ Python bindings and the pure C++ libraries, you can follow
+the same instructions as shown above:
 
 .. code-block:: sh
 
-  $ python bootstrap-buildout.py
-  ...
-  $ ./bin/buildout
+  $ buildout
   ...
 
 .. note::
@@ -273,9 +272,7 @@ As shown above, to compile your C++ Python bindings and the pure C++ libraries, 
 
 .. code-block:: sh
 
-  $ python bootstrap-buildout.py
-  ...
-  $ ./bin/buildout
+  $ buildout
   ...
 
 This will automatically check out all required ``bob_packages`` and compile them locally.
@@ -286,9 +283,7 @@ To get the source code compiled using another build directory, you can define a 
 
 .. code-block:: sh
 
-  $ python bootstrap-buildout.py
-  ...
-  $ BOB_BUILD_DIRECTORY=/tmp/build_bob ./bin/buildout
+  $ BOB_BUILD_DIRECTORY=/tmp/build_bob buildout
   ...
 
 The C++ code of this package, **and the code of all other** ``bob_packages`` will be compiled using the selected directory.

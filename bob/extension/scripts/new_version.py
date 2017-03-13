@@ -190,12 +190,6 @@ def main(command_line_options = None):
     else:
       raise ValueError("The stable version '%s' cannot be smaller than the current version '%s'" % (args.stable_version, current_version))
 
-  if not os.path.exists('./bin/buildout'):
-    if args.force or args.no_buildout:
-      logger.warn("The bin/buildout script does not exist. Have you bootstrapped your system?")
-    else:
-      raise IOError("The bin/buildout script does not exist. Have you bootstrapped your system?")
-
 
   if 'tag' in args.steps:
     if args.stable_version is not None and Version(args.stable_version) > Version(current_version):
@@ -214,7 +208,7 @@ def main(command_line_options = None):
   if 'build' in args.steps:
     if not args.no_buildout:
       print ("\nBuilding the package")
-      run_commands(None, ['./bin/buildout'] + args.build_options)
+      run_commands(None, ['buildout'] + args.build_options)
 
   if args.no_buildout:
     if sys.executable:

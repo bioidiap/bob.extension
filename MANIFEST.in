@@ -1,4 +1,4 @@
-include LICENSE README.rst bootstrap-buildout.py buildout.cfg version.txt
+include LICENSE README.rst buildout.cfg version.txt
 recursive-include doc conf.py *.rst
 recursive-include bob *.cpp *.h
 recursive-include bob/extension/data *.tar.bz2
