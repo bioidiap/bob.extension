@@ -31,23 +31,30 @@ def _run(package, run_call):
     with tarfile.open(tarball) as tar: tar.extractall(temp_dir)
     package_dir = os.path.join(temp_dir, "bob.example.%s" % package)
 
+    def _join(*args):
+      a = (package_dir,) + args
+      return os.path.join(*a)
+
+    def _bin(path):
+      return _join('bin', path)
+
     # buildout
     # if we have a setup.py in our current directory, we develop both (as we might be in the current source directory of bob.extension and use it),
     # otherwise we only develop the downloaded source package
-    develop = '%s\n.'%os.getcwd() if os.path.exists("setup.py") else '.'
-    subprocess.call(['buildout', 'buildout:prefer-final=false', 'buildout:develop=%s'%develop], cwd=package_dir)
-    assert os.path.exists(os.path.join(package_dir, "bin", "python"))
+    develop = '%s\n.' % os.getcwd() if os.path.exists('setup.py') else '.'
+    subprocess.call(['buildout', 'buildout:prefer-final=false', 'buildout:develop=%s'%develop], cwd=package_dir, shell=True)
+    assert os.path.exists(_bin('python'))
 
     # nosetests
-    subprocess.call(['./bin/nosetests', '-sv'], cwd=package_dir)
+    subprocess.call([_bin('nosetests'), '-sv'])
 
     # check that the call is working
-    subprocess.call(run_call, cwd=package_dir)
+    subprocess.call([_bin(run_call[0])] + run_call[1:])
 
-    subprocess.call(['./bin/sphinx-build', 'doc', 'sphinx'], cwd=package_dir)
-    assert os.path.exists(os.path.join(package_dir, "sphinx", "index.html"))
+    subprocess.call([_bin('sphinx-build'), _join('doc'), _join('sphinx')])
+    assert os.path.exists(_join('sphinx', 'index.html'))
 
-    subprocess.call('./bin/python -c "import pkg_resources; from bob.example.%s import get_config; print(get_config())"'%package, cwd=package_dir, shell=True)
+    subprocess.call([_bin('python'), '-c', 'import pkg_resources; from bob.example.%s import get_config; print(get_config())'%package])
 
   finally:
     shutil.rmtree(temp_dir)
@@ -55,14 +62,14 @@ def _run(package, run_call):
 
 def test_project():
   # Tests that the bob.example.project works
-  _run('project', ['./bin/version.py'])
+  _run('project', ['version.py'])
 
 
 def test_extension():
   # Tests that the bob.example.extension compiles and works
-  _run('extension', ['./bin/reverse.py', '1', '2', '3', '4', '5'])
+  _run('extension', ['reverse.py', '1', '2', '3', '4', '5'])
 
 
 def test_library():
   # Tests that the bob.example.library compiles and works
-  _run('library', ['./bin/reverse.py', '1', '2', '3', '4', '5'])
+  _run('library', ['reverse.py', '1', '2', '3', '4', '5'])
