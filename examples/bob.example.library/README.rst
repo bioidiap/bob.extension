@@ -2,17 +2,17 @@
 .. Fri Dec 23 13:41:36 CET 2016
 
 .. image:: http://img.shields.io/badge/docs-stable-yellow.svg
-   :target: http://pythonhosted.org/bob.example.extension/index.html
+   :target: http://pythonhosted.org/bob.example.library/index.html
 .. image:: http://img.shields.io/badge/docs-latest-orange.svg
-   :target: https://www.idiap.ch/software/bob/docs/latest/bob/bob.example.extension/master/index.html
-.. image:: https://gitlab.idiap.ch/bob/bob.example.extension/badges/master/build.svg
-   :target: https://gitlab.idiap.ch/bob/bob.example.extension/commits/master
+   :target: https://www.idiap.ch/software/bob/docs/latest/bob/bob.example.library/master/index.html
+.. image:: https://gitlab.idiap.ch/bob/bob.example.library/badges/master/build.svg
+   :target: https://gitlab.idiap.ch/bob/bob.example.library/commits/master
 .. image:: https://img.shields.io/badge/gitlab-project-0000c0.svg
-   :target: https://gitlab.idiap.ch/bob/bob.example.extension
-.. image:: http://img.shields.io/pypi/v/bob.example.extension.svg
-   :target: https://pypi.python.org/pypi/bob.example.extension
-.. image:: http://img.shields.io/pypi/dm/bob.example.extension.svg
-   :target: https://pypi.python.org/pypi/bob.example.extension
+   :target: https://gitlab.idiap.ch/bob/bob.example.library
+.. image:: http://img.shields.io/pypi/v/bob.example.library.svg
+   :target: https://pypi.python.org/pypi/bob.example.library
+.. image:: http://img.shields.io/pypi/dm/bob.example.library.svg
+   :target: https://pypi.python.org/pypi/bob.example.library
 
 
 ============================
