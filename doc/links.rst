@@ -23,3 +23,6 @@
 .. _zc.buildout: http://pypi.python.org/pypi/zc.buildout/
 .. _mr.developer: http://pypi.python.org/pypi/mr.developer/
 .. _bob.blitz: https://gitlab.idiap.ch/bob/bob.blitz
+.. _pip: https://pip.pypa.io/en/stable/
+.. _pip's user guide: https://pip.pypa.io/en/stable/user_guide/
+.. _conda: https://conda.io/
