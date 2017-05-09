@@ -27,12 +27,11 @@ You can check it out by:
   $ tar -xjf bob.example.extension.tar.bz2
   $ cd bob.example.extension
 
-One difference to pure Python packages is that now an additional file ``requirements.txt`` can be found in the root directory of the package.
-In this file, all packages that are **directly** required to compile the C/C++ code in your package are listed.
-For our example, this is only the ``bob.blitz`` package.
-**Indirectly** required packages will be downloaded and installed automatically.
+.. note::
+   
+   Is the requirements.txt really different from pure Python ? (I don't think so) 
 
-The second big difference comes in the ``setup.py``.
+The big difference with pure Python packages comes in the ``setup.py``.
 To be able to import ``bob.extension`` and ``bob.blitz`` in the setup.py, we need to include some code:
 
 .. code-block:: python
@@ -46,6 +45,10 @@ To be able to import ``bob.extension`` and ``bob.blitz`` in the setup.py, we nee
 We keep the ``setup_packages`` and ``bob_packages`` in separate variables since we will need them later.
 The ``bob_packages`` contain a list of bob packages that this extension **directly** depends on.
 In our example, we only depend on ``bob.blitz``, and we can leave the list empty.
+
+.. note::
+
+   Is bob.blitz mandatory in any C/C++ packages ?
 
 As the second step, we need to add some lines in the header of the file to tell the ``setuptools`` system to compile our library with our ``Extension`` class:
 
@@ -89,7 +92,7 @@ Third, we have to add an extension using the ``Extension`` class, by listing all
     ...
   )
 
-These modifications will allow you to compile extensions that are linked against our core Python-C++ bridge ``bob.blitz`` (be default).
+These modifications will allow you to compile extensions that are linked against our core Python-C++ bridge ``bob.blitz`` (by default).
 You can specify any other ``pkg-config`` module and that will be linked in (for example, ``boost`` or ``opencv``) using the ``packages`` parameter.
 For ``boost`` packages, you might need to define, which boost modules are required.
 By default, when using boost you should at least add the ``system`` module, i.e., by:
@@ -114,10 +117,6 @@ Other modules and options can be set manually using `the standard options for Py
 Most of the bob packages come with pure C++ code and Python bindings, where we commonly use the `Python C-API <https://docs.python.org/2/extending/index.html>`_ for the bindings.
 When your library compiles and links against the pure C++ code, you can simply use the ``bob_packages`` as above.
 This will automatically add the desired include and library directories, as well as the libraries and the required preprocessor options.
-
-.. note::
-   Usually we provide one extension ``version`` that deals with versioning.
-   One example of such a ``version`` extension can be found in our example.
 
 In our example, we have defined a small C++ function, which also shows the basic bridge between ``numpy.ndarray`` and our C++ pendant ``Blitz++``.
 Basically, there are two C++ files for our extension.
@@ -186,7 +185,7 @@ Again, a complete example can be downloaded via:
 
 .. code-block:: sh
 
-  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/examples/bob.example.library.tar.bz2
+  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/bob/extension/data/bob.example.library.tar.bz2
   $ tar -xjf bob.example.library.tar.bz2
   $ cd bob.example.library
 
@@ -289,8 +288,6 @@ To get the source code compiled using another build directory, you can define a 
 The C++ code of this package, **and the code of all other** ``bob_packages`` will be compiled using the selected directory.
 Again, after compilation this directory can be safely removed.
 
-.. note::
-   For Idiapers, the :ref:`Note from above <idiap_note>` applies again.
 
 Another environment variable enables parallel compilation of C or C++ code.
 Use ``BOB_BUILD_PARALLEL=X`` (where ``X`` is the number of parallel processes you want) to enable parallel building.

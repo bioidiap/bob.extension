@@ -17,7 +17,7 @@
 .. _pep 386: http://www.python.org/dev/peps/pep-0386/
 .. _python: http://www.python.org
 .. _pypi: http://pypi.python.org
-.. _satellite packages: https://www.idiap.ch/software/bob/packages
+.. _bob packages: https://www.idiap.ch/software/bob/packages
 .. _setuptools: https://setuptools.readthedocs.io
 .. _sphinx: http://sphinx.pocoo.org
 .. _zc.buildout: http://pypi.python.org/pypi/zc.buildout/

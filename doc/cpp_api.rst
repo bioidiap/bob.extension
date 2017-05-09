@@ -4,11 +4,15 @@
 ..
 .. Copyright (C) 2011-2014 Idiap Research Institute, Martigny, Switzerland
 
-.. _helpers:
 
-==================
- Helper utilities
-==================
+===========================
+ C++ API to `bob.extension` 
+===========================
+
+----------------
+Helper utilities
+----------------
+.. _helpers:
 
 In the header file ``<bob.extension/defines.h>`` we have added some functions that help you to keep your code short and clean.
 Particularly, we provide three preprocessor directives:
@@ -49,9 +53,10 @@ so that they can be used in bindings for both Python2 and Python3.
 
 .. _cpp_api:
 
-======================================
+
+-------------------------------------
  C++ API of the Documentation classes
-======================================
+-------------------------------------
 
 This section includes information for using the pure C++ API for the documentation classes, which can be accessed after including:
 
@@ -64,6 +69,7 @@ Any free text that you specify to describe your functions will be interpreted as
 Hence, it is possible to use any directives like ``.. note::``, ``.. math::``, and even links inside the documentation like ``:py:class:`` and references as ``[REF]_``.
 
 
+----------------------
 Function Documentation
 ----------------------
 
@@ -198,6 +204,7 @@ During the binding of your function, you can use it, like:
    };
 
 
+-----------------------
 Variables Documentation
 -----------------------
 
@@ -232,6 +239,7 @@ Variables Documentation
       that it can be viewed correctly inside of an 80-character Python console.
 
 
+-------------------
 Class Documentation
 -------------------
 
