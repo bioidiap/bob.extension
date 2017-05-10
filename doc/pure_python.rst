@@ -3,7 +3,7 @@
 .. Tue 15 Oct 17:41:52 2013
 
 ===========================
-Python Package Development 
+Python Package Development
 ===========================
 
 Anatomy of a package
@@ -12,13 +12,11 @@ Anatomy of a package
 The best way to create your package is to download the skeleton that is described in this tutorial and build on it, modifying what you need.
 Fire-up a shell window, activate your bob environment (as explained `here <https://www.idiap.ch/software/bob/install>`_) and then do this:
 
-.. todo::
-    Update the command line not using tarball
-
 .. code-block:: sh
 
-  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/bob/extension/data/bob.example.project.tar.bz2
-  $ tar -xjf bob.example.project.tar.bz2
+  $ git clone https://gitlab.idiap.ch/bob/bob.extension.git
+  $ cp -R bob.extension/bob/extension/data/bob.example.project ./
+  $ rm -rf bob.extension # optionally remove the cloned source of bob.extension
   $ cd bob.example.project
 
 The anatomy of a minimal package should look like the following:
@@ -30,7 +28,7 @@ The anatomy of a minimal package should look like the following:
   +-- README.rst             # a minimal description of the package, in reStructuredText format
   +-- buildout.cfg           # buildout configuration
   +-- setup.py               # installation instruction for this particular package
-  +-- requirements.txt       # requirements of your package 
+  +-- requirements.txt       # requirements of your package
   +-- version.txt            # the (current) version of your package
   +-- doc                    # documentation directory
   |   +-- conf.py            # Sphinx configuration
@@ -56,7 +54,7 @@ To customize the package to your needs, you will need to edit this file and modi
 Before doing so, it is suggested you go through all of this tutorial so you are familiar with the whole environment.
 The example package, as it is distributed, contains a fully working example.
 
-In the remainder of this document, we mainly explain how to setup the ``setup.py`` and the ``buildout.cfg``, going from minimal working example to more advanced features. 
+In the remainder of this document, we mainly explain how to setup the ``setup.py`` and the ``buildout.cfg``, going from minimal working example to more advanced features.
 
 .. note::
    ``requirements.txt should be listed in ``MANIFEST.in``
@@ -82,7 +80,7 @@ package, all of which is contained in the ``setup`` function:
     ...
     packages = find_packages(),
     ...
-    install_requires = install_requires, 
+    install_requires = install_requires,
     ...
     entry_points = {
       'console_scripts' : [
@@ -97,7 +95,7 @@ In detail, it defines the name and the version of this package, which files belo
 Building your package
 ---------------------
 
-To be able to use the package, we first need to build it.  
+To be able to use the package, we first need to build it.
 Buildout is used to set up your local environment with packages that it finds from different sources.
 It is initialized by the ``buildout.cfg`` file, which is part of the package that you unzipped above.
 Let\'s have a look inside it:
@@ -144,9 +142,9 @@ When the ``newest`` flag is set to ``true``, buildout will install all packages 
     running experiments or production.
 
 
-Finally, running buildout is a single step process by invoking the ``buildout`` command line. 
-All options in the ``buildout.cfg`` can be overwritten on command line, by specifying 
-``buildout:option=...``, where ``option`` can be any entry in the ``buildout.cfg``.  
+Finally, running buildout is a single step process by invoking the ``buildout`` command line.
+All options in the ``buildout.cfg`` can be overwritten on command line, by specifying
+``buildout:option=...``, where ``option`` can be any entry in the ``buildout.cfg``.
 
 .. code-block:: sh
 
@@ -166,7 +164,7 @@ All options in the ``buildout.cfg`` can be overwritten on command line, by speci
 
 buildout has performed the following steps:
 
-1. It went through the list of ``eggs``, searched for according packages and installed them *locally* 
+1. It went through the list of ``eggs``, searched for according packages and installed them *locally*
 2. It  populated the ``./bin`` directory with all the ``console_scripts`` that you have specified in the ``setup.py``.
    In our example, this is ``./bin/version.py``.
 
@@ -203,12 +201,12 @@ With this option, you can tell buildout particularly, in which directories it sh
 
    develop = src/bob.blitz
              .
-   
+
    [sources]
    bob.blitz = git https://gitlab.idiap.ch/bob/bob.blitz
    ...
 
-A new section called ``[sources]`` appears, where the package information for `mr.developer`_ is initialized. For more details, please read 
+A new section called ``[sources]`` appears, where the package information for `mr.developer`_ is initialized. For more details, please read
 `its documentation <https://pypi.python.org/pypi/mr.developer>`_.
 Again, mr.developer does not automatically place the packages into the ``develop`` list (and neither in the ``eggs``), so you have to do that yourself.
 
@@ -216,7 +214,7 @@ With this augmented ``buidlout.cfg``, the ``buildout`` command will perform the 
 
 1.  It checks out the packages that you specified using ``mr.developer``.
 
-2.  It develops all packages in the ``develop`` section 
+2.  It develops all packages in the ``develop`` section
     (it links the source of the packages to your local environment).
 
 3.  It will go through the list of ``eggs`` and search for according packages in the following order:
@@ -241,9 +239,9 @@ respecting the order of dependencies**).
 
    We advise to *always* have two configuration files to be used with buildout:
     1. A simple minimal ``buildout.cfg`` file, such as the one in bob.example.project
-    2. A more complete version, called ``develop.cfg`` that checks out whatever (Bob) packages that your project depend on. 
-        
-    Buildout by default looks for ``buildout.cfg`` in your current folder and uses that configuration file. 
+    2. A more complete version, called ``develop.cfg`` that checks out whatever (Bob) packages that your project depend on.
+
+    Buildout by default looks for ``buildout.cfg`` in your current folder and uses that configuration file.
     You can specify a different config file with the ``-c`` option:
 
     .. code:: sh

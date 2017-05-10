@@ -18,8 +18,9 @@ You can check it out by:
 
 .. code-block:: sh
 
-  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/bob/extension/data/bob.example.extension.tar.bz2
-  $ tar -xjf bob.example.extension.tar.bz2
+  $ git clone https://gitlab.idiap.ch/bob/bob.extension.git
+  $ cp -R bob.extension/bob/extension/data/bob.example.extension ./
+  $ rm -rf bob.extension # optionally remove the cloned source of bob.extension
   $ cd bob.example.extension
 
 
@@ -43,7 +44,7 @@ In our example, we only depend on ``bob.blitz``, and we can leave the list empty
 
 .. warning::
 
-   ``bob.blitz`` is required in all C++/Python packages since it contains all the mechanisms 
+   ``bob.blitz`` is required in all C++/Python packages since it contains all the mechanisms
    to deal with arrays amongst other things.
 
 As the second step, we need to add some lines in the header of the file to tell the ``setuptools`` system to compile our library with our ``Extension`` class:
@@ -119,7 +120,7 @@ Basically, there are two C++ files for our extension.
 ``bob/example/extension/Function.cpp`` contains the pure C++ implementation of the function.
 In ``bob/example/extension/main.cpp``, we define the Python bindings to that function.
 
-.. 
+..
   including the creation of a complete Python module called ``_library``.
   Additionally, we give a short example of how to use our documentation classes provided in this module (see below for more details).
   Finally, the function ``reverse`` from the module ``_library`` is imported into our module in the ``bob/example/extension/__init__.py`` file.
@@ -184,8 +185,9 @@ Again, a complete example can be downloaded via:
 
 .. code-block:: sh
 
-  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/bob/extension/data/bob.example.library.tar.bz2
-  $ tar -xjf bob.example.library.tar.bz2
+  $ git clone https://gitlab.idiap.ch/bob/bob.extension.git
+  $ cp -R bob.extension/bob/extension/data/bob.example.library ./
+  $ rm -rf bob.extension # optionally remove the cloned source of bob.extension
   $ cd bob.example.library
 
 To generate a Library, simply add it in the list of ``ext_modules``:
