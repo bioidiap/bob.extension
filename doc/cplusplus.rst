@@ -27,9 +27,10 @@ You can check it out by:
   $ tar -xjf bob.example.extension.tar.bz2
   $ cd bob.example.extension
 
-.. note::
-   
-   Is the requirements.txt really different from pure Python ? (I don't think so) 
+  
+
+Setting up your package
++++++++++++++++++++++++
 
 The big difference with pure Python packages comes in the ``setup.py``.
 To be able to import ``bob.extension`` and ``bob.blitz`` in the setup.py, we need to include some code:
@@ -46,9 +47,10 @@ We keep the ``setup_packages`` and ``bob_packages`` in separate variables since 
 The ``bob_packages`` contain a list of bob packages that this extension **directly** depends on.
 In our example, we only depend on ``bob.blitz``, and we can leave the list empty.
 
-.. note::
+.. warning::
 
-   Is bob.blitz mandatory in any C/C++ packages ?
+   ``bob.blitz`` is required in all C++/Python packages since it contains all the mechanisms 
+   to deal with arrays amongst other things.
 
 As the second step, we need to add some lines in the header of the file to tell the ``setuptools`` system to compile our library with our ``Extension`` class:
 
@@ -114,16 +116,19 @@ By default, when using boost you should at least add the ``system`` module, i.e.
 
 Other modules and options can be set manually using `the standard options for Python extensions <https://docs.python.org/2/extending/building.html>`_.
 
-Most of the bob packages come with pure C++ code and Python bindings, where we commonly use the `Python C-API <https://docs.python.org/2/extending/index.html>`_ for the bindings.
+Most of the core bob packages come with pure C++ code and Python bindings, where we commonly use the `Python C-API <https://docs.python.org/2/extending/index.html>`_ for the bindings.
 When your library compiles and links against the pure C++ code, you can simply use the ``bob_packages`` as above.
 This will automatically add the desired include and library directories, as well as the libraries and the required preprocessor options.
 
 In our example, we have defined a small C++ function, which also shows the basic bridge between ``numpy.ndarray`` and our C++ pendant ``Blitz++``.
 Basically, there are two C++ files for our extension.
 ``bob/example/extension/Function.cpp`` contains the pure C++ implementation of the function.
-In ``bob/example/extension/main.cpp``, we define the Python bindings to that function, including the creation of a complete Python module called ``_library``.
-Additionally, we give a short example of how to use our documentation classes provided in this module (see below for more details).
-Finally, the function ``reverse`` from the module ``_library`` is imported into our module in the ``bob/example/extension/__init__.py`` file.
+In ``bob/example/extension/main.cpp``, we define the Python bindings to that function.
+
+.. to_put_somewhere_esle::
+   including the creation of a complete Python module called ``_library``.
+   Additionally, we give a short example of how to use our documentation classes provided in this module (see below for more details).
+   Finally, the function ``reverse`` from the module ``_library`` is imported into our module in the ``bob/example/extension/__init__.py`` file.
 
 .. note::
    In the bindings of the ``reverse`` function in ``bob/example/extension/main.cpp``, we make use of some C++ defines that makes the life easier.

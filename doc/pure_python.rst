@@ -58,6 +58,9 @@ The example package, as it is distributed, contains a fully working example.
 
 In the remainder of this document, we mainly explain how to setup the ``setup.py`` and the ``buildout.cfg``, going from minimal working example to more advanced features. 
 
+.. note::
+   ``requirements.txt should be listed in ``MANIFEST.in``
+
 Setting up your package
 -----------------------
 
@@ -88,7 +91,7 @@ package, all of which is contained in the ``setup`` function:
     },
   )
 
-In detail, it defines the name and the version of this package, which files belong to the package (those files are automatically collected by the ``find_packages`` function), other packages that we depend on, namespaces (see below) and console scripts. The full set of options can be inspected in the `Setuptools documentation <https://setuptools.readthedocs.io>`_.
+In detail, it defines the name and the version of this package, which files belong to the package (those files are automatically collected by the ``find_packages`` function), other packages that we depend on, namespaces and console scripts. The full set of options can be inspected in the `Setuptools documentation <https://setuptools.readthedocs.io>`_.
 
 
 Building your package
@@ -129,8 +132,8 @@ Some of the entries need attention.
 * The next entry is the ``develop`` list.
   As a minimal requirement, you need to develop the current package of course, which is stored in ``.``, i.e, the current directory.
 
-The remaining options define, how the packages are build.
-For example, the ``debug`` flag defined, how the :ref:`C++ code <extension-c++>` in all the packages is built.
+The remaining options define how the (dependent) packages are build.
+For example, the ``debug`` flag defined, how the :ref:`C++ code <extension-c++>` in all the (dependent) packages is built.
 The ``verbose`` options handles the verbosity of the build.
 When the ``newest`` flag is set to ``true``, buildout will install all packages in the latest versions, even if an older version is already available.
 
@@ -142,7 +145,7 @@ When the ``newest`` flag is set to ``true``, buildout will install all packages 
 
 
 Finally, running buildout is a single step process by invoking the ``buildout`` command line. 
-All options in the buildout.cfg can be overwritten on command line, by specifying 
+All options in the ``buildout.cfg`` can be overwritten on command line, by specifying 
 ``buildout:option=...``, where ``option`` can be any entry in the ``buildout.cfg``.  
 
 .. code-block:: sh

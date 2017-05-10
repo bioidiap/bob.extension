@@ -59,8 +59,14 @@ To run the test units on your package call:
   OK
 
 
+You should put additional packages needed for testing (e.g. ``nosetests``) in the ``requirements.txt`` file.
+
 Continuous integration
 ----------------------
+
+Conda recipe
+------------
+see ``bob.conda``
 
 Distributing Your Work
 ----------------------

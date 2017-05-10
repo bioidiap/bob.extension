@@ -4,6 +4,7 @@
 ..
 .. Copyright (C) 2011-2014 Idiap Research Institute, Martigny, Switzerland
 
+.. _helpers:
 
 ===========================
  C++ API to `bob.extension` 
@@ -12,7 +13,6 @@
 ----------------
 Helper utilities
 ----------------
-.. _helpers:
 
 In the header file ``<bob.extension/defines.h>`` we have added some functions that help you to keep your code short and clean.
 Particularly, we provide three preprocessor directives:

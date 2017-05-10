@@ -23,7 +23,11 @@ By following these instructions you will be able to:
 
 * Download and install |project| packages to build a local working environment.
 * Install python packages to augment your virtual work environment capabilities 
-* Implement your own package including either pure Python code, a mixture of C/C++ and Python code, and even pure C/C++ libraries with clean C/C++ interfaces 
+* Implement your own package including either pure Python code, a mixture of C/C++ and Python code, and even pure C/C++ libraries with clean C/C++ interfaces.
+  
+  .. note::
+     If possible, you should try to develop new packages using Python only, since they are easier to maintain.
+
 * Distribute your work to others in a clean and organized manner.
 
 These instructions heavily rely on the use of Python `distutils`_ and `zc.buildout`_.
