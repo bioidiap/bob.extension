@@ -26,3 +26,4 @@
 .. _pip: https://pip.pypa.io/en/stable/
 .. _pip's user guide: https://pip.pypa.io/en/stable/user_guide/
 .. _conda: https://conda.io/
+.. _napoleon: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/ 

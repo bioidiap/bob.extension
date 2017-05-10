@@ -50,7 +50,9 @@ Documentation
    :maxdepth: 2
 
    pure_python
-   cplusplus
+   cplusplus_modules
+   cplusplus_library
+   documenting
    advanced_topics
    py_api
    cpp_api

@@ -1,7 +1,6 @@
-====================
-More advanced topics
-====================
-
+=========================
+Additional considerations
+=========================
 
 Python Package Namespace
 ------------------------
@@ -9,36 +8,6 @@ Python Package Namespace
 We like to make use of namespaces to define combined sets of functionality that go well together.
 Python package namespaces are `explained in details here <http://peak.telecommunity.com/DevCenter/setuptools#namespace-package>`_ together with implementation details.
 For bob packages, we usually use the ``bob`` namespace, using several sub-namespaces such as ``bob.io``, ``bob.ip``, ``bob.learn``, ``bob.db`` or (like here) ``bob.example``.
-
-
-Documentation
--------------
-
-If you intend to distribute your newly created package, please consider carefully documenting and creating unit tests for your package.
-Documentation is a great starting point for users and unit tests can be used to check functionality in unexpected circumstances such as variations in package versions.
-
-To write documentation, use the `Sphinx`_ Documentation Generator.
-A template has been setup for you under the ``doc`` directory.
-Get familiar with Sphinx and then unleash the writer in you.
-
-Once you have edited both ``doc/conf.py`` and ``doc/index.rst`` you can run the documentation generator executing:
-
-.. code-block:: sh
-
-  $ ./bin/sphinx-build -n doc sphinx
-  ...
-
-This example generates the output of the sphinx processing in the directory ``sphinx``.
-You can find more options for ``sphinx-build`` using the ``-h`` flag:
-
-.. code-block:: sh
-
-  $ ./bin/sphinx-build -h
-  ...
-
-.. note::
-
-  If the code you are distributing corresponds to the work described in a publication, don't forget to mention it in your ``doc/index.rst`` file.
 
 
 Unit Tests
@@ -61,12 +30,73 @@ To run the test units on your package call:
 
 You should put additional packages needed for testing (e.g. ``nosetests``) in the ``requirements.txt`` file.
 
-Continuous integration
-----------------------
+
+Continuous integration (CI)
+---------------------------
+
+.. note:: 
+   
+   This is valid for people at Idiap (or external bob contributors with access to Idiap's gitlab)
+
+.. note::
+  
+   Before going into CI, you should make sure that your pacakge has a gitlab repository.
+   If not, do the following in your package root folder:
+
+   .. code-block:: sh
+      
+      $ git init
+      $ git remote add origin git@gitlab.idiap.ch:bob/`basename $(pwd)`
+      $ git add bob/ buildout.cfg COPYING doc/ MANIFEST.IN README.rst requirements.txt setup.py version.txt
+      $ git commit -m '[Initial commit]'
+      $ git push -u origin master
+      
+
+Copy the appropriate yml template for the CI builds:
+
+
+.. code-block:: sh
+
+  # for pure python
+  $ curl -k --silent https://gitlab.idiap.ch/bob/bob.admin/raw/master/templates/ci-for-python-only.yml > .gitlab-ci.yml
+  # for c/c++ extensions
+  $ curl -k --silent https://gitlab.idiap.ch/bob/bob.admin/raw/master/templates/ci-for-cxx-extensions.yml | tr -d '\r' > .gitlab-ci.yml
+
+Add the file to git:
+
+.. code-block:: sh
+
+  $ git add .gitlab-ci.yml
+
+
+The ci file should work out of the box. It is long-ish, but generic to any
+package in the system.
+
+You also need to enable the following options on your project:
+
+1. In the project "Settings" page, make sure builds are enabled
+2. If you have a private project, check the package settings and make sure that
+   the "Deploy Keys" for our builders (all `conda-*` related servers) are
+   enabled
+3. Visit the "Runners" section of your package settings and enable all conda
+   runners, for linux and macosx variants
+4. Go into the "Variables" section of your package setup and **add common
+   variables** corresponding to the usernames and passwords for uploading
+   wheels and documentation tar balls to our (web DAV) server, as well as PyPI
+   packages.  You can copy required values from [the "Variables" section of
+   bob.admin](https://gitlab.idiap.ch/bob/bob.admin/variables). N.B.: You
+   **must** be logged into gitlab to access that page.
+5. Make sure to **disable** the service "Build e-mails" (those are very
+   annoying)
+6. Setup the coverage regular expression under "CI/CD pipelines" to have the
+   value `^TOTAL.*\s+(\d+\%)$`, which is adequate for figuring out the output
+   of `coverage report`
+
 
 Conda recipe
 ------------
 see ``bob.conda``
+
 
 Distributing Your Work
 ----------------------
@@ -82,6 +112,8 @@ This file will be used to generate the front page of your package on PyPI_ and w
 
 To ease up your life, we also provide a script to run all steps to publish your package.
 Please read the following paragraphs to understand the steps in the ``./bin/bob_new_version.py`` script that will be explained at the end of this section.
+
+Add package to the list in the wiki
 
 Version Numbering Scheme
 ------------------------
