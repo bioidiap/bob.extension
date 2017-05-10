@@ -9,12 +9,7 @@
 ==================================
 
 |project| massively relies on a mixture between the user-friendly and easy-to-develop Python interface, and a fast implementation of identified bottlenecks using C++.
-Typically, |project|'s packages include both a pure C++ library, which can be included and linked in pure C++ code, as well as Python bindings for the C++ code.
-Sometimes, even a C-API for the python bindings is available.
-But, let's go step by step...
-
-C or C++/Python Packages
-------------------------
+Typically, |project|'s core packages include both a pure C++ library as well as Python bindings for the C++ code.
 
 Creating C++/Python bindings should be rather straightforward.
 Only few adaptations need to be performed to get the C/C++ code being compiled and added as an extension.
@@ -27,10 +22,9 @@ You can check it out by:
   $ tar -xjf bob.example.extension.tar.bz2
   $ cd bob.example.extension
 
-  
 
 Setting up your package
-+++++++++++++++++++++++
+-----------------------
 
 The big difference with pure Python packages comes in the ``setup.py``.
 To be able to import ``bob.extension`` and ``bob.blitz`` in the setup.py, we need to include some code:
@@ -125,10 +119,10 @@ Basically, there are two C++ files for our extension.
 ``bob/example/extension/Function.cpp`` contains the pure C++ implementation of the function.
 In ``bob/example/extension/main.cpp``, we define the Python bindings to that function.
 
-.. to_put_somewhere_esle::
-   including the creation of a complete Python module called ``_library``.
-   Additionally, we give a short example of how to use our documentation classes provided in this module (see below for more details).
-   Finally, the function ``reverse`` from the module ``_library`` is imported into our module in the ``bob/example/extension/__init__.py`` file.
+.. 
+  including the creation of a complete Python module called ``_library``.
+  Additionally, we give a short example of how to use our documentation classes provided in this module (see below for more details).
+  Finally, the function ``reverse`` from the module ``_library`` is imported into our module in the ``bob/example/extension/__init__.py`` file.
 
 .. note::
    In the bindings of the ``reverse`` function in ``bob/example/extension/main.cpp``, we make use of some C++ defines that makes the life easier.
