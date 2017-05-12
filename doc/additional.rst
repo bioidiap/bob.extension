@@ -110,8 +110,8 @@ Distributing your work
 ----------------------
 
 To distribute a package, we recommend you use PyPI_.
-`Python Packaging User Guide <https://packaging.python.org/>`_
-contains details and good examples on how to achieve this.
+`Python Packaging User Guide <https://packaging.python.org/>`_ contains details
+and good examples on how to achieve this.
 Moreover, you can provide a conda_ package for your PyPI_ package for easier
 installation. In order to create a conda_ package, you need to create a conda_
 recipe for that package.
