@@ -15,15 +15,13 @@ Only few adaptations need to be performed to get the C/C++ code being compiled a
 For simplicity, we created an example package that includes a simple example of a C++ extension.
 You can check it out by:
 
-
-
 .. code-block:: sh
 
-  $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/bob/extension/data/bob.example.extension.tar.bz2
-  $ tar -xjf bob.example.extension.tar.bz2
+  $ git clone https://gitlab.idiap.ch/bob/bob.extension.git
+  $ cp -R bob.extension/bob/extension/data/bob.example.extension ./
+  $ rm -rf bob.extension # optionally remove the cloned source of bob.extension
   $ cd bob.example.extension
 
-.. todo:: Should we advise to clone ``bob.extension`` and then go to ``./bob.extension/examples/bob.example.extension/`` instead ?
 
 Setting up your package
 -----------------------
