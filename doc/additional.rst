@@ -2,15 +2,9 @@
 Additional considerations
 =========================
 
-Python Package Namespace
-------------------------
-
-We like to make use of namespaces to define combined sets of functionality that go well together.
-Python package namespaces are `explained in details here <http://peak.telecommunity.com/DevCenter/setuptools#namespace-package>`_ together with implementation details.
-For bob packages, we usually use the ``bob`` namespace, using several sub-namespaces such as ``bob.io``, ``bob.ip``, ``bob.learn``, ``bob.db`` or (like here) ``bob.example``.
 
 
-Unit Tests
+Unit tests
 ----------
 
 Writing unit tests is an important asset on code that needs to run in different platforms and a great way to make sure all is OK.
@@ -19,7 +13,7 @@ To run the test units on your package call:
 
 .. code-block:: sh
 
-  $ ./bin/nosetests -sv
+  $ ./bin/nosetests -v
   bob.example.library.test.test_reverse ... ok
 
   ----------------------------------------------------------------------
@@ -27,8 +21,13 @@ To run the test units on your package call:
 
   OK
 
+This example shows the results of the tests in the ``bob.example.project`` package. Ideally, you should
+write test units for each function of your package ...
 
-You should put additional packages needed for testing (e.g. ``nosetests``) in the ``requirements.txt`` file.
+.. note::
+  
+   You should put additional packages needed for testing (e.g. ``nosetests``) in the ``requirements.txt`` file.
+
 
 
 Continuous integration (CI)
@@ -72,7 +71,7 @@ Add the file to git:
 The ci file should work out of the box. It is long-ish, but generic to any
 package in the system.
 
-You also need to enable the following options on your project:
+You also need to enable the following options - through gitlab - on your project:
 
 1. In the project "Settings" page, make sure builds are enabled
 2. If you have a private project, check the package settings and make sure that
@@ -93,29 +92,25 @@ You also need to enable the following options on your project:
    of `coverage report`
 
 
-Conda recipe
-------------
-see ``bob.conda``
+Python package namespace
+------------------------
+
+We like to make use of namespaces to define combined sets of functionality that go well together.
+Python package namespaces are `explained in details here <http://peak.telecommunity.com/DevCenter/setuptools#namespace-package>`_ together with implementation details.
+For bob packages, we usually use the ``bob`` namespace, using several sub-namespaces such as ``bob.io``, ``bob.ip``, ``bob.learn``, ``bob.db`` or (like here) ``bob.example``.
 
 
-Distributing Your Work
+Distributing your work
 ----------------------
 
 To distribute a package, we recommend you use PyPI_.
 `The Hitchhiker’s Guide to Packaging <http://guide.python-distribute.org/>`_ contains details and good examples on how to achieve this.
-Particularly, you should edit your ``README.rst`` file to have a proper description of your package.
-This file will be used to generate the front page of your package on PyPI_ and will, hence, be the first contact point of the world with your package.
-
-.. note::
-  If you are writing a package to extend Bob, you might want to follow the README structure of all Bob packages.
-  The ``README.rst`` of **this package** (``bob.extension``) is a good example, including all the badges that show the current status of the package and the link to relevant information.
 
 To ease up your life, we also provide a script to run all steps to publish your package.
 Please read the following paragraphs to understand the steps in the ``./bin/bob_new_version.py`` script that will be explained at the end of this section.
 
-Add package to the list in the wiki
-
-Version Numbering Scheme
+------------------------
+Version numbering scheme
 ------------------------
 
 We recommend you follow |project|'s version numbering scheme using a 3-tier string: ``M.m.p``.
@@ -146,11 +141,11 @@ Here are lists of valid Python version numbers following this scheme::
   1.2.3b44
   2.4.99c32
 
+--------------------------------
+Release methodology for packages
+--------------------------------
 
-Release Methodology for Satellite Packages
-------------------------------------------
-
-Here is a set of steps we recommend you follow when releasing a new version of your satellite package:
+Here is a set of steps we recommend you follow when releasing a new version of your package:
 
 1. First decide on the new version number your package will get.
    If you are  making a minor, API preserving, modification on an existing stable package (already published on PyPI), just increment the last digit on the version.
@@ -186,7 +181,7 @@ Here is a set of steps we recommend you follow when releasing a new version of y
 
    In this fictitious representation, the ``master`` branch continue under development, but one can see older branches don't receive much attention anymore.
 
-   Here is an example for creating a branch at gitlab (many of our satellite packages are hosted there).
+   Here is an example for creating a branch at gitlab (many of our packages are hosted there).
    Let's create a branch called ``1.1``:
 
    .. code-block:: sh
@@ -230,9 +225,11 @@ Here is a set of steps we recommend you follow when releasing a new version of y
 
 5. Announce the update on the relevant channels.
 
-
-Upload Additional Documentation to PythonHosted.org
 ---------------------------------------------------
+Upload additional documentation to PythonHosted.org
+---------------------------------------------------
+
+.. todo:: is this section still valid ?
 
 In case you have written additional sphinx documentation in your satellite package that you want to share with the world, there is an easy way to push the documentation to `PythonHosted.org <http://pythonhosted.org>`_.
 More detailed information are given `here <http://pythonhosted.org/an_example_pypi_project/buildanduploadsphinx.html>`__, which translates roughly into:
@@ -246,9 +243,9 @@ The link to the documentation will automatically be added to the PyPI page of
 your package.  Usually it is a good idea to check the documentation after
 building and before uploading.
 
-
-Change the Version of your Satellite Package
---------------------------------------------
+----------------------------------
+Change the version of your package
+----------------------------------
 
 It is well understood that it requires quite some work to understand and follow the steps to publish (a new version) of your package.
 Especially, when you want to update the .git repository and the version on PyPI_ at the same time.
@@ -279,5 +276,19 @@ Detailed information of what the script is doing, you can get when using the ``-
 .. code-block:: sh
 
   $ ./bin/bob_new_version.py -vv --dry-run
+
+
+------------
+Conda recipe
+------------
+
+.. todo:: explanation on how to make conda recipe
+
+----------------------------
+Add your package on our wiki
+----------------------------
+
+You should also add your package in the list that can be found on `Bob's wiki <https://gitlab.idiap.ch/bob/bob/wikis/Packages>`_.
+
 
 .. include:: links.rst

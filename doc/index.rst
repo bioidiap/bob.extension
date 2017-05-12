@@ -53,7 +53,7 @@ Documentation
    cplusplus_modules
    cplusplus_library
    documenting
-   advanced_topics
+   additional
    py_api
    cpp_api
    pip

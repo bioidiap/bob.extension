@@ -16,6 +16,8 @@ as well as in the C++ code of other C++/Python packages. Again, a complete examp
   $ tar -xjf bob.example.library.tar.bz2
   $ cd bob.example.library
 
+.. todo:: Should we advise to clone ``bob.extension`` and then go to ``./bob.extension/examples/bob.example.library/`` instead ?
+
 -----------------------
 Setting up your package
 -----------------------

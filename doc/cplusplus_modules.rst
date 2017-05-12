@@ -4,9 +4,9 @@
 
 .. _extension-c++:
 
-=====================================
- C/C++ modules in your Python package
-=====================================
+==============================
+ C/C++ modules in your package
+==============================
 
 |project| massively relies on a mixture between the user-friendly and easy-to-develop Python interface, and a fast implementation of identified bottlenecks using C++.
 
@@ -15,12 +15,15 @@ Only few adaptations need to be performed to get the C/C++ code being compiled a
 For simplicity, we created an example package that includes a simple example of a C++ extension.
 You can check it out by:
 
+
+
 .. code-block:: sh
 
   $ wget https://gitlab.idiap.ch/bob/bob.extension/raw/master/bob/extension/data/bob.example.extension.tar.bz2
   $ tar -xjf bob.example.extension.tar.bz2
   $ cd bob.example.extension
 
+.. todo:: Should we advise to clone ``bob.extension`` and then go to ``./bob.extension/examples/bob.example.extension/`` instead ?
 
 Setting up your package
 -----------------------

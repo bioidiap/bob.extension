@@ -3,7 +3,7 @@
 .. Tue 15 Oct 17:41:52 2013
 
 ===========================
-Python Package Development
+Python package development 
 ===========================
 
 Anatomy of a package
@@ -18,6 +18,8 @@ Fire-up a shell window, activate your bob environment (as explained `here <https
   $ cp -R bob.extension/bob/extension/data/bob.example.project ./
   $ rm -rf bob.extension # optionally remove the cloned source of bob.extension
   $ cd bob.example.project
+
+.. todo:: Should we advise to clone ``bob.extension`` and then go to ``./bob.extension/examples/bob.example.project/`` instead ?
 
 The anatomy of a minimal package should look like the following:
 

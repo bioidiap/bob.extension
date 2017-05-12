@@ -2,15 +2,39 @@
 
 .. _docs:
 
-=====================
-Documenting your code
-=====================
+========================
+Documenting your package
+========================
 
 If you intend to distribute your newly created package, please consider carefully documenting it. 
 Documentation is a great starting point for users.
 
-Ideally, you should write a user's guide for your package. There are plenty of packages user guides examples in the existing bob packages
+First you should have a proper README file (such as the one provided in packages previousy provided as examples). 
+We made a simple, minimal ``README.rst`` template that you can get by doing:
+
+.. code-block:: sh
+
+  $ curl -k --silent https://gitlab.idiap.ch/bob/bob.admin/raw/master/templates/readme-template.rst > README.rst
+  $ sed -i "s/<DATE>/`date`/g" README.rst
+  $ sed -i "s/<PACKAGE>/`basename $(pwd)`/g" README.rst
+  # example from bob.extension, don't copy verbatim!
+  $ sed -i "s%<TITLE>%Python/C++ Bob Extension Building Support%g" README.rst
+  $ sed -i s%<SHORTINTRO>%It provides a simple mechanism for extending Bob_ by building packages using either pure python or a mix of C++ and python.%g;" README.rst
+
+Replace the following tags by hand if you don't like/trust the `sed` lines above:
+
+  1. `<DATE>`: To today's date. E.g.: `Mon 08 Aug 2016 09:47:28 CEST`
+  2. `<PACKAGE>`: With the name of your package. E.g.: `bob.extension`
+  3. `<TITLE>`: Replace the title (and the size of the title delimiters). E.g.: `Python/C++ Bob Extension Building Support`
+  4. `<SHORTINTRO>`: With a 1 or 2 lines description of your package (it is OK to
+     re-use what you have in `setup.py`). E.g.: `It provides a simple mechanism
+     for extending Bob_ by building packages using either pure python or a mix of
+     C++ and python.`
+
+Additional information should be made available in the documentation. 
+Ideally, you should write a user's guide for your package. There are plenty of examples in the existing bob packages
 - and don't hesitate to tell us (either by opening an issue on gitlab or through our mailing list) if some are missing or outdated.
+
 
 Documenting Python code
 -----------------------
