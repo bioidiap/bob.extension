@@ -25,31 +25,31 @@ This example shows the results of the tests in the ``bob.example.project`` packa
 write test units for each function of your package ...
 
 .. note::
-  
-   You should put additional packages needed for testing (e.g. ``nosetests``) in the ``requirements.txt`` file.
 
+   You should put additional packages needed for testing (e.g. ``nosetests``)
+   in the ``test-requirements.txt`` file.
 
 
 Continuous integration (CI)
 ---------------------------
 
-.. note:: 
-   
+.. note::
+
    This is valid for people at Idiap (or external bob contributors with access to Idiap's gitlab)
 
 .. note::
-  
+
    Before going into CI, you should make sure that your pacakge has a gitlab repository.
    If not, do the following in your package root folder:
 
    .. code-block:: sh
-      
+
       $ git init
       $ git remote add origin git@gitlab.idiap.ch:bob/`basename $(pwd)`
       $ git add bob/ buildout.cfg COPYING doc/ MANIFEST.IN README.rst requirements.txt setup.py version.txt
       $ git commit -m '[Initial commit]'
       $ git push -u origin master
-      
+
 
 Copy the appropriate yml template for the CI builds:
 
@@ -110,10 +110,144 @@ Distributing your work
 ----------------------
 
 To distribute a package, we recommend you use PyPI_.
-`The Hitchhiker’s Guide to Packaging <http://guide.python-distribute.org/>`_ contains details and good examples on how to achieve this.
+`Python Packaging User Guide <https://packaging.python.org/>`_
+contains details and good examples on how to achieve this.
+Moreover, you can provide a conda_ package for your PyPI_ package for easier
+installation. In order to create a conda_ package, you need to create a conda_
+recipe for that package.
 
-To ease up your life, we also provide a script to run all steps to publish your package.
-Please read the following paragraphs to understand the steps in the ``./bin/bob_new_version.py`` script that will be explained at the end of this section.
+..note::
+
+    To ease up your life, we also provide a script to run all steps to publish
+    your package. Please read the following sections to understand the steps
+    in the ``./bin/bob_new_version.py`` script that will be explained at the
+    end of these section.
+
+
+------------
+Conda recipe
+------------
+
+.. todo:: improve conda docs.
+
+If you want to create a new recipe for a package, first:
+
+#. Learn about conda_.
+#. Read the official `conda build guide`_.
+#. Read `conda-forge's documentation`_.
+#. Read the readme of `anaconda-recipes`_.
+
+At Idiap, we provide our own `conda channel`_ to distribute |project| packages
+and some other dependencies that are not available in the ``defaults`` channel.
+This channel is maintained in `bob.conda`_.
+
+.. note::
+
+    If you are at Idiap, every newly developed |project| package must have a
+    conda_ recipe in `bob.conda`_ **before** a new version is tagged. Since our
+    conda recipes pull your package source from PyPI and you only get to have a
+    PyPI source *after* you tag, there is a little chicken and egg problem. Do
+    not worry. To avoid this the first time you create a conda recipe for a new
+    |project| package, make sure the builds are skipped for your recipe:
+
+    .. code-block:: yaml
+
+        build:
+          skip: true
+
+    Later when you tag a package for the first time, the CI process will
+    automatically update your recipe in `bob.conda`_ to the tagged version.
+    Then, you can remove the line that says ``skip: true`` to actually start
+    building your package in `bob.conda`_. This is only relevant for the
+    packages that are being tagged for the first time. In future, you just tag
+    and your package will be uploaded to PyPI_ first and then its recipe in
+    `bob.conda`_ will be updated through a merge request.
+
+
+Folder structure in ``bob.conda``
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+There are several folder inside this repository and they are organized like
+this:
+
+-  ``dependencies`` A folder to keep the recipes for packages that are
+   not part of Bob.
+-  ``recipes`` A folder to keep recipes for Bob packages which contain
+   C/C++ code.
+-  ``skeleton`` A folder to keep recipes for Bob packages that contain Pyhon
+   2/3 compatible and platform-independent code. Usually this is the place that
+   you want to place your recipe.
+-  ``scripts`` Contains some useful scripts.
+
+To add a new recipe, you can start by copying one of the recipes available
+in ``bob.conda``. Below is some detailed information about our channel.
+
+
+
+A few remarks
+^^^^^^^^^^^^^
+
+* Make sure you follow the pinning policies already available inside other
+  packages recipes. You need to do a little searching here.
+* Clearly mark your name (gitlab id) as maintainer of the recipe
+* If the package has some C/C++ code, add following build and run
+  requirements into ``meta.yaml``:
+
+.. code:: yaml
+
+    requirements:
+      build:
+        - toolchain 2.3.2
+        - gcc 4.8.5  # [linux]
+        - libgcc 4.8.5  # [linux]
+      run:
+        - libgcc 4.8.5  # [linux]
+
+Testing
+^^^^^^^
+
+In order to test the recipe, you'll need to install ``conda-build`` on
+your conda root environment. Make sure you have the latest available
+version on your system.
+
+.. note::
+
+    You must install conda on your local machine. You cannot use a central
+    conda instllation (like the one we provide at Idiap) for this building
+    purpose.
+
+You **should** have only these two channels on the top of your channel list:
+
+.. code-block:: yaml
+
+    -  https://www.idiap.ch/software/bob/conda
+    -  defaults
+
+This can be achieved with the following commands:
+
+.. code-block:: sh
+
+    $ conda config --add channels defaults
+    $ conda config --add channels http://www.idiap.ch/software/bob/conda
+
+Once that is done, you can try to build your new recipe with:
+
+.. code-block:: sh
+
+    $ CONDA_NPY=112 conda build <package>
+
+If that works, upload your changes on this package on a branch and
+create a merge request. Wait for the tests to pass on the MR and make
+sure everything completes well, by inspecting the log files. If all is
+good, assign the branch for merge to one of the package maintainers.
+
+.. warning::
+
+   You should only use the packages from the ``defaults`` channel and our
+   channel. The packages from our channel **are not** co-installable with the
+   packages from `conda-forge`. If you need to use a package from
+   `conda-forge`, you need to first port that package to bob.conda_ first.
+
 
 ------------------------
 Version numbering scheme
@@ -263,17 +397,12 @@ Detailed information of what the script is doing, you can get when using the ``-
   $ ./bin/bob_new_version.py -vv --dry-run
 
 
-------------
-Conda recipe
-------------
-
-.. todo:: explanation on how to make conda recipe
-
 ----------------------------
 Add your package on our wiki
 ----------------------------
 
-You should also add your package in the list that can be found on `Bob's wiki <https://gitlab.idiap.ch/bob/bob/wikis/Packages>`_.
+You should also add your package in the list that can be found on
+`Bob packages`_.
 
 
 .. include:: links.rst

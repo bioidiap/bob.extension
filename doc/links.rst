@@ -26,4 +26,10 @@
 .. _pip: https://pip.pypa.io/en/stable/
 .. _pip's user guide: https://pip.pypa.io/en/stable/user_guide/
 .. _conda: https://conda.io/
-.. _napoleon: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/ 
+.. _napoleon: https://sphinxcontrib-napoleon.readthedocs.io/en/latest/
+.. _conda: https://conda.io
+.. _bob.conda: https://gitlab.idiap.ch/bob/bob.conda/
+.. _conda build guide: https://conda.io/docs/building/build.html
+.. _conda-forge's documentation: https://conda-forge.github.io/docs/
+.. _anaconda-recipes: https://github.com/ContinuumIO/anaconda-recipes/
+.. _conda channel: https://www.idiap.ch/software/bob/conda/
