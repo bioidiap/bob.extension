@@ -116,7 +116,7 @@ Moreover, you can provide a conda_ package for your PyPI_ package for easier
 installation. In order to create a conda_ package, you need to create a conda_
 recipe for that package.
 
-..note::
+.. note::
 
     To ease up your life, we also provide a script to run all steps to publish
     your package. Please read the following sections to understand the steps
