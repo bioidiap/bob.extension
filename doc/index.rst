@@ -23,6 +23,7 @@ Documentation
 
    guide
    buildout
+   pip
    extension
    cpp_api
    py_api
