@@ -60,7 +60,8 @@ command:
 while the content of your ``requirements.txt`` file lists the packages that the
 current package both depends on and the dependencies that you want to develop.
 For example, the following ``requirements.txt`` file can be used to develop
-:py:ref:`bob.io.image <bob.io.image>`::
+:py:ref:`bob.io.image <bob.io.image>`, together with **all** of its direct and
+indirect dependencies::
 
     setuptools
     -egit+https://gitlab.idiap.ch/bob/bob.extension.git#egg=bob.extension
