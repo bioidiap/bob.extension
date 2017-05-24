@@ -97,12 +97,16 @@ In the following, we will see what the configuration files for ``zc.buildout`` l
     ...
     entry_points = {
       'console_scripts' : [
-        'version.py = bob.example.project.script.version:main',
+        'bob_example_project_version.py = bob.example.project.script.version:main',
       ],
     },
   )
 
 In detail, it defines the name and the version of this package, which files belong to the package (those files are automatically collected by the ``find_packages`` function), other packages that we depend on, namespaces and console scripts. The full set of options can be inspected in the `Setuptools documentation <https://setuptools.readthedocs.io>`_.
+
+.. warning:: 
+  
+  The (executable) script name should somehow contain the namespace of the package
 
 
 Building your package
@@ -186,7 +190,7 @@ buildout has performed the following steps:
 
 1. It went through the list of ``eggs``, searched for according packages and installed them *locally*
 2. It  populated the ``./bin`` directory with all the ``console_scripts`` that you have specified in the ``setup.py``.
-   In our example, this is ``./bin/version.py``.
+   In our example, this is ``./bin/bob_example_project_version.py``.
 
 .. note::
 
@@ -243,7 +247,7 @@ With this augmented ``buildout.cfg``, the ``buildout`` command will perform the 
     #. In the python environment, e.g., packages installed with ``pip``.
     #. Online, i.e. on PyPI_.
 4.  It will populate the ``./bin`` directory with all the ``console_scripts`` that you have specified in the ``setup.py``.
-    In our example, this is ``./bin/version.py``.
+    In our example, this is ``./bin/bob_example_project_version.py``.
 
 The order of packages that you list in ``eggs`` and ``develop`` are important and dependencies should be listed first.
 Especially, when you want to use a private package and which not available through `pypi`_.
@@ -271,11 +275,11 @@ respecting the order of dependencies**).
 Your local environment
 ======================
 
-After buildout has finished, you should now be able to execute ``./bin/version.py``:
+After buildout has finished, you should now be able to execute ``./bin/bob_example_project_version.py``:
 
 .. code-block:: sh
 
-   $ ./bin/version.py
+   $ ./bin/bob_example_project_version.py
    bob.blitz: 2.0.5 [api=0x0201] ([PATH]/eggs/bob.blitz-2.0.5-py2.7-linux-x86_64.egg)
    * C/C++ dependencies:
      - Blitz++: 0.10

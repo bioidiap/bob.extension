@@ -100,6 +100,12 @@ Python package namespaces are `explained in details here <http://peak.telecommun
 For bob packages, we usually use the ``bob`` namespace, using several sub-namespaces such as ``bob.io``, ``bob.ip``, ``bob.learn``, ``bob.db`` or (like here) ``bob.example``.
 
 
+The scripts you created should also somehow contain the namespace of the package. In our example,
+the script is named ``bob_example_project_version.py``, reflecting the  namespace ``bob.example``
+
+
+
+
 Distributing your work
 ----------------------
 

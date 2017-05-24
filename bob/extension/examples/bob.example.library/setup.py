@@ -147,7 +147,7 @@ setup(
 
       # scripts should be declared using this entry:
       'console_scripts': [
-        'reverse.py = bob.example.library.script.reverse:main',
+        'bob_example_library_reverse.py = bob.example.library.script.reverse:main',
       ],
     },
 

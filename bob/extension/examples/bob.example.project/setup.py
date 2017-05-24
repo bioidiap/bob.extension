@@ -90,7 +90,7 @@ setup(
 
       # scripts should be declared using this entry:
       'console_scripts' : [
-        'version.py = bob.example.project.script.version:main',
+        'bob_example_project_version.py = bob.example.project.script.version:main',
       ],
     },
 

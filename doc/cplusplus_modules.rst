@@ -147,11 +147,11 @@ just do:
    If you want to change that, switch the according flag in the ``buildout.cfg`` to ``debug = False``, and the compilation will be done with optimization flags and C++ exception handling enabled.
 
 
-Now, we can use the script ``./bin/reverse.py`` (that we have registered in the ``setup.py``) to reverse a list of floats, using the C++ implementation of the ``reverse`` function:
+Now, we can use the script ``./bin/bob_example_extension_reverse.py`` (that we have registered in the ``setup.py``) to reverse a list of floats, using the C++ implementation of the ``reverse`` function:
 
 .. code-block:: sh
 
-  $ ./bin/reverse.py 1 2 3 4 5
+  $ ./bin/bob_example_extension_reverse.py 1 2 3 4 5
   [1.0, 2.0, 3.0, 4.0, 5.0] reversed is [ 5.  4.  3.  2.  1.]
 
 We can also see that the function documentation has made it into the module, too:
