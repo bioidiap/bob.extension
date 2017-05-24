@@ -15,7 +15,7 @@ Fire-up a shell window, activate your bob environment (as explained `here <https
 .. code-block:: sh
 
   $ git clone https://gitlab.idiap.ch/bob/bob.extension.git
-  $ cp -R bob.extension/bob/extension/data/bob.example.project ./
+  $ cp -R bob.extension/bob/extension/examples/bob.example.project ./
   $ rm -rf bob.extension # optionally remove the cloned source of bob.extension
   $ cd bob.example.project
 
@@ -133,7 +133,7 @@ Some of the entries need attention.
 
 * The first entry are the ``eggs``.
   In there, you can list all python packages that should be installed, additionally to the ones specified in the ``requirements.txt``.
-  Typically, this is used when the packages you need are not available on PyPI. These packages will then be available to be used in your environment.
+  These packages will then be available to be used in your environment.
   Dependencies for those packages will be automatically managed, **as long as you keep** ``bob.buildout`` **in your list of** ``extensions``.
   At least, the current package needs to be in the ``eggs`` list.
 
@@ -147,6 +147,13 @@ The remaining options define how the (dependent) packages are build.
 For example, the ``debug`` flag defined, how the :ref:`C++ code <extension-c++>` in all the (dependent) packages is built.
 The ``verbose`` options handles the verbosity of the build.
 When the ``newest`` flag is set to ``true``, buildout will install all packages in the latest versions, even if an older version is already available.
+
+.. note::
+  
+    We normally set ``newest = False`` to avoid downloading already installed dependencies.
+    Also, it installs by default the latest stable version of the package, unless 
+    ``prefer-final = False``, in which case the latest available on PyPI, including betas, will be installed.
+
 
 .. warning::
 
@@ -223,7 +230,7 @@ A new section called ``[sources]`` appears, where the package information for `m
 `its documentation <https://pypi.python.org/pypi/mr.developer>`_.
 Again, mr.developer does not automatically place the packages into the ``develop`` list (and neither in the ``eggs``), so you have to do that yourself.
 
-With this augmented ``buidlout.cfg``, the ``buildout`` command will perform the following steps:
+With this augmented ``buildout.cfg``, the ``buildout`` command will perform the following steps:
 
 1.  It checks out the packages that you specified using ``mr.developer``.
 
@@ -234,8 +241,7 @@ With this augmented ``buidlout.cfg``, the ``buildout`` command will perform the 
 
     #. In one of the already developed directories.
     #. In the python environment, e.g., packages installed with ``pip``.
-    #. Online, i.e., in the ``find-links`` directory, or by default on PyPI_.
-
+    #. Online, i.e. on PyPI_.
 4.  It will populate the ``./bin`` directory with all the ``console_scripts`` that you have specified in the ``setup.py``.
     In our example, this is ``./bin/version.py``.
 
