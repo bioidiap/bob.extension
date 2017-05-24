@@ -51,14 +51,14 @@ def _run(package, run_call):
 
 def test_project():
   # Tests that the bob.example.project works
-  _run('project', ['version.py'])
+  _run('project', ['bob_example_project_version.py'])
 
 
 def test_extension():
   # Tests that the bob.example.extension compiles and works
-  _run('extension', ['reverse.py', '1', '2', '3', '4', '5'])
+  _run('extension', ['bob_example_extension_reverse.py', '1', '2', '3', '4', '5'])
 
 
 def test_library():
   # Tests that the bob.example.library compiles and works
-  _run('library', ['reverse.py', '1', '2', '3', '4', '5'])
+  _run('library', ['bob_example_library_reverse.py', '1', '2', '3', '4', '5'])
