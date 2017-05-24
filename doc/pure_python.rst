@@ -59,7 +59,7 @@ The example package, as it is distributed, contains a fully working example.
 In the remainder of this document, we mainly explain how to setup the ``setup.py`` and the ``buildout.cfg``, going from minimal working example to more advanced features.
 
 .. note::
-   ``requirements.txt should be listed in ``MANIFEST.in``
+   ``requirements.txt`` should be listed in ``MANIFEST.in``
 
 Setting up your package
 -----------------------
@@ -67,12 +67,23 @@ Setting up your package
 The package you cloned above is a pure-Python example package and contains all
 elements to get you started.  It defines a single library module called
 ``bob.example.project``, which declares a simple script, called ``version.py``
-that prints out the version of the dependent library :ref:`bob.blitz`.  When
-you clone the package, you will not find any executable as ``buildout`` needs
-to check all dependencies and install missing ones before you can execute
-anything.  Particularly, it inspects the ``setup.py`` file in the root
-directory of the package, which contains all required information to build the
-package, all of which is contained in the ``setup`` function:
+that prints out the version of the dependent library :ref:`bob.blitz`.  
+
+While developing a package, you'd like to create a "temporary" local environment allowing you to benefit 
+from all packages installed on your conda environment, while making the Python interpreter search for your 
+package contents locally. 
+
+In order to create this local environment, you will use ``zc.buildout``. 
+``zc.buildout`` takes as input a "recipe" that explains how to build such a local working environmnent. 
+The recipe, by default, is stored in the ``buildout.cfg`` file. 
+Once buildout runs, it creates executable scripts in the local bin folder.
+
+Each executable is programmed to use Python from the conda environmnent, but also to consider (prioritarily) your package checkout. 
+In order to do this, buildout will examine your setup.py file using setuptools and will ensure all build and run-time dependencies 
+of your package are available either on the central (conda) installation or locally, installing missing packages. 
+As a consequence, the local development environment is not available just after cloning.
+
+In the following, we will see what the configuration files for ``zc.buildout`` look like, starting with ``setup.py``.
 
 .. code-block:: python
 
