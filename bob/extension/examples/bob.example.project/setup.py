@@ -33,25 +33,12 @@
 # allows you to test your package with new python dependencies w/o requiring
 # administrative interventions.
 
-
-
-# Add here other bob packages that your module depend on
-setup_packages = ['bob.extension', 'bob.blitz']
-bob_packages = []
-
 from setuptools import setup, dist
-dist.Distribution(dict(setup_requires = setup_packages + bob_packages))
-
-# import the Extension class and the build_ext function from bob.blitz
-from bob.blitz.extension import Extension, build_ext
+dist.Distribution(dict(setup_requires = ['bob.extension']))
 
 # load the requirements.txt for additional requirements
 from bob.extension.utils import load_requirements, find_packages
-build_requires = setup_packages + bob_packages + load_requirements()
-
-# read version from "version.txt" file
-version = open("version.txt").read().rstrip()
-
+install_requires = load_requirements()
 
 # The only thing we do in this file is to call the setup() function with all
 # parameters that define our package.
@@ -59,15 +46,15 @@ setup(
 
     # This is the basic information about your project. Modify all this
     # information before releasing code publicly.
-    name = 'bob.example.extension',
-    version = version,
-    description = 'Example for using Bob inside a C++ extension of a buildout project',
+    name = 'bob.example.project',
+    version = open("version.txt").read().rstrip(),
+    description = 'Example for using Bob inside a buildout project',
 
     url = 'https://github.com/<YourInstitution>/<YourPackage>',
     license = 'GPLv3',
     author = '<YourName>',
-    author_email='<YourEmail>',
-    keywords='bob, extension',
+    author_email = '<YourEmail>',
+    keywords = 'bob',
 
     # If you have a better, long description of your package, place it on the
     # 'doc' directory and then hook it here
@@ -78,50 +65,12 @@ setup(
     packages = find_packages('bob'),
     include_package_data = True,
 
-    # These lines define which packages should be installed when you "install"
+    # This line defines which packages should be installed when you "install"
     # this package. All packages that are mentioned here, but are not installed
     # on the current system will be installed locally and only visible to the
     # scripts of this package. Don't worry - You won't need administrative
     # privileges when using buildout.
-    setup_requires = build_requires,
-    install_requires = build_requires,
-
-    # In fact, we are defining two extensions here. In any case, you can define
-    # as many extensions as you need. Each of them will be compiled
-    # independently into a separate .so file.
-    ext_modules = [
-
-      # The first extension defines the version of this package and all C++-dependencies.
-      Extension("bob.example.extension.version",
-        # list of files compiled into this extension
-        [
-          "bob/example/extension/version.cpp",
-        ],
-        # additional parameters, see Extension documentation
-        version = version,
-        bob_packages = bob_packages,
-      ),
-
-      # The second extension contains the actual C++ code and the Python bindings
-      Extension("bob.example.extension._library",
-        # list of files compiled into this extension
-        [
-          # the pure C++ code
-          "bob/example/extension/Function.cpp",
-          # the Python bindings
-          "bob/example/extension/main.cpp",
-        ],
-        # additional parameters, see Extension documentation
-        version = version,
-        bob_packages = bob_packages,
-      ),
-    ],
-
-    # Important! We need to tell setuptools that we want the extension to be
-    # compiled with our build_ext function!
-    cmdclass = {
-      'build_ext': build_ext,
-    },
+    install_requires = install_requires,
 
     # This entry defines which scripts you will have inside the 'bin' directory
     # once you install the package (or run 'bin/buildout'). The order of each
@@ -141,7 +90,7 @@ setup(
 
       # scripts should be declared using this entry:
       'console_scripts' : [
-        'reverse.py = bob.example.extension.script.reverse:main',
+        'bob_example_project_version.py = bob.example.project.script.version:main',
       ],
     },
 
@@ -150,7 +99,7 @@ setup(
     # useful here (http://pypi.python.org/pypi?%3Aaction=list_classifiers).
     classifiers = [
       'Framework :: Bob',
-      'Development Status :: 4 - Beta',
+      'Development Status :: 3 - Alpha',
       'Intended Audience :: Developers',
       'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
       'Natural Language :: English',

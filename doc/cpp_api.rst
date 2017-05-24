@@ -4,54 +4,13 @@
 ..
 .. Copyright (C) 2011-2014 Idiap Research Institute, Martigny, Switzerland
 
-.. _helpers:
-
-==================
- Helper utilities
-==================
-
-In the header file ``<bob.extension/defines.h>`` we have added some functions that help you to keep your code short and clean.
-Particularly, we provide three preprocessor directives:
-
-.. c:macro:: BOB_TRY
-
-   Starts a try-catch block to protect your bound function against exceptions of any kinds (which would lead to a Python interpreter crash otherwise).
-
-.. c:macro:: BOB_CATCH_FUNCTION(char* message, void* ret)
-
-   Catches C++ exceptions of any kind, adds the ``message`` in case an unknown exception is caught, and returns with the given error return (which is usually 0 for normal functions or -1 for constructors and setter functions).
-   This macro should be used when binding a stand-alone function, for binding class member functions, please use :c:macro:`BOB_CATCH_MEMBER`.
-
-.. c:macro:: BOB_CATCH_MEMBER(char* message, void* ret)
-
-   Catches C++ exceptions of any kind, adds the ``message`` in case an unknown exception is caught, and returns with the given error return (which is usually 0 for normal functions or -1 for constructors and setter functions).
-   This macro should be used when binding a member function of a class, for binding stand-alone functions, please use :c:macro:`BOB_CATCH_FUNCTION`.
-
-These preprocessor directives will catch any C++ exception that is raised inside the C/C++ code that you bind to python and translate them into proper Python exceptions.
-
-.. warning::
-   These directives will only be active in **release** mode, when compiling
-   with ``debug = true``, they will not do anything.  This is in order to
-   support C++ debuggers like ``gdb`` or ``gdb-python`` to be able to handle
-   these exceptions.
-
-Additionally, we added some preprocessor directives that help in the bindings:
-
-.. c:macro:: PyBob_NumberCheck(PyObject* o)
-
-   Checks if the given object ``o`` is a number, i.e., an int, a long, a float
-   or a complex.
-
-After including the above mentioned header, we also re-define the functions
-:c:func:`PyInt_Check`, :c:func:`PyInt_AS_LONG`, :c:func:`PyString_Check` and
-:c:func:`PyString_AS_STRING` (which doesn't exist in the bindings for Python3)
-so that they can be used in bindings for both Python2 and Python3.
 
 .. _cpp_api:
 
-======================================
+
+=====================================
  C++ API of the Documentation classes
-======================================
+=====================================
 
 This section includes information for using the pure C++ API for the documentation classes, which can be accessed after including:
 
@@ -64,6 +23,7 @@ Any free text that you specify to describe your functions will be interpreted as
 Hence, it is possible to use any directives like ``.. note::``, ``.. math::``, and even links inside the documentation like ``:py:class:`` and references as ``[REF]_``.
 
 
+----------------------
 Function Documentation
 ----------------------
 
@@ -198,6 +158,7 @@ During the binding of your function, you can use it, like:
    };
 
 
+-----------------------
 Variables Documentation
 -----------------------
 
@@ -232,6 +193,7 @@ Variables Documentation
       that it can be viewed correctly inside of an 80-character Python console.
 
 
+-------------------
 Class Documentation
 -------------------
 
