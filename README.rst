@@ -7,6 +7,8 @@
    :target: https://www.idiap.ch/software/bob/docs/latest/bob/bob.extension/master/index.html
 .. image:: https://gitlab.idiap.ch/bob/bob.extension/badges/master/build.svg
    :target: https://gitlab.idiap.ch/bob/bob.extension/commits/master
+.. image:: https://gitlab.idiap.ch/bob/bob.extension/badges/master/coverage.svg
+   :target: https://gitlab.idiap.ch/bob/bob.extension/commits/master
 .. image:: https://img.shields.io/badge/gitlab-project-0000c0.svg
    :target: https://gitlab.idiap.ch/bob/bob.extension
 .. image:: http://img.shields.io/pypi/v/bob.extension.svg
@@ -25,10 +27,10 @@ using either pure python or a mix of C++ and python.
 Installation
 ------------
 
-Follow our `installation`_ instructions. Then, using the Python interpreter
-provided by the distribution, build this package with::
+Complete Bob's `installation`_ instructions. Then, to install this pacakge,
+run::
 
-  $ buildout
+  $ conda install bob.extension
 
 
 Contact
