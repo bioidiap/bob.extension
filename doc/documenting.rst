@@ -7,7 +7,8 @@ Documenting your package
 ========================
 
 If you intend to distribute your newly created package, please consider carefully documenting it. 
-Documentation is a great starting point for users.
+Documentation is an essential starting point for new users.
+Undocumented code tends to be barely re-used and may end up being abandoned.
 
 First you should have a proper README file (such as the one provided in packages previousy provided as examples). 
 We made a simple, minimal ``README.rst`` template that you can get by doing:
@@ -48,7 +49,7 @@ you can have a look on the `Napoleon`_ website (and the links within) or in exis
 
 .. note::
 
-   If you are at Idiap, you should start by doing the following: 
+   You should start by doing the following: 
 
    .. code-block:: sh
    

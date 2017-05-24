@@ -225,41 +225,20 @@ Here is a set of steps we recommend you follow when releasing a new version of y
 
 5. Announce the update on the relevant channels.
 
----------------------------------------------------
-Upload additional documentation to PythonHosted.org
----------------------------------------------------
-
-.. todo:: is this section still valid ?
-
-In case you have written additional sphinx documentation in your satellite package that you want to share with the world, there is an easy way to push the documentation to `PythonHosted.org <http://pythonhosted.org>`_.
-More detailed information are given `here <http://pythonhosted.org/an_example_pypi_project/buildanduploadsphinx.html>`__, which translates roughly into:
-
-.. code-block:: sh
-
-   $ ./bin/python setup.py build_sphinx --source-dir=doc --build-dir=build/doc --all-files
-   $ ./bin/python setup.py upload_docs --upload-dir=build/doc/html
-
-The link to the documentation will automatically be added to the PyPI page of
-your package.  Usually it is a good idea to check the documentation after
-building and before uploading.
 
 ----------------------------------
 Change the version of your package
 ----------------------------------
 
-It is well understood that it requires quite some work to understand and follow the steps to publish (a new version) of your package.
-Especially, when you want to update the .git repository and the version on PyPI_ at the same time.
 In total, 5 steps need to be performed, in the right order.
 These steps are:
 
-1. Adding a tag in your git repository, possibly after changing the version of your package.
-2. Running buildout to build your package.
-3. Register and upload your package at PyPI.
-4. Upload the documentation of your package to PythonHosted.org.
 
-and, finally, to keep track of new changes:
 
-5. Switch to a new version number.
+  1. Change the value in version.txt
+  2. Change links in README.rst so documentation and build tags point to the right version instead of master
+  3. Commit, tag and push
+  4. Change the value in version.txt to the next possible version tag (beta)
 
 All these steps are combined in the ``./bin/bob_new_version.py`` script.
 This script needs to be run from within the root directory of your package.
