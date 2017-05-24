@@ -16,20 +16,12 @@ import pkg_resources
 
 
 def _run(package, run_call):
-  tarball = os.path.join(
-      pkg_resources.resource_filename('bob.extension', 'data'),
-      'bob.example.%s.tar.bz2' % package,
-      )
   temp_dir = tempfile.mkdtemp(prefix="bob_test")
-
-  # redirect output of functions to /dev/null to avoid spamming the console
-  # devnull = open(os.devnull, 'w')
+  package_dir = os.path.join(temp_dir, 'bob.example.{0}'.format(package))
 
   try:
-    # extract archive
-    import tarfile
-    with tarfile.open(tarball) as tar: tar.extractall(temp_dir)
-    package_dir = os.path.join(temp_dir, "bob.example.%s" % package)
+    base_path = pkg_resources.resource_filename(__name__, os.path.join('examples', 'bob.example.{0}'.format(package)))
+    shutil.copytree(base_path, package_dir, symlinks=False, ignore=None)
 
     def _join(*args):
       a = (package_dir,) + args
@@ -39,10 +31,7 @@ def _run(package, run_call):
       return _join('bin', path)
 
     # buildout
-    # if we have a setup.py in our current directory, we develop both (as we might be in the current source directory of bob.extension and use it),
-    # otherwise we only develop the downloaded source package
-    develop = '%s\n.' % os.getcwd() if os.path.exists('setup.py') else '.'
-    subprocess.call(['buildout', 'buildout:prefer-final=false', 'buildout:develop=%s'%develop], cwd=package_dir, shell=True)
+    subprocess.call(['buildout', 'buildout:prefer-final=false'], cwd=package_dir, shell=True)
     assert os.path.exists(_bin('python'))
 
     # nosetests
