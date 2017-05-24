@@ -127,11 +127,9 @@ Building your package
 ---------------------
 
 To be able to use the package, we first need to build and install it locally.
-While developing a package, you need to install this package into your
-development environment. But you also need to install your package in
-*development* mode so that you do not have to re-install your package after
-every change that you do in the source. zc.buildout_ allows you to exactly do
-that.
+While developing a package, you need to install your package in *development*
+mode so that you do not have to re-install your package after every change that
+you do in the source. zc.buildout_ allows you to exactly do that.
 
 .. note::
     zc.buildout_ will create another local environment from your conda_
@@ -150,18 +148,17 @@ default, is stored in a file called ``buildout.cfg``.
 
 .. important::
     Once ``buildout`` runs, it creates several executable scripts in a local
-    ``bin`` folder. This means that you need to use the scripts from the
-    ``bin`` folder instead of using its equivalence from your conda
-    environment. For example, use ``./bin/python`` instead of ``python``.
+    ``bin`` folder. Each executable is programmed to use Python from the conda
+    environment, but also to consider (prioritarily) your package checkout.
+    This means that you need to use the scripts from the ``bin`` folder instead
+    of using its equivalence from your conda environment. For example, use
+    ``./bin/python`` instead of ``python``.
 
 ``buildout`` will examine your ``setup.py`` file using setuptools_ and will
 ensure all build and run-time dependencies of your package are available either
 through the conda installation or it will install them locally without changing
-your conda environment.
-
-Moreover, buildout is used to set up your local environment with packages that it finds from different sources.
-It is initialized by the ``buildout.cfg`` file, which is part of the package that you unzipped above.
-Let\'s have a look inside it:
+your conda environment. It is initialized by the ``buildout.cfg`` file, which
+is part of the package that you unzipped above. Let\'s have a look inside it:
 
 .. code-block:: guess
 
