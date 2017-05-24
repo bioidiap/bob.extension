@@ -26,7 +26,8 @@ You can check it out by:
 Setting up your package
 -----------------------
 
-The big difference with pure Python packages comes in the ``setup.py``.
+Typically, Python extensions written in C/C++ for Bob should use a set of standard APIs allowing C++ Blitz++ Arrays to be transparently converted to Python NumPy Arrays. 
+The build of your package will therefore depend on, at least, two packages: (1) bob.extension (this package): will provide build instructions and resources for defining and building your extension (2) bob.blitz: will provide a bridge between pure C++ code, depending on Blitz++ Arrays and NumPy arrays.
 To be able to import ``bob.extension`` and ``bob.blitz`` in the setup.py, we need to include some code:
 
 .. code-block:: python

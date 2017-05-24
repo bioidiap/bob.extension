@@ -7,7 +7,7 @@ C/C++ libraries in your package
 Typically, |project|'s core packages include both a pure C++ library as well as Python bindings for the C++ code.
 
 If you want to provide a library with pure C++ code in your package as well, you can use the :py:class:`bob.extension.Library` class.
-It will automatically compile your C/C++ code using `CMake <http://www.cmake.org>`_ into a shared library that you can import in your own C/C++-Python bindings, 
+It will automatically compile your C/C++ code using `CMake <http://www.cmake.org>`_ into a shared library that you can link to your own C/C++-Python bindings, 
 as well as in the C++ code of other C++/Python packages. Again, a complete example can be downloaded via:
 
 .. code-block:: sh
