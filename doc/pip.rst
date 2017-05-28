@@ -1,6 +1,13 @@
 Using pip for development
 ==========================
 
+.. warning::
+
+    This guide is not complete and not recommended. You can just skip this
+    page. There are some problems when using pip and conda at the same time
+    which may lead to breaking **all your conda environments**. You can look at
+    the ``conda develop`` command for an alternative.
+
 Since all |project| packages are distributed with `Setuptools`_, you can easily
 develop them using pip_. Additionally, you can use conda_ to create separate
 isolated environments for your different tasks.
