@@ -128,8 +128,6 @@ recipe for that package.
 Conda recipe
 ------------
 
-.. todo:: improve conda docs.
-
 If you want to create a new recipe for a package, first:
 
 #. Learn about conda_.

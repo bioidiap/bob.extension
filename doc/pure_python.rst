@@ -37,8 +37,6 @@ Fire-up a shell window, activate your development environment (as explained in
   $ cd bob.example.project
   $ git init # initialize this folder as a git repository.
 
-.. todo:: Should we advise to clone ``bob.extension`` and then go to ``./bob.extension/examples/bob.example.project/`` instead ?
-
 The anatomy of a minimal package should look like the following:
 
 .. code-block:: sh
@@ -118,8 +116,8 @@ belong to the package (those files are automatically collected by the
 console scripts. The full set of options can be inspected in the
 `Setuptools documentation <https://setuptools.readthedocs.io>`_.
 
-.. warning:: 
-  
+.. warning::
+
   The (executable) script name should somehow contain the namespace of the package
 
 
@@ -196,9 +194,9 @@ The ``verbose`` options handles the verbosity of the build.
 When the ``newest`` flag is set to ``true``, buildout will install all packages in the latest versions, even if an older version is already available.
 
 .. note::
-  
+
     We normally set ``newest = False`` to avoid downloading already installed dependencies.
-    Also, it installs by default the latest stable version of the package, unless 
+    Also, it installs by default the latest stable version of the package, unless
     ``prefer-final = False``, in which case the latest available on PyPI, including betas, will be installed.
 
 
