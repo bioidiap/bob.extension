@@ -1,16 +1,33 @@
 .. vim: set fileencoding=utf-8 :
-.. Andre Anjos <andre.dos.anjos@gmail.com>
-.. Tue 15 Oct 17:41:52 2013
+
+.. _bob.extension.pure_python:
 
 ===========================
-Python package development 
+Python package development
 ===========================
+
+The instructions below heavily rely on the use of Python `setuptools`_ and
+`zc.buildout`_.
+
+.. note::
+  The core of our strategy is based on standard tools for *defining* and
+  *deploying* Python packages. If you are not familiar with Python's
+  `setuptools`_ or PyPI_, it can be beneficial to learn about those before you
+  start. Python's `Setuptools`_ is a mechanism to *define and distribute*
+  Python code in a packaged format, optionally through `PyPI`_, a web-based
+  Python package index and distribution portal. `Python packaging guide`_ can
+  also be useful to learn about setuptools_.
+
+  `zc.buildout`_ is a tool to *deploy* Python packages locally, automatically
+  setting up and encapsulating your work environment.
 
 Anatomy of a package
 --------------------
 
-The best way to create your package is to download the skeleton that is described in this tutorial and build on it, modifying what you need.
-Fire-up a shell window, activate your bob environment (as explained `here <https://www.idiap.ch/software/bob/install>`_) and then do this:
+The best way to create your package is to download the skeleton that is
+described in this tutorial and build on it, modifying what you need.
+Fire-up a shell window, activate your development environment (as explained in
+:doc:`development_setup`) and then do this:
 
 .. code-block:: sh
 
@@ -18,24 +35,23 @@ Fire-up a shell window, activate your bob environment (as explained `here <https
   $ cp -R bob.extension/bob/extension/examples/bob.example.project ./
   $ rm -rf bob.extension # optionally remove the cloned source of bob.extension
   $ cd bob.example.project
-
-.. todo:: Should we advise to clone ``bob.extension`` and then go to ``./bob.extension/examples/bob.example.project/`` instead ?
+  $ git init # initialize this folder as a git repository.
 
 The anatomy of a minimal package should look like the following:
 
 .. code-block:: sh
 
   .
-  +-- MANIFEST.in            # extras to be installed, besides the Python files
-  +-- README.rst             # a minimal description of the package, in reStructuredText format
-  +-- buildout.cfg           # buildout configuration
-  +-- setup.py               # installation instruction for this particular package
-  +-- requirements.txt       # requirements of your package
-  +-- version.txt            # the (current) version of your package
-  +-- doc                    # documentation directory
-  |   +-- conf.py            # Sphinx configuration
-  |   +-- index.rst          # Documentation starting point for Sphinx
-  +-- bob                    # Python package (a.k.a. "the code")
+  +-- MANIFEST.in       # extras to be installed, besides the Python files
+  +-- README.rst        # a minimal description of the package, in reStructuredText format
+  +-- buildout.cfg      # buildout configuration
+  +-- setup.py          # installation instruction for this particular package
+  +-- requirements.txt  # requirements of your package
+  +-- version.txt       # the (current) version of your package
+  +-- doc               # documentation directory
+  |   +-- conf.py       # Sphinx configuration
+  |   +-- index.rst     # Documentation starting point for Sphinx
+  +-- bob               # Python package (a.k.a. "the code")
   |   +-- example
   |   |   +-- project
   |   |   |   +-- script
@@ -46,20 +62,26 @@ The anatomy of a minimal package should look like the following:
   |   |   +-- __init__.py
   |   +-- __init__.py
 
-Our example that you just downloaded contains exactly these files.
-All files are in text format and should be heavily commented.
-The most important file that requires your attention is ``setup.py``.
-This file contains the basic information for the Python package you will be creating.
-It defines scripts the package provides and also loads dependencies it requires for execution. Note that the dependencies
-are not specified directly in the ``setup.py`` file, but are loaded from the ``requirements.txt`` file.
-To customize the package to your needs, you will need to edit this file and modify it accordingly.
-Before doing so, it is suggested you go through all of this tutorial so you are familiar with the whole environment.
-The example package, as it is distributed, contains a fully working example.
-
-In the remainder of this document, we mainly explain how to setup the ``setup.py`` and the ``buildout.cfg``, going from minimal working example to more advanced features.
+Our example that you just downloaded contains exactly these files. All files
+are in text format and should be heavily commented. The most important file
+that requires your attention is ``setup.py``. This file contains the basic
+information for the Python package you will be creating. It defines scripts the
+package provides and also loads dependencies it requires for execution.
 
 .. note::
-   ``requirements.txt`` should be listed in ``MANIFEST.in``
+    Note that the dependencies are not specified directly in the ``setup.py``
+    file, but are loaded from the ``requirements.txt`` file. This is unique to
+    |project| packages and you should always do this.
+
+To customize the package to your needs, you will need to edit this file and
+modify it accordingly. Before doing so, it is suggested you go through all of
+this tutorial so you are familiar with the whole environment. The example
+package, as it is distributed, contains a fully working example.
+
+In the remainder of this document, we mainly explain how to setup the
+``setup.py`` and the ``buildout.cfg``, going from minimal working example to
+more advanced features.
+
 
 Setting up your package
 -----------------------
@@ -67,23 +89,9 @@ Setting up your package
 The package you cloned above is a pure-Python example package and contains all
 elements to get you started.  It defines a single library module called
 ``bob.example.project``, which declares a simple script, called ``version.py``
-that prints out the version of the dependent library :ref:`bob.blitz`.  
-
-While developing a package, you'd like to create a "temporary" local environment allowing you to benefit 
-from all packages installed on your conda environment, while making the Python interpreter search for your 
-package contents locally. 
-
-In order to create this local environment, you will use ``zc.buildout``. 
-``zc.buildout`` takes as input a "recipe" that explains how to build such a local working environmnent. 
-The recipe, by default, is stored in the ``buildout.cfg`` file. 
-Once buildout runs, it creates executable scripts in the local bin folder.
-
-Each executable is programmed to use Python from the conda environmnent, but also to consider (prioritarily) your package checkout. 
-In order to do this, buildout will examine your setup.py file using setuptools and will ensure all build and run-time dependencies 
-of your package are available either on the central (conda) installation or locally, installing missing packages. 
-As a consequence, the local development environment is not available just after cloning.
-
-In the following, we will see what the configuration files for ``zc.buildout`` look like, starting with ``setup.py``.
+that prints out the version of the dependent library
+:ref:`bob.blitz <bob.blitz>`. These information is available in your
+``setup.py`` file and particularly in its ``setup`` function:
 
 .. code-block:: python
 
@@ -102,20 +110,53 @@ In the following, we will see what the configuration files for ``zc.buildout`` l
     },
   )
 
-In detail, it defines the name and the version of this package, which files belong to the package (those files are automatically collected by the ``find_packages`` function), other packages that we depend on, namespaces and console scripts. The full set of options can be inspected in the `Setuptools documentation <https://setuptools.readthedocs.io>`_.
+In detail, it defines the name and the version of this package, which files
+belong to the package (those files are automatically collected by the
+``find_packages`` function), other packages that we depend on, namespaces and
+console scripts. The full set of options can be inspected in the
+`Setuptools documentation <https://setuptools.readthedocs.io>`_.
 
-.. warning:: 
-  
+.. warning::
+
   The (executable) script name should somehow contain the namespace of the package
 
 
 Building your package
 ---------------------
 
-To be able to use the package, we first need to build it.
-Buildout is used to set up your local environment with packages that it finds from different sources.
-It is initialized by the ``buildout.cfg`` file, which is part of the package that you unzipped above.
-Let\'s have a look inside it:
+To be able to use the package, we first need to build and install it locally.
+While developing a package, you need to install your package in *development*
+mode so that you do not have to re-install your package after every change that
+you do in the source. zc.buildout_ allows you to exactly do that.
+
+.. note::
+    zc.buildout_ will create another local environment from your conda_
+    environment but unlike conda_ environments this environment is not isolated
+    rather it inherits from your conda_ environment. This means you can still
+    use the libraries that are installed in your conda_ environment.
+    zc.buildout_ also allows you to install PyPI_ packages into your
+    environment. You can use it to install some Python library if it is not
+    available using conda_. Keep in mind that to install a library you should
+    always prefer conda_ but to install your package from source in
+    *development* mode, you should use zc.buildout_.
+
+zc.buildout_ provides a ``buildout`` command. ``buildout`` takes as input a
+"recipe" that explains how to build a local working environment. The recipe, by
+default, is stored in a file called ``buildout.cfg``.
+
+.. important::
+    Once ``buildout`` runs, it creates several executable scripts in a local
+    ``bin`` folder. Each executable is programmed to use Python from the conda
+    environment, but also to consider (prioritarily) your package checkout.
+    This means that you need to use the scripts from the ``bin`` folder instead
+    of using its equivalence from your conda environment. For example, use
+    ``./bin/python`` instead of ``python``.
+
+``buildout`` will examine your ``setup.py`` file using setuptools_ and will
+ensure all build and run-time dependencies of your package are available either
+through the conda installation or it will install them locally without changing
+your conda environment. It is initialized by the ``buildout.cfg`` file, which
+is part of the package that you unzipped above. Let\'s have a look inside it:
 
 .. code-block:: guess
 
@@ -153,9 +194,9 @@ The ``verbose`` options handles the verbosity of the build.
 When the ``newest`` flag is set to ``true``, buildout will install all packages in the latest versions, even if an older version is already available.
 
 .. note::
-  
+
     We normally set ``newest = False`` to avoid downloading already installed dependencies.
-    Also, it installs by default the latest stable version of the package, unless 
+    Also, it installs by default the latest stable version of the package, unless
     ``prefer-final = False``, in which case the latest available on PyPI, including betas, will be installed.
 
 
@@ -166,7 +207,7 @@ When the ``newest`` flag is set to ``true``, buildout will install all packages 
     running experiments or production.
 
 
-Finally, running buildout is a single step process by invoking the ``buildout`` command line.
+Finally, run buildout is a single step process by invoking the ``buildout`` command line.
 All options in the ``buildout.cfg`` can be overwritten on command line, by specifying
 ``buildout:option=...``, where ``option`` can be any entry in the ``buildout.cfg``.
 
@@ -294,7 +335,7 @@ After buildout has finished, you should now be able to execute ``./bin/bob_examp
 
 Also, when using the newly generated ``./bin/python`` script, you can access all packages that you have developed, including your own package:
 
-.. code-block:: guess
+.. code-block:: sh
 
    $ ./bin/python
    >>> import bob.example.project
@@ -313,6 +354,6 @@ Everything is now setup for you to continue the development of this package.
 Modify all required files to setup your own package name, description and dependencies.
 Start adding files to your library (or libraries) and, if you wish, make this package available in a place with public access to make your research public.
 We recommend using Gitlab or GitHub.
-Optionally, `drop-us a message <https://groups.google.com/d/forum/bob-devel>`_ talking about the availability of this package so we can add it to the growing list of `bob packages`_.
+Optionally, `drop-us a message <discuss_>`_ talking about the availability of this package so we can add it to the growing list of `bob packages`_.
 
 .. include:: links.rst
