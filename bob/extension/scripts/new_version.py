@@ -163,7 +163,8 @@ def main(command_line_options=None):
     stable_version_list = list(current_version_list)
     if args.minor:
       if args.major:
-        raise ValueError("--minor and --major should not be specified at the same time.")
+        raise ValueError(
+            "--minor and --major should not be specified at the same time.")
       stable_version_list[2] = 0
       stable_version_list[1] += 1
     elif args.major:
@@ -175,7 +176,8 @@ def main(command_line_options=None):
           (args.stable_version, current_version))
   else:
     if args.minor or args.major:
-      raise ValueError("--minor and --major should not be used with --stable-version")
+      raise ValueError(
+          "--minor and --major should not be used with --stable-version")
 
   stable_Version = Version(args.stable_version)
   stable_version_list = list(stable_Version.version)
@@ -250,6 +252,11 @@ def main(command_line_options=None):
     print("\nTagging version '%s'" % args.stable_version)
     run_commands(None, ['git', 'tag', 'v%s' %
                         args.stable_version], ['git', 'push', '--tags'])
+    package = os.path.basename(os.path.realpath(os.path.curdir))
+    run_commands(None, [
+        'firefox',
+        'https://gitlab.idiap.ch/bob/{}/tags/v{}/release/edit'.format(
+            package, args.stable_version)])
 
   if 'latest' in args.steps:
     # update Gitlab version to latest version
