@@ -51,11 +51,11 @@ for example:
 -> automatic stable version: 2.1.6
 -> automatic latest version: 2.1.7b0
 
-* current version (in version.txt): 2.1.6b3 with --minor
+* current version (in version.txt): 2.1.6b3 and --minor is provided.
 -> automatic stable version: 2.2.0
 -> automatic latest version: 2.2.1b0
 
-* current version (in version.txt): 2.1.6b3 with --major
+* current version (in version.txt): 2.1.6b3 and --major is provided.
 -> automatic stable version: 3.0.0
 -> automatic latest version: 3.0.1b0
 
@@ -156,36 +156,38 @@ def main(command_line_options=None):
 
   # get current version
   current_version = open(version_file).read().rstrip()
+  current_version = Version(current_version)
+  current_version_list = list(current_version.version)
 
   if args.stable_version is None:
-    vlist = list(Version(current_version).version)
+    stable_version_list = list(current_version_list)
     if args.minor:
       if args.major:
-        print("--minor and --major should not be specified at the same time.")
-        return
-      vlist[2] = 0
-      vlist[1] += 1
+        raise ValueError("--minor and --major should not be specified at the same time.")
+      stable_version_list[2] = 0
+      stable_version_list[1] += 1
     elif args.major:
-      vlist[2] = 0
-      vlist[1] = 0
-      vlist[0] += 1
-    args.stable_version = ".".join("%s" % v for v in vlist)
+      stable_version_list[2] = 0
+      stable_version_list[1] = 0
+      stable_version_list[0] += 1
+    args.stable_version = ".".join("%s" % v for v in stable_version_list)
     print("Assuming stable version to be %s (since current version %s)" %
           (args.stable_version, current_version))
   else:
     if args.minor or args.major:
-      print("--minor and --major should not be used with --stable-version")
-      return
+      raise ValueError("--minor and --major should not be used with --stable-version")
+
+  stable_Version = Version(args.stable_version)
+  stable_version_list = list(stable_Version.version)
 
   if args.latest_version is None:
     # increase current patch version once
-    version = Version(current_version)
-    ver = list(version.version)
-    ver[-1] += 1
-    args.latest_version = ".".join([str(v) for v in ver])
-    if version.prerelease is not None:
+    latest_version_list = list(stable_version_list)
+    latest_version_list[-1] += 1
+    args.latest_version = ".".join([str(v) for v in latest_version_list])
+    if current_version.prerelease is not None:
       args.latest_version += "".join(str(p)
-                                     for p in version.prerelease[:-1]) + '0'
+                                     for p in current_version.prerelease[:-1]) + '0'
     print("Assuming latest version to be %s (since current version %s)" %
           (args.latest_version, current_version))
 
@@ -218,14 +220,14 @@ def main(command_line_options=None):
     else:
       raise ValueError("The latest version '%s' must be greater than the stable version '%s'" % (
           args.latest_version, args.stable_version))
-  if Version(current_version) >= Version(args.latest_version):
+  if current_version >= Version(args.latest_version):
     if args.force:
       logger.warn("The latest version '%s' must be greater than the current version '%s'" % (
           args.latest_version, current_version))
     else:
       raise ValueError("The latest version '%s' must be greater than the current version '%s'" % (
           args.latest_version, current_version))
-  if args.stable_version is not None and Version(current_version) > Version(args.stable_version):
+  if args.stable_version is not None and current_version > Version(args.stable_version):
     if args.force:
       logger.warn("The stable version '%s' cannot be smaller than the current version '%s'" % (
           args.stable_version, current_version))
@@ -234,7 +236,7 @@ def main(command_line_options=None):
           args.stable_version, current_version))
 
   if 'tag' in args.steps:
-    if args.stable_version is not None and Version(args.stable_version) > Version(current_version):
+    if args.stable_version is not None and Version(args.stable_version) > current_version:
       print("\nReplacing branch tag in README.rst to '%s'" %
             ('v' + args.stable_version))
       _update_readme(args.stable_version)
