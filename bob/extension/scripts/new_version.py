@@ -115,9 +115,11 @@ def _update_readme(version=None):
           if "gitlab" in line: #gitlab links
             replacement = "/v%s" % version if version is not None else "/master"
             line = BRANCH_RE.sub(replacement, line)
-          if "stable" in line: #our doc server
-            replacement = "/v%s" % version if version is not None else "/stable"
-            line = BRANCH_RE.sub(replacement, line)
+          if "software/bob" in line: #our doc server
+            if 'master' not in line: #don't replace 'latest' pointer
+              replacement = "/v%s" % version if version is not None \
+                  else "/stable"
+              line = BRANCH_RE.sub(replacement, line)
         write.write(line)
   os.rename(".README.rst", "README.rst")
 
