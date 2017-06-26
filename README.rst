@@ -14,7 +14,6 @@
 .. image:: http://img.shields.io/pypi/v/bob.extension.svg
    :target: https://pypi.python.org/pypi/bob.extension
 
-
 ===========================================
  Python/C++ Bob Extension Building Support
 ===========================================
