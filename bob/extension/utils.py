@@ -526,7 +526,12 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
 
     for s in server:
       # generate URL
-      url = s % p.split()[0]
+      package_name = p.split()[0]
+      if s.count('%s') == 1: #old style
+        url = s % package_name
+      else: #use new style, with mapping, try to link against specific version
+        version = pkg_resources.require(package_name)[0].version
+        url = s % {'name': package_name, 'version': version}
 
       try:
         # otherwise, urlopen will fail
