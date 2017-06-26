@@ -107,13 +107,17 @@ logger = logging.getLogger("bob.extension")
 
 def _update_readme(version=None):
   # replace the travis badge in the README.rst with the given version
-  BRANCH_RE = re.compile(r'/(master|(v\d+\.\d+\.\d+([abc]\d+)?))')
+  BRANCH_RE = re.compile(r'/(stable|master|(v\d+\.\d+\.\d+([abc]\d+)?))')
   with open("README.rst") as read:
     with open(".README.rst", 'w') as write:
       for line in read:
-        if BRANCH_RE.search(line) is not None and "gitlab" in line:
-          replacement = "/v%s" % version if version is not None else "/master"
-          line = BRANCH_RE.sub(replacement, line)
+        if BRANCH_RE.search(line) is not None:
+          if "gitlab" in line: #gitlab links
+            replacement = "/v%s" % version if version is not None else "/master"
+            line = BRANCH_RE.sub(replacement, line)
+          if "stable" in line: #our doc server
+            replacement = "/v%s" % version if version is not None else "/stable"
+            line = BRANCH_RE.sub(replacement, line)
         write.write(line)
   os.rename(".README.rst", "README.rst")
 
