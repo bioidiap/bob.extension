@@ -1,10 +1,10 @@
 .. vim: set fileencoding=utf-8 :
-.. Thu 04 Aug 2016 16:39:57 CEST
+.. Mon 26 Jun 2017 12:37:53 CEST
 
 .. image:: http://img.shields.io/badge/docs-stable-yellow.svg
-   :target: http://pythonhosted.org/bob.extension/index.html
+   :target: https://www.idiap.ch/software/bob/docs/bob/bob.extension/stable/index.html
 .. image:: http://img.shields.io/badge/docs-latest-orange.svg
-   :target: https://www.idiap.ch/software/bob/docs/latest/bob/bob.extension/master/index.html
+   :target: https://www.idiap.ch/software/bob/docs/bob/bob.extension/master/index.html
 .. image:: https://gitlab.idiap.ch/bob/bob.extension/badges/master/build.svg
    :target: https://gitlab.idiap.ch/bob/bob.extension/commits/master
 .. image:: https://gitlab.idiap.ch/bob/bob.extension/badges/master/coverage.svg
@@ -13,8 +13,7 @@
    :target: https://gitlab.idiap.ch/bob/bob.extension
 .. image:: http://img.shields.io/pypi/v/bob.extension.svg
    :target: https://pypi.python.org/pypi/bob.extension
-.. image:: http://img.shields.io/pypi/dm/bob.extension.svg
-   :target: https://pypi.python.org/pypi/bob.extension
+
 
 ===========================================
  Python/C++ Bob Extension Building Support
