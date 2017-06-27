@@ -107,6 +107,7 @@ logger = logging.getLogger("bob.extension")
 
 def _update_readme(version=None):
   # replace the travis badge in the README.rst with the given version
+  DOC_IMAGE = re.compile(r'\-(stable|(v\d+\.\d+\.\d+([abc]\d+)?))\-')
   BRANCH_RE = re.compile(r'/(stable|master|(v\d+\.\d+\.\d+([abc]\d+)?))')
   with open("README.rst") as read:
     with open(".README.rst", 'w') as write:
@@ -120,6 +121,9 @@ def _update_readme(version=None):
               replacement = "/v%s" % version if version is not None \
                   else "/stable"
               line = BRANCH_RE.sub(replacement, line)
+        if DOC_IMAGE.search(line) is not None:
+          replacement = '-v%s-' % version if version is not None else '-stable-'
+          line = DOC_IMAGE.sub(replacement, line)
         write.write(line)
   os.rename(".README.rst", "README.rst")
 
@@ -259,10 +263,6 @@ def main(command_line_options=None):
     run_commands(None, ['git', 'tag', 'v%s' %
                         args.stable_version], ['git', 'push', '--tags'])
     package = os.path.basename(os.path.realpath(os.path.curdir))
-    run_commands(None, [
-        'firefox',
-        'https://gitlab.idiap.ch/bob/{}/tags/v{}/release/edit'.format(
-            package, args.stable_version)])
 
   if 'latest' in args.steps:
     # update Gitlab version to latest version
@@ -271,6 +271,11 @@ def main(command_line_options=None):
     print("\nSetting latest version '%s'" % args.latest_version)
     run_commands(args.latest_version, ['git', 'add', 'version.txt', 'README.rst'], [
                  'git', 'commit', '-m', 'Increased latest version to %s  [skip ci]' % args.latest_version], ['git', 'push'])
+
+  if 'tag' in args.steps:
+    print("\n**IMPORTANT**: Open your web browser and add a changelog here:\n" \
+        "  https://gitlab.idiap.ch/bob/%s/tags/v%s/release/edit" % \
+        (package, args.stable_version))
 
 
 if __name__ == '__main__':

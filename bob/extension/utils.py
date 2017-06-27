@@ -10,6 +10,7 @@ import re
 import sys
 import glob
 import platform
+import pkg_resources
 
 DEFAULT_PREFIXES = [
     "/opt/local",
@@ -530,7 +531,10 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
       if s.count('%s') == 1: #old style
         url = s % package_name
       else: #use new style, with mapping, try to link against specific version
-        version = pkg_resources.require(package_name)[0].version
+        try:
+          version = pkg_resources.require(package_name)[0].version
+        except pkg_resources.DistributionNotFound:
+          version = 'stable' #package is not a runtime dep, only referenced
         url = s % {'name': package_name, 'version': version}
 
       try:
