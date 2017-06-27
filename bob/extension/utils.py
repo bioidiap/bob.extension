@@ -10,6 +10,7 @@ import re
 import sys
 import glob
 import platform
+import pkg_resources
 
 DEFAULT_PREFIXES = [
     "/opt/local",
