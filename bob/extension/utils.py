@@ -383,7 +383,7 @@ def find_packages(directories=['bob']):
   return packages
 
 def link_documentation(additional_packages = ['python', 'numpy'], requirements_file = "../requirements.txt", server = None):
-  """Generates a list of documented packages on pythonhosted.org for the packages read from the "requirements.txt" file and the given list of additional packages.
+  """Generates a list of documented packages on our documentation server for the packages read from the "requirements.txt" file and the given list of additional packages.
 
   Parameters:
 
@@ -398,7 +398,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   server : str or None
     The url to the server which provides the documentation.
     If ``None`` (the default), the ``BOB_DOCUMENTATION_SERVER`` environment variable is taken if existent.
-    If neither ``server`` is specified, nor a ``BOB_DOCUMENTATION_SERVER`` environment variable is set, the default ``"https://pythonhosted.org/%s"`` is used.
+    If neither ``server`` is specified, nor a ``BOB_DOCUMENTATION_SERVER`` environment variable is set, the default ``"http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/"`` is used.
 
   """
 
@@ -498,7 +498,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   _add_scipy_index()
   _add_index('matplotlib', 'http://matplotlib.org/')
   _add_index('setuptools', 'https://setuptools.readthedocs.io/en/latest/')
-  _add_index('six', 'https://pythonhosted.org/six/')
+  _add_index('six', 'https://six.readthedocs.io')
   _add_index('sqlalchemy', 'https://docs.sqlalchemy.org/en/latest/')
   _add_index('docopt', 'http://docopt.readthedocs.io/en/latest/')
   _add_index('scikit-image', 'http://scikit-image.org/docs/dev/')
@@ -510,7 +510,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     if "BOB_DOCUMENTATION_SERVER" in os.environ:
       server = os.environ["BOB_DOCUMENTATION_SERVER"]
     else:
-      server = "https://pythonhosted.org/%s"
+      server = "http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/"
 
   # array support for BOB_DOCUMENTATION_SERVER
   # transforms "(file:///path/to/dir  https://example.com/dir| http://bla )"

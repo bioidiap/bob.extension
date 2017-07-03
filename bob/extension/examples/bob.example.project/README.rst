@@ -1,17 +1,17 @@
 .. vim: set fileencoding=utf-8 :
-.. Fri Dec 23 13:41:36 CET 2016
+.. Mon 03 Jul 2017 11:50:06 CEST
 
 .. image:: http://img.shields.io/badge/docs-stable-yellow.svg
-   :target: http://pythonhosted.org/bob.example.project/index.html
+   :target: https://www.idiap.ch/software/bob/docs/bob/bob.example.project/stable/index.html
 .. image:: http://img.shields.io/badge/docs-latest-orange.svg
-   :target: https://www.idiap.ch/software/bob/docs/latest/bob/bob.example.project/master/index.html
+   :target: https://www.idiap.ch/software/bob/docs/bob/bob.example.project/master/index.html
 .. image:: https://gitlab.idiap.ch/bob/bob.example.project/badges/master/build.svg
+   :target: https://gitlab.idiap.ch/bob/bob.example.project/commits/master
+.. image:: https://gitlab.idiap.ch/bob/bob.example.project/badges/master/coverage.svg
    :target: https://gitlab.idiap.ch/bob/bob.example.project/commits/master
 .. image:: https://img.shields.io/badge/gitlab-project-0000c0.svg
    :target: https://gitlab.idiap.ch/bob/bob.example.project
 .. image:: http://img.shields.io/pypi/v/bob.example.project.svg
-   :target: https://pypi.python.org/pypi/bob.example.project
-.. image:: http://img.shields.io/pypi/dm/bob.example.project.svg
    :target: https://pypi.python.org/pypi/bob.example.project
 
 
@@ -39,12 +39,9 @@ provided by the distribution, build this package with::
 Documentation and Further Information
 -------------------------------------
 
-Please refer to the latest Bob user guide, accessing from the `Bob website
-<http://www.idiap.ch/software/bob>`_ for how to create your own packages based
-on this example. In particular, the Section entitled `Bob Satellite Package
-Development and Maintenance
-<https://pythonhosted.org/bob.extension/guide.html>`_
-contains details on how to setup, build and roll out your code.
+Refer to the latest Bob_ documentation for details. In particular, the
+guide `Bob Package Development`_ contains details on how to setup, build and
+roll out your own code.
 
 
 Contact
@@ -58,3 +55,4 @@ development `mailing list`_.
 .. _bob: https://www.idiap.ch/software/bob
 .. _installation: https://www.idiap.ch/software/bob/install
 .. _mailing list: https://www.idiap.ch/software/bob/discuss
+.. _bob package development: https://www.idiap.ch/software/bob/docs/bob/bob.extension/master/

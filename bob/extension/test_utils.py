@@ -190,8 +190,8 @@ package-z
         'other.bob.package',
         ]
 
-    # test linkage to pythonhosted.org
-    server = "https://pythonhosted.org/%s/"
+    # test linkage to official documentation
+    server = "http://www.idiap.ch/software/bob/docs/bob/%s/master/"
     os.environ["BOB_DOCUMENTATION_SERVER"] = server
     result = link_documentation(additional_packages, stringio(f))
     expected = [
@@ -203,23 +203,6 @@ package-z
         ]
     result = [k[0] for k in result.values()]
     nose.tools.eq_(sorted(result), sorted(expected))
-
-    # test idiap server
-    server = "https://www.idiap.ch/software/bob/docs/latest/bob/%s/master/"
-    os.environ["BOB_DOCUMENTATION_SERVER"] = server
-    result = link_documentation(additional_packages, stringio(f))
-    expected = [
-        'https://docs.python.org/%d.%d/' % sys.version_info[:2],
-        'http://matplotlib.org/',
-        'https://setuptools.readthedocs.io/en/latest/',
-        server % 'bob.extension',
-        server % 'gridtk',
-        ]
-    # SSL connection could not be established by the client
-    # See: https://secure.idiap.ch/bugzilla5/show_bug.cgi?id=12681
-    # See: https://gitlab.idiap.ch/bob/bob.extension/issues/17
-    # in this case and to circumvent the bug above, we keep the entry
-    #nose.tools.eq_(sorted(result.keys()), sorted(expected))
 
   finally:
     sys.stdout = _stdout
