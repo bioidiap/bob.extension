@@ -510,7 +510,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     if "BOB_DOCUMENTATION_SERVER" in os.environ:
       server = os.environ["BOB_DOCUMENTATION_SERVER"]
     else:
-      server = "http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/"
+      server = "http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/|http://www.idiap.ch/software/bob/docs/bob/%(name)s/master/"
 
   # array support for BOB_DOCUMENTATION_SERVER
   # transforms "(file:///path/to/dir  https://example.com/dir| http://bla )"
