@@ -6,10 +6,12 @@ There are some considerations that needs to be taken into account **before**
 you release a new version:
 
   * Make sure you running this script from the root directory of the package.
-  * Make sure all changes are committed to the git repository and pushed.
   * Make sure all the tests are passing.
   * Make sure the documentation is building with the following command:
     ``sphinx-build -aEWn doc sphinx``
+  * Make sure the documentation badges in README.rst are pointing to:
+    https://www.idiap.ch/software/bob/docs/bob/...
+  * Make sure all changes are committed to the git repository and pushed.
   * For database packages, make sure that the '.sql3' file or other
     metadata files have been generated (if any).
   * Make sure bob.nightlies is green after the changes are submitted if the
