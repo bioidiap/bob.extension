@@ -532,7 +532,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
         url = s % package_name
       else: #use new style, with mapping, try to link against specific version
         try:
-          version = pkg_resources.require(package_name)[0].version
+          version = 'v' + pkg_resources.require(package_name)[0].version
         except pkg_resources.DistributionNotFound:
           version = 'stable' #package is not a runtime dep, only referenced
         url = s % {'name': package_name, 'version': version}
