@@ -34,8 +34,8 @@ test:
   imports:
     - {{ name }}
   commands:
-    - bob_new_version.py--help
-    - bob_dependecy_graph.py--help
+    - bob_new_version.py --help
+    - bob_dependecy_graph.py --help
     - nosetests --with-coverage --cover-package={{ name }} -sv {{ name }} --exclude=test_extensions
     # The doctests will run only if "CI_PROJECT_DIR" is available as an
     # environment variable. If you are testing locally, you can set it to the
