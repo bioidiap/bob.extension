@@ -1,0 +1,64 @@
+{% set name = 'bob.extension' %}
+
+package:
+  name: {{ name }}
+  version: {{ environ.get('BOB_PACKAGE_VERSION', '0.0.1') }}
+
+build:
+  entry_points:
+    - bob_new_version.py = bob.extension.scripts:new_version
+    - bob_dependecy_graph.py = bob.extension.scripts:dependency_graph
+  number: {{ environ.get('BOB_BUILD_NUMBER', 0) }}
+  script:
+    - cd {{ environ.get('CI_PROJECT_DIR', environ.get('RECIPE_DIR') + '/..') }}
+    {% if environ.get('BUILD_EGG') %}
+    - python setup.py sdist --formats=zip
+    {% endif %}
+    - pip install .
+    - sphinx-build -W doc $PREFIX/docs/{{ name }}
+  script_env:
+   - BOB_DOCUMENTATION_SERVER
+
+requirements:
+  build:
+    - python
+    - setuptools
+    - toolchain {{ toolchain }}
+    - sphinx
+    - sphinx_rtd_theme
+  run:
+    - python
+    - setuptools
+
+test:
+  imports:
+    - {{ name }}
+  commands:
+    - bob_new_version.py--help
+    - bob_dependecy_graph.py--help
+    - nosetests --with-coverage --cover-package={{ name }} -sv {{ name }}
+    # The doctests will run only if "CI_PROJECT_DIR" is available as an
+    # environment variable. If you are testing locally, you can set it to the
+    # root of your project.
+    - sphinx-build -b doctest {{ environ.get('CI_PROJECT_DIR') }}/doc sphinx
+  requires:
+    - nose
+    - coverage
+    - sphinx
+    - sphinx_rtd_theme
+    - boost
+    - cmake
+    - pkg-config
+    - freetype
+    - libblitz
+    - numpy
+    - toolchain {{ toolchain }}
+    - gcc {{ gcc }}  # [linux]
+    - libgcc {{ libgcc }}  # [linux]
+    - bob.buildout
+
+about:
+  home: https://www.idiap.ch/software/bob/
+  license: BSD 3-Clause
+  summary: Building of Python/C++ extensions for Bob
+  license_family: BSD
