@@ -33,6 +33,6 @@
 .. _anaconda-recipes: https://github.com/ContinuumIO/anaconda-recipes/
 .. _conda channel: https://www.idiap.ch/software/bob/conda/
 .. _Python packaging guide: https://packaging.python.org/distributing/
-.. _bob-devel: https://gitlab.idiap.ch/bob/bob-devel
+.. _bob-devel: https://gitlab.idiap.ch/bob/bob.conda/tree/master/recipes/bob-devel
 .. _pip: https://pip.pypa.io/en/stable/
 .. _discuss: https://www.idiap.ch/software/bob/discuss
