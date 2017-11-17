@@ -39,6 +39,7 @@ Documentation
    cplusplus_library
    documenting
    additional
+   config
    py_api
    cpp_api
    pip
