@@ -13,4 +13,3 @@ defaults['bob.db.atnt'] = {
     'directory': '/directory/to/root/of/atnt-database',
     'extension': '.ppm',
     }
-

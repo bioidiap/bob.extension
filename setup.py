@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 # Define package version
 version = open("version.txt").read().rstrip()
 
-requires = ['setuptools']
+requires = ['setuptools', 'six']
 import sys
 if sys.version_info[0] == 2 and sys.version_info[1] <= 6:
   requires.append('importlib')

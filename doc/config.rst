@@ -32,7 +32,7 @@ objects from a given configuration file, like this:
 If the function :py:func:`bob.extension.config.load` succeeds, it returns a
 python dictionary containing strings as keys and objects (of any kind) which
 represent the configuration resource. For example, if the file
-``example-config.py`` contained:
+``basic-config.py`` contained:
 
 .. literalinclude:: ../bob/extension/data/basic-config.py
    :language: python
@@ -44,7 +44,7 @@ Then, the object ``configuration`` would look like this:
 
 .. doctest:: basic-config
 
-   >>> print(json.dumps(configuration, indent=2, sort_keys=True))
+   >>> print(json.dumps(configuration, indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
    {
      "a": 1,
      "b": 3,
@@ -54,6 +54,19 @@ Then, the object ``configuration`` would look like this:
 
 The configuration file does not have to limit itself to simple Pythonic
 operations, you can import modules and more.
+
+There is a special function to load global configuration resources, typically
+called *run commands* (or "rc" for short files). The function is called
+:py:func:`bob.extension.config.loadrc` file and automatically searches for an
+RC file named :py:func:`bob.extension.config.RCFILENAME` on the current
+directory and, if that does not exist, reads the file with the same name
+located on the root of your home directory (or whatever ``${HOME}/.bobrc.py``
+points to).
+
+Configurable resources in each |project| package should be clearly named so you
+can correctly configure them. The next section hints on how to organize such
+global resources so they are configured homogeneously across packages in the
+|project| echo-system.
 
 
 Package Defaults
@@ -78,7 +91,7 @@ elements at the start of the configuration file loading. Here is an example:
 
 .. testsetup:: defaults-config
 
-   from bob.extension.config import load, update
+   from bob.extension.config import load
 
 
 When loaded, this configuration file produces the result:
@@ -108,31 +121,33 @@ When loaded, this configuration file produces the result:
    configuration file.
 
 
-Value Overrides
----------------
+Chain Loading
+-------------
 
 It is possible to implement chain configuration loading and overriding by
-either calling :py:func:`bob.extension.config.load` many times or by nesting
-calls to ``load()`` within the same configuration file. Here is an example of
-the latter:
+either calling :py:func:`bob.extension.config.load` many times or by passing
+iterables with filenames to that function. Suppose we have two configuration
+files which must be loaded in sequence:
+
+.. literalinclude:: ../bob/extension/data/defaults-config.py
+   :caption: "defaults-config.py" (first to be loaded)
+   :language: python
+   :linenos:
 
 .. literalinclude:: ../bob/extension/data/load-config.py
-   :caption: "load-config.py"
+   :caption: "load-config.py" (loaded after defaults-config.py)
    :language: python
    :linenos:
 
 
-The function :py:func:`bob.extension.config.update` is also bound to the
-configuration readout and appears as an object called ``update`` within the
-configuration file. It provides an easier handle to update the ``defaults``
-dictionary.
-
-This would produce the following result:
+Then, one can chain-load them like this:
 
 .. doctest:: defaults-config
 
    >>> #the variable `path` points to <path-to-bob.extension's root>/data
-   >>> configuration = load(os.path.join(path, 'load-config.py'))
+   >>> file1 = os.path.join(path, 'defaults-config.py')
+   >>> file2 = os.path.join(path, 'load-config.py')
+   >>> configuration = load([file1, file2])
    >>> print(json.dumps(configuration, indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
    {
      "defaults": {
@@ -145,50 +160,3 @@ This would produce the following result:
 
 The user wanting to override defaults needs to manage the overriding and the
 order in which the override happens.
-
-It is possible to implement the same override technique programmatically. For
-example, suppose a program that receives various configuration files to read as
-input and must override values set, one after the other:
-
-.. code-block:: sh
-
-   # example application call
-   $ ./my-application.py config1.py config2.py
-
-
-The configuration files contain settings like these:
-
-.. literalinclude:: ../bob/extension/data/config1.py
-   :caption: "config1.py"
-   :language: python
-   :linenos:
-
-
-.. literalinclude:: ../bob/extension/data/config2.py
-   :caption: "config2.py"
-   :language: python
-   :linenos:
-
-
-Programmatically, the application and implement the update of the configuration
-using :py:func:`bob.extension.config.update`:
-
-.. doctest:: defaults-config
-
-   >>> #the variable `path` points to <path-to-bob.extension's root>/data
-   >>> configuration = load(os.path.join(path, 'config1.py'))
-   >>> _ = update(configuration, load(os.path.join(path, 'config2.py')))
-   >>> print(json.dumps(configuration, indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
-   {
-     "defaults": {
-       "bob.core": {
-         "verbosity": 30
-       },
-       "bob.db.atnt": {
-         "extension": ".jpg"
-       }
-     },
-     "var1": "howdy",
-     "var2": "world",
-     "var3": "foo"
-   }
