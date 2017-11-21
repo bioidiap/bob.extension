@@ -61,7 +61,8 @@ called *run commands* (or "rc" for short files). The function is called
 RC file named :py:func:`bob.extension.config.RCFILENAME` on the current
 directory and, if that does not exist, reads the file with the same name
 located on the root of your home directory (or whatever ``${HOME}/.bobrc.py``
-points to).
+points to). The path of the file that will be loaded can be overridden by an
+environment variable named :py:attr:`bob.extension.config.RCFILENAME`.
 
 Configurable resources in each |project| package should be clearly named so you
 can correctly configure them. The next section hints on how to organize such

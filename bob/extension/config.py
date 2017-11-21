@@ -7,7 +7,12 @@ import os
 import imp
 import six
 import collections
+import logging
 
+logger = logging.getLogger(__name__)
+
+ENVNAME = 'BOBRC'
+"""Name of environment variable to look for an alternative for the RC file"""
 
 RCFILENAME = '.bobrc.py'
 """Default name to be used for the RC file to load"""
@@ -39,15 +44,13 @@ def _load_context(path, context):
   '''
 
   retval = imp.new_module('config')
-
-  # defines symbols
-  for k, v in context.items(): retval.__dict__[k] = v
+  retval.__dict__.update(context)
 
   # executes the module code on the context of previously import modules
   exec(compile(open(path, "rb").read(), path, 'exec'), retval.__dict__)
 
   # notice retval.__dict__ is deleted when we return
-  return dict([(k,v) for k,v in retval.__dict__.items() if not k.startswith('_')])
+  return dict((k,v) for k,v in retval.__dict__.items() if not k.startswith('_'))
 
 
 def load(path, context=None):
@@ -85,15 +88,12 @@ def load(path, context=None):
       if 'defaults' not in context:
         context['defaults'] = {}
 
-    retval = _load_context(os.path.realpath(os.path.expanduser(path)), context)
-
-    return retval
+    return _load_context(os.path.realpath(os.path.expanduser(path)), context)
 
   elif isinstance(path, collections.Iterable):
 
-    retval = None
-    for k in path: retval = load(k, retval)
-    return retval
+    for k in path: context = load(k, context)
+    return context
 
   else:
 
@@ -106,8 +106,9 @@ def loadrc(context=None):
   This method will load **exactly** one (global) resource configuration file in
   this fixed order of preference:
 
-  1. A file named :py:attr:`RCFILENAME` on the current directory
-  2. A file named :py:attr:`RCFILENAME` on your HOME directory
+  1. A path pointed by the environment variable BOBRC
+  2. A file named :py:attr:`RCFILENAME` on the current directory
+  3. A file named :py:attr:`RCFILENAME` on your HOME directory
 
 
   Parameters:
@@ -125,11 +126,16 @@ def loadrc(context=None):
 
   '''
 
-  if os.path.exists(RCFILENAME):
+  if 'BOBRC' in os.environ:
+    path = os.environ['BOBRC']
+  elif os.path.exists(RCFILENAME):
     path = os.path.realpath(RCFILENAME)
+    logger.debug("Loading RC file `%s'...", path)
   elif os.path.exists(os.path.expanduser('~' + os.sep + RCFILENAME)):
     path = os.path.expanduser('~' + os.sep + RCFILENAME)
+    logger.debug("Loading RC file `%s'...", path)
   else:
+    logger.debug("No RC file found", path)
     return {}
 
   return load(path, context)
