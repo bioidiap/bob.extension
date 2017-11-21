@@ -8,8 +8,6 @@ This package also provides a configuration system that can be used by packages
 in the |project|-echosystem. The configuration system is pretty simple and uses
 Python itself to load and validate input files, making no *a priori*
 requirements on the amount or complexity of data that needs to be configured.
-Since configuration files are written in Python, you can execute full python
-programs while configuring, import modules, create classes and more.
 
 The configuration system is centered around a single function called
 :py:func:`bob.extension.config.load`. You call it to load the configuration
@@ -54,6 +52,16 @@ Then, the object ``configuration`` would look like this:
 
 The configuration file does not have to limit itself to simple Pythonic
 operations, you can import modules and more.
+
+.. note::
+
+   Since configuration files are written in Python, you can execute full python
+   programs while configuring, import modules, create classes and more.
+   **However**, it is recommended that you keep the configuration files simple.
+   Avoid defining classes in the configuration files. A recommended
+   configuration file normally would only contain
+   ``dict, list, tuple, str, int, float, True, False, None`` Python objects.
+
 
 There is a special function to load global configuration resources, typically
 called *run commands* (or "rc" for short files). The function is called
