@@ -121,12 +121,11 @@ def loadrc(context=None):
     path = os.environ['BOBRC']
   elif os.path.exists(RCFILENAME):
     path = os.path.realpath(RCFILENAME)
-    logger.debug("Loading RC file `%s'...", path)
   elif os.path.exists(os.path.expanduser('~' + os.sep + RCFILENAME)):
     path = os.path.expanduser('~' + os.sep + RCFILENAME)
-    logger.debug("Loading RC file `%s'...", path)
   else:
     logger.debug("No RC file found", path)
     return {}
 
+  logger.debug("Loading RC file `%s'...", path)
   return load([path], context)
