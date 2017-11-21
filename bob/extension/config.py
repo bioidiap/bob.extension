@@ -5,7 +5,6 @@
 
 import os
 import imp
-import six
 import collections
 import logging
 
@@ -53,7 +52,7 @@ def _load_context(path, context):
   return dict((k,v) for k,v in retval.__dict__.items() if not k.startswith('_'))
 
 
-def load(path, context=None):
+def load(paths, context=None):
   '''Loads a set of configuration files, in sequence
 
   This method will load one or more configuration files. Everytime a
@@ -63,10 +62,10 @@ def load(path, context=None):
 
   Parameters:
 
-    path (:py:class:`str`, :py:class:`list`): The full path of the Python file
-      to load the module contents from. If an iterable is passed, then it is
-      iterated and each configuration file is loaded by creating/modifying the
-      context generated after each file readout.
+    paths (:py:class:`list`): A list or iterable containing paths (relative or
+      absolute) of configuration files that need to be loaded in sequence.
+      Each configuration file is loaded by creating/modifying the context
+      generated after each file readout.
 
     context (:py:class:`dict`, Optional): If passed, start the readout of the
       first configuration file with the given context. Otherwise, create a new
@@ -80,24 +79,16 @@ def load(path, context=None):
 
   '''
 
-  if isinstance(path, six.string_types):
-
-    if context is None:
-      context = dict(defaults={})
-    else:
-      if 'defaults' not in context:
-        context['defaults'] = {}
-
-    return _load_context(os.path.realpath(os.path.expanduser(path)), context)
-
-  elif isinstance(path, collections.Iterable):
-
-    for k in path: context = load(k, context)
-    return context
-
+  if context is None:
+    context = dict(defaults={})
   else:
+    if 'defaults' not in context:
+      context['defaults'] = {}
 
-    raise TypeError('path must be either a string or iterable over strings')
+  for k in paths:
+    context = _load_context(os.path.realpath(os.path.expanduser(k)), context)
+
+  return context
 
 
 def loadrc(context=None):
@@ -138,4 +129,4 @@ def loadrc(context=None):
     logger.debug("No RC file found", path)
     return {}
 
-  return load(path, context)
+  return load([path], context)

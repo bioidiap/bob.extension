@@ -13,7 +13,7 @@ programs while configuring, import modules, create classes and more.
 
 The configuration system is centered around a single function called
 :py:func:`bob.extension.config.load`. You call it to load the configuration
-objects from a given configuration file, like this:
+objects from one or more configuration files, like this:
 
 .. testsetup:: *
 
@@ -26,7 +26,7 @@ objects from a given configuration file, like this:
 
    >>> from bob.extension.config import load
    >>> #the variable `path` points to <path-to-bob.extension's root>/data
-   >>> configuration = load(os.path.join(path, 'basic-config.py'))
+   >>> configuration = load([os.path.join(path, 'basic-config.py')])
 
 
 If the function :py:func:`bob.extension.config.load` succeeds, it returns a
@@ -100,7 +100,7 @@ When loaded, this configuration file produces the result:
 .. doctest:: defaults-config
 
    >>> #the variable `path` points to <path-to-bob.extension's root>/data
-   >>> configuration = load(os.path.join(path, 'defaults-config.py'))
+   >>> configuration = load([os.path.join(path, 'defaults-config.py')])
    >>> print(json.dumps(configuration, indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
    {
      "defaults": {
@@ -126,9 +126,9 @@ Chain Loading
 -------------
 
 It is possible to implement chain configuration loading and overriding by
-either calling :py:func:`bob.extension.config.load` many times or by passing
-iterables with filenames to that function. Suppose we have two configuration
-files which must be loaded in sequence:
+passing iterables with more than one filename to
+:py:func:`bob.extension.config.load`. Suppose we have two configuration files
+which must be loaded in sequence:
 
 .. literalinclude:: ../bob/extension/data/defaults-config.py
    :caption: "defaults-config.py" (first to be loaded)
