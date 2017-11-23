@@ -45,8 +45,7 @@ Then, the object ``configuration`` would look like this:
    >>> print(json.dumps(configuration, indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
    {
      "a": 1,
-     "b": 3,
-     "defaults": {}
+     "b": 3
    }
 
 
@@ -82,15 +81,12 @@ Package Defaults
 ----------------
 
 While the configuration system by itself does not make assumptions about your
-configuration strategy, it does provide some support to better organize
-package-based defaults which can be used by |project| echo-system packages.
-Package-based defaults may be, for example, the directory where raw data files
-for a particular ``bob.db`` are installed or the verbosity-level logging
-messages should have.
+configuration strategy, we recommend to organize values in a sensible manner
+which relates to the package name. Package-based defaults may be, for example,
+the directory where raw data files for a particular ``bob.db`` are installed or
+the verbosity-level logging messages should have.
 
-Package defaults are typically organized dictionary called ``defaults``. The
-variable ``defaults`` is **guaranteed** to be defined and to contain no
-elements at the start of the configuration file loading. Here is an example:
+Here is an example for the package ``bob.db.atnt``:
 
 .. literalinclude:: ../bob/extension/data/defaults-config.py
    :caption: "defaults-config.py"
@@ -111,11 +107,9 @@ When loaded, this configuration file produces the result:
    >>> configuration = load([os.path.join(path, 'defaults-config.py')])
    >>> print(json.dumps(configuration, indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
    {
-     "defaults": {
-       "bob.db.atnt": {
-         "directory": "/directory/to/root/of/atnt-database",
-         "extension": ".ppm"
-       }
+     "bob_db_atnt": {
+       "directory": "/directory/to/root/of/atnt-database",
+       "extension": ".ppm"
      }
    }
 
@@ -159,11 +153,9 @@ Then, one can chain-load them like this:
    >>> configuration = load([file1, file2])
    >>> print(json.dumps(configuration, indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
    {
-     "defaults": {
-       "bob.db.atnt": {
-         "directory": "/directory/to/root/of/atnt-database",
-         "extension": ".hdf5"
-       }
+     "bob_db_atnt": {
+       "directory": "/directory/to/root/of/atnt-database",
+       "extension": ".hdf5"
      }
    }
 

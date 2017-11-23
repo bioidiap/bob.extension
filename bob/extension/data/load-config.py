@@ -1,1 +1,1 @@
-defaults['bob.db.atnt']['extension'] = '.hdf5'
+bob_db_atnt['extension'] = '.hdf5'

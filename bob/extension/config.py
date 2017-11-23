@@ -79,11 +79,7 @@ def load(paths, context=None):
 
   '''
 
-  if context is None:
-    context = dict(defaults={})
-  else:
-    if 'defaults' not in context:
-      context['defaults'] = {}
+  if context is None: context = dict()
 
   for k in paths:
     context = _load_context(os.path.realpath(os.path.expanduser(k)), context)
