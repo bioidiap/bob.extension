@@ -68,8 +68,8 @@ non-existing keys.
 
 .. warning::
 
-   The variables of each package **must** start with the name of package. For
-   example, if the variable is used in ``bob.db.atnt``, its name should be
+   The variables of each package **must** start with the name of the package.
+   For example, if the variable is used in ``bob.db.atnt``, its name should be
    ``bob.db.atnt.<name>``. This is required to avoid variable name clashes
    between hundreds of |project| packages. Remember that your package
    **is not** special and you **should** follow this rule.
