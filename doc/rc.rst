@@ -54,8 +54,8 @@ Here is an example on how the configuration system can be potentially used:
    ...         self.original_directory = original_directory
 
 :py:attr:`bob.extension.rc` is a dictionary which returns ``None`` for
-non-existing keys so you don't have to worry about exception handling for non-
-existing keys.
+non-existing keys so you don't have to worry about exception handling for
+non-existing keys.
 
 .. warning::
 
