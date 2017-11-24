@@ -5,7 +5,7 @@
 
 import os
 import imp
-import collections
+import copy
 import logging
 
 logger = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ RCFILENAME = '.bobrc.py'
 """Default name to be used for the RC file to load"""
 
 
-def _load_context(path, context):
+def _load_context(path, mod):
   '''Loads the Python file as module, returns a resolved context
 
   This function is implemented in a way that is both Python 2 and Python 3
@@ -30,26 +30,23 @@ def _load_context(path, context):
     path (str): The full path of the Python file to load the module contents
       from
 
-    context (dict): A mapping which indicates name -> object relationship to
-      be established within the file before loading it. This dictionary
-      establishes the context in which the module loading is executed, i.e.,
-      previously existing variables when the readout of the new module starts.
+    mod (module): A preloaded module to use as context for the next module
+      loading. You can create a new module using :py:mod:`imp` as in ``m =
+      imp.new_module('name'); m.__dict__.update(ctxt)`` where ``ctxt`` is a
+      python dictionary with string -> object values representing the contents
+      of the module to be created.
 
 
   Returns:
 
-    dict: A python dictionary with the new, fully resolved context.
+    module: A python module with the fully resolved context
 
   '''
 
-  retval = imp.new_module('config')
-  retval.__dict__.update(context)
+  # executes the module code on the context of previously imported modules
+  exec(compile(open(path, "rb").read(), path, 'exec'), mod.__dict__)
 
-  # executes the module code on the context of previously import modules
-  exec(compile(open(path, "rb").read(), path, 'exec'), retval.__dict__)
-
-  # notice retval.__dict__ is deleted when we return
-  return dict((k,v) for k,v in retval.__dict__.items() if not k.startswith('_'))
+  return mod
 
 
 def load(paths, context=None):
@@ -79,23 +76,26 @@ def load(paths, context=None):
 
   '''
 
-  if context is None: context = dict()
+  mod = imp.new_module('config')
+  if context is not None: mod.__dict__.update(context)
 
   for k in paths:
-    context = _load_context(os.path.realpath(os.path.expanduser(k)), context)
+    logger.debug("Loading configuration file `%s'...", k)
+    mod = _load_context(k, mod)
 
-  return context
+  # notice context.__dict__ will be gone as soon as the module is deleted
+  # we need to shallow-copy it to prevent this
+  return dict((k,v) for k,v in mod.__dict__.items() if not k.startswith('_'))
 
 
-def loadrc(context=None):
+def _loadrc(context=None):
   '''Loads the default configuration file, or an override if provided
 
   This method will load **exactly** one (global) resource configuration file in
   this fixed order of preference:
 
   1. A path pointed by the environment variable BOBRC
-  2. A file named :py:attr:`RCFILENAME` on the current directory
-  3. A file named :py:attr:`RCFILENAME` on your HOME directory
+  2. A file named :py:attr:`RCFILENAME` on your HOME directory
 
 
   Parameters:
@@ -115,13 +115,13 @@ def loadrc(context=None):
 
   if 'BOBRC' in os.environ:
     path = os.environ['BOBRC']
-  elif os.path.exists(RCFILENAME):
-    path = os.path.realpath(RCFILENAME)
   elif os.path.exists(os.path.expanduser('~' + os.sep + RCFILENAME)):
     path = os.path.expanduser('~' + os.sep + RCFILENAME)
   else:
-    logger.debug("No RC file found", path)
+    logger.debug("No RC file found")
     return {}
 
   logger.debug("Loading RC file `%s'...", path)
-  return load([path], context)
+  mod = imp.new_module('rc')
+  if context is not None: mod.__dict__.update(context)
+  return _load_context(path, mod)

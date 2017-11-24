@@ -8,13 +8,19 @@ import os
 import pkg_resources
 path = pkg_resources.resource_filename('bob.extension', 'data')
 
-from .config import load, loadrc, ENVNAME
+from .config import load, _loadrc, ENVNAME
 
 
 def test_basic():
 
   c = load([os.path.join(path, 'basic-config.py')])
   assert c == {'a': 1, 'b': 3}
+
+
+def test_basic_with_context():
+
+  c = load([os.path.join(path, 'basic-config.py')], {'d': 35, 'a': 0})
+  assert c == {'a': 1, 'b': 3, 'd': 35}
 
 
 def test_defaults():
@@ -34,5 +40,6 @@ def test_chain_loading():
 def test_rc_env():
 
   os.environ[ENVNAME] = os.path.join(path, 'basic-config.py')
-  c = loadrc() #should load from environment variable
-  assert c == {'a': 1, 'b': 3}
+  c = _loadrc() #should load from environment variable
+  assert c.a == 1
+  assert c.b == 3
