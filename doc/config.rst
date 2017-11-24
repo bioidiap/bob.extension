@@ -164,7 +164,7 @@ When loaded, this configuration file produces the following result:
    >>> mod = _loadrc()
    >>> #notice `mod` is a normal python module
    >>> print(mod)
-   <module 'rc' (built-in)>
+   <module 'rc'...>
    >>> print(json.dumps(dict((k,v) for k,v in mod.__dict__.items() if not k.startswith('_')), indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
    {
      "bob_db_atnt": {
