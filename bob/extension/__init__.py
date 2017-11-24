@@ -20,7 +20,7 @@ from .pkgconfig import pkgconfig
 from .boost import boost
 from .utils import uniq, uniq_paths, find_executable, find_library
 from .cmake import CMakeListsGenerator
-from .config import _loadrc
+from .rc_config import _loadrc
 
 __version__ = pkg_resources.require(__name__)[0].version
 
@@ -762,6 +762,8 @@ def get_config(package=__name__, externals=None, api_version=None):
 
 # Loads the rc user preferences
 rc = _loadrc()
+"""The content of the global configuration file loaded as a dictionary.
+The value for any non-existing key is ``None``."""
 
 # gets sphinx autodoc done right - don't remove it
 __all__ = [_ for _ in dir() if not _.startswith('_')]

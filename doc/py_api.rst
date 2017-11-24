@@ -18,6 +18,7 @@ Configuration
 -------------
 
 .. automodule:: bob.extension.config
+.. automodule:: bob.extension.rc_config
 
 
 Scripts
