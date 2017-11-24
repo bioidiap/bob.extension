@@ -40,7 +40,7 @@ For Developers
 
 The configuration file is automatically loaded and is available as
 :py:attr:`bob.extension.rc`.
-It's main usage (for now) is to automatically load find where the databases
+It's main usage (for now) is to automatically find where the databases
 are located.
 Here is an example on how the configuration system can be potentially used:
 
@@ -62,14 +62,14 @@ existing keys.
    The variables of each package **must** start with the name of package. For
    example, if the variable is used in ``bob.db.atnt``, its name should be
    ``bob.db.atnt.<name>``. This is required to avoid variable name clashes
-   between hundreds of |project| package. Remember that your package is **not**
-   special and **should** follow this rule.
+   between hundreds of |project| packages. Remember that your package is
+   **not** special and you **should** follow this rule.
 
 In the documentation of your package do not explain how the configuration
 system works. Just provide an example command on how the variable should be
-configured::
+configured. For example::
 
    $ bob config set bob.db.mydatabase.directory /path/to/mydatabase
 
 And point to this page for more information. You can point to this page using
-the ``ref`` command: ``:ref:`bob.extension.rc```
+the ``:ref:`` command like this: ``:ref:`bob.extension.rc```.
