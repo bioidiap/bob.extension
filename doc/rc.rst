@@ -95,4 +95,4 @@ should be configured. For example:
 
 
 And refer to this page for more information. You can create a link to this page
-using the ``:ref:`` command like this: ``:ref:`bob.extension.rc``.
+using the ``:ref:`` command like this: ``:ref:`bob.extension.rc```.
