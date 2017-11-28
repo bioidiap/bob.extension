@@ -64,8 +64,7 @@ def _loadrc():
   logger.debug("Loading RC file `%s'...", path)
 
   with open(path, 'rt') as f:
-    context = json.load(f, object_hook=_default_none_dict)
-  return context
+    return json.load(f, object_hook=_default_none_dict)
 
 
 def _dumprc(context, f):
@@ -78,6 +77,7 @@ def _dumprc(context, f):
   f : obj
       An object that provides a ``f.write()`` function.
   """
+
   json.dump(context, f, sort_keys=True, indent=4, separators=(',', ': '))
 
 
@@ -89,6 +89,7 @@ def _saverc(context):
   context : dict
       All the configurations to save into the rc file.
   """
+
   path = _get_rc_path()
   with open(path, 'wt') as f:
     _dumprc(context, f)

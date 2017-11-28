@@ -29,9 +29,9 @@ def setup_parser(parser):
 def show(arguments=None):
     """Shows the content of bob's global configuration file.
     """
-    print("The configuration is located at {}".format(_get_rc_path()))
-    print("It's content are:")
+    print("Displaying `{}':".format(_get_rc_path()))
     _dumprc(rc, sys.stdout)
+    print()
 
 
 def show_command(subparsers):

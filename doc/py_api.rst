@@ -17,8 +17,9 @@ Functions
 Configuration
 -------------
 
-.. automodule:: bob.extension.config
 .. automodule:: bob.extension.rc_config
+
+.. automodule:: bob.extension.config
 
 
 Scripts

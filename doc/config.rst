@@ -5,9 +5,11 @@
 ===================================
 
 This package also provides a configuration system that can be used by packages
-in the |project|-echosystem. The configuration system is pretty simple and uses
-Python itself to load and validate input files, making no *a priori*
-requirements on the amount or complexity of data that needs to be configured.
+in the |project|-echosystem to load *run-time* configuration for applications
+(for package-level static variable configuration use :ref:`bob.extension.rc`).
+The run-time configuration system is pretty simple and uses Python itself to
+load and validate input files, making no *a priori* requirements on the amount
+or complexity of data that needs to be configured.
 
 The configuration system is centered around a single function called
 :py:func:`bob.extension.config.load`. You call it to load the configuration
