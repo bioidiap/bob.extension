@@ -1,0 +1,112 @@
+.. _bob.extension.config:
+
+===================================
+ Python-based Configuration System
+===================================
+
+This package also provides a configuration system that can be used by packages
+in the |project|-echosystem to load *run-time* configuration for applications
+(for package-level static variable configuration use :ref:`bob.extension.rc`).
+The run-time configuration system is pretty simple and uses Python itself to
+load and validate input files, making no *a priori* requirements on the amount
+or complexity of data that needs to be configured.
+
+The configuration system is centered around a single function called
+:py:func:`bob.extension.config.load`. You call it to load the configuration
+objects from one or more configuration files, like this:
+
+.. testsetup:: *
+
+   import os
+   import pkg_resources
+   path = pkg_resources.resource_filename('bob.extension', 'data')
+   import json
+
+.. doctest:: basic-config
+
+   >>> from bob.extension.config import load
+   >>> #the variable `path` points to <path-to-bob.extension's root>/data
+   >>> configuration = load([os.path.join(path, 'basic-config.py')])
+
+
+If the function :py:func:`bob.extension.config.load` succeeds, it returns a
+python dictionary containing strings as keys and objects (of any kind) which
+represent the configuration resource. For example, if the file
+``basic-config.py`` contained:
+
+.. literalinclude:: ../bob/extension/data/basic-config.py
+   :language: python
+   :linenos:
+   :caption: "basic-config.py"
+
+
+Then, the object ``configuration`` would look like this:
+
+.. doctest:: basic-config
+
+   >>> print(json.dumps(configuration, indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
+   {
+     "a": 1,
+     "b": 3
+   }
+
+
+The configuration file does not have to limit itself to simple Pythonic
+operations, you can import modules, define functions and more.
+
+
+.. note::
+
+   Variables starting with an underscore (``_``) are automatically removed from
+   the list of returned values by :py:func:`bob.extension.config.load`.
+
+   If you want to use temporary values on your configuration file either name
+   them starting with an underscore or delete the object before the end of the
+   configuration file.
+
+
+Chain Loading
+-------------
+
+It is possible to implement chain configuration loading and overriding by
+passing iterables with more than one filename to
+:py:func:`bob.extension.config.load`. Suppose we have two configuration files
+which must be loaded in sequence:
+
+.. literalinclude:: ../bob/extension/data/basic-config.py
+   :caption: "basic-config.py" (first to be loaded)
+   :language: python
+   :linenos:
+
+.. literalinclude:: ../bob/extension/data/load-config.py
+   :caption: "load-config.py" (loaded after basic-config.py)
+   :language: python
+   :linenos:
+
+
+Then, one can chain-load them like this:
+
+.. testsetup:: basic-config
+
+   import os
+   import pkg_resources
+   path = pkg_resources.resource_filename('bob.extension', 'data')
+   import json
+
+   from bob.extension.config import load
+
+
+.. doctest:: basic-config
+
+   >>> #the variable `path` points to <path-to-bob.extension's root>/data
+   >>> file1 = os.path.join(path, 'basic-config.py')
+   >>> file2 = os.path.join(path, 'load-config.py')
+   >>> configuration = load([file1, file2])
+   >>> print(json.dumps(configuration, indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
+   {
+     "a": 1,
+     "b": 6
+   }
+
+The user wanting to override the values needs to manage the overriding and the
+order in which the override happens.
