@@ -77,6 +77,4 @@ def load(paths, context=None):
     logger.debug("Loading configuration file `%s'...", k)
     mod = _load_context(k, mod)
 
-  # notice context.__dict__ will be gone as soon as the module is deleted
-  # we need to shallow-copy it to prevent this
-  return dict((k, v) for k, v in mod.__dict__.items() if not k.startswith('_'))
+  return mod

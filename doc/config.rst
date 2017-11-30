@@ -44,25 +44,14 @@ Then, the object ``configuration`` would look like this:
 
 .. doctest:: basic-config
 
-   >>> print(json.dumps(configuration, indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
-   {
-     "a": 1,
-     "b": 3
-   }
+   >>> print("a = %d\nb = %d"%(configuration.a, configuration.b)) # doctest: +NORMALIZE_WHITESPACE
+   a = 1
+   b = 3
 
 
 The configuration file does not have to limit itself to simple Pythonic
 operations, you can import modules, define functions and more.
 
-
-.. note::
-
-   Variables starting with an underscore (``_``) are automatically removed from
-   the list of returned values by :py:func:`bob.extension.config.load`.
-
-   If you want to use temporary values on your configuration file either name
-   them starting with an underscore or delete the object before the end of the
-   configuration file.
 
 
 Chain Loading
@@ -102,11 +91,10 @@ Then, one can chain-load them like this:
    >>> file1 = os.path.join(path, 'basic-config.py')
    >>> file2 = os.path.join(path, 'load-config.py')
    >>> configuration = load([file1, file2])
-   >>> print(json.dumps(configuration, indent=2, sort_keys=True)) # doctest: +NORMALIZE_WHITESPACE
-   {
-     "a": 1,
-     "b": 6
-   }
+   >>> print("a = %d \nb = %d"%(configuration.a, configuration.b)) # doctest: +NORMALIZE_WHITESPACE
+   a = 1
+   b = 6
+
 
 The user wanting to override the values needs to manage the overriding and the
 order in which the override happens.
