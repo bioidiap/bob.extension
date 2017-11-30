@@ -9,6 +9,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+loaded_configs = []
 
 def _load_context(path, mod):
   '''Loads the Python file as module, returns a resolved context
@@ -77,4 +78,8 @@ def load(paths, context=None):
     logger.debug("Loading configuration file `%s'...", k)
     mod = _load_context(k, mod)
 
+  # Small gambiarra (https://www.urbandictionary.com/define.php?term=Gambiarra)
+  # to avoid the gc to collect some already imported modules
+  loaded_configs.append(mod)
+  
   return mod
