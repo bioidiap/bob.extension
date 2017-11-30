@@ -114,7 +114,7 @@ In detail, it defines the name and the version of this package, which files
 belong to the package (those files are automatically collected by the
 ``find_packages`` function), other packages that we depend on, namespaces and
 console scripts. The full set of options can be inspected in the
-`Setuptools documentation <https://setuptools.readthedocs.io>`_.
+`Setuptools documentation`_.
 
 .. warning::
 

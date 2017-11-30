@@ -5,11 +5,15 @@
 '''
 
 import imp
+import pkg_resources
+import pkgutil
+from os.path import isfile
 import logging
 
 logger = logging.getLogger(__name__)
 
-loaded_configs = []
+LOADED_CONFIGS = []
+
 
 def _load_context(path, mod):
   '''Loads the Python file as module, returns a resolved context
@@ -18,23 +22,22 @@ def _load_context(path, mod):
   compatible. It does not directly load the python file, but reads its contents
   in memory before Python-compiling it. It leaves no traces on the file system.
 
-
-  Parameters:
-
-    path (str): The full path of the Python file to load the module contents
+  Parameters
+  ----------
+  path : str
+      The full path of the Python file to load the module contents
       from
-
-    mod (module): A preloaded module to use as context for the next module
+  mod : module
+      A preloaded module to use as context for the next module
       loading. You can create a new module using :py:mod:`imp` as in ``m =
       imp.new_module('name'); m.__dict__.update(ctxt)`` where ``ctxt`` is a
       python dictionary with string -> object values representing the contents
       of the module to be created.
 
-
-  Returns:
-
-    module: A python module with the fully resolved context
-
+  Returns
+  -------
+  mod : :any:`module`
+      A python module with the fully resolved context
   '''
 
   # executes the module code on the context of previously imported modules
@@ -43,43 +46,120 @@ def _load_context(path, mod):
   return mod
 
 
-def load(paths, context=None):
+def _get_module_filename(module_name):
+  """Resolves a module name to an actual Python file.
+
+  Parameters
+  ----------
+  module_name : str
+      The name of the module
+
+  Returns
+  -------
+  str
+      The Python files that corresponds to the module name.
+  """
+  loader = pkgutil.get_loader(module_name)
+  if loader is None:
+    return ''
+  return loader.filename
+
+
+def _resolve_entry_point_or_modules(paths, entry_point_group):
+  """Resolves a mixture of paths, entry point names, and module names to just
+  paths. For example paths can be:
+  ``paths = ['/tmp/config.py', 'config1', 'bob.extension.config2']``.
+
+  Parameters
+  ----------
+  paths : [str]
+      An iterable strings that either point to actual files, are entry point
+      names, or are module names.
+  entry_point_group : str
+      The entry point group name to search in entry points.
+
+  Raises
+  ------
+  ValueError
+      If one of the paths cannot be resolved to an actual path to a file.
+
+  Returns
+  -------
+  paths : [str]
+      The resolved paths pointing to existing files.
+  """
+  entries = {e.name: e for e in
+             pkg_resources.iter_entry_points(entry_point_group)}
+  files = []
+
+  for i, path in enumerate(paths):
+    old_path = path
+    # if it is already a file
+    if isfile(path):
+      pass
+    # If it is an entry point name
+    elif path in entries:
+      module_name = entries[path].module_name
+      path = _get_module_filename(module_name)
+      if not isfile(path):
+        raise ValueError(
+            "The specified entry point: `{}' pointing to module: `{}' and "
+            "resolved to: `{}' does not point to an existing "
+            "file.".format(old_path, module_name, path))
+    # If it is not a path nor an entry point name, it is a module name then?
+    else:
+      path = _get_module_filename(path)
+      if not isfile(path):
+        raise ValueError(
+            "The specified path: `{}' resolved to: `{}' is not a file, entry "
+            "point name, or a module name".format(old_path, path))
+    files.append(path)
+  return files
+
+
+def load(paths, context=None, entry_point_group=None):
   '''Loads a set of configuration files, in sequence
 
-  This method will load one or more configuration files. Everytime a
+  This method will load one or more configuration files. Every time a
   configuration file is loaded, the context (variables) loaded from the
   previous file is made available, so the new configuration file can override
   or modify this context.
 
-  Parameters:
+  Parameters
+  ----------
+  paths : [str]
+      A list or iterable containing paths (relative or absolute) of
+      configuration files that need to be loaded in sequence. Each
+      configuration file is loaded by creating/modifying the context generated
+      after each file readout.
+  context : :py:class:`dict`, optional
+      If provided, start the readout of the first configuration file with the
+      given context. Otherwise, create a new internal context.
+  entry_point_group : :py:class:`str`, optional
+      If provided, it will treat non-existing file paths as entry point names
+      under the ``entry_point_group`` name.
 
-    paths (:py:class:`list`): A list or iterable containing paths (relative or
-      absolute) of configuration files that need to be loaded in sequence.
-      Each configuration file is loaded by creating/modifying the context
-      generated after each file readout.
-
-    context (:py:class:`dict`, Optional): If passed, start the readout of the
-      first configuration file with the given context. Otherwise, create a new
-      internal context.
-
-
-  Returns:
-
-    dict: A dictionary of key-values representing the resolved context, after
-    loading the provided modules and resolving all variables.
-
+  Returns
+  -------
+  mod : :any:`module`
+      A module representing the resolved context, after loading the provided
+      modules and resolving all variables.
   '''
 
   mod = imp.new_module('config')
   if context is not None:
     mod.__dict__.update(context)
 
+  # resolve entry points to paths
+  if entry_point_group is not None:
+    paths = _resolve_entry_point_or_modules(paths, entry_point_group)
+
   for k in paths:
     logger.debug("Loading configuration file `%s'...", k)
     mod = _load_context(k, mod)
 
   # Small gambiarra (https://www.urbandictionary.com/define.php?term=Gambiarra)
-  # to avoid the gc to collect some already imported modules
-  loaded_configs.append(mod)
-  
+  # to avoid the garbage collector to collect some already imported modules.
+  LOADED_CONFIGS.append(mod)
+
   return mod
