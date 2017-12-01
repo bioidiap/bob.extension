@@ -62,7 +62,10 @@ def _get_module_filename(module_name):
   loader = pkgutil.get_loader(module_name)
   if loader is None:
     return ''
-  return loader.filename
+  try:
+    return loader.path
+  except AttributeError:
+    return loader.filename
 
 
 def _resolve_entry_point_or_modules(paths, entry_point_group):
