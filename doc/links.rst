@@ -18,6 +18,7 @@
 .. _python: http://www.python.org
 .. _pypi: http://pypi.python.org
 .. _bob packages: https://www.idiap.ch/software/bob/packages
+.. _setuptools documentation:
 .. _setuptools: https://setuptools.readthedocs.io
 .. _sphinx: http://sphinx.pocoo.org
 .. _zc.buildout: http://pypi.python.org/pypi/zc.buildout/
