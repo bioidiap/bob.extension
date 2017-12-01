@@ -1,12 +1,26 @@
+.. _bob.extension.framework:
+
+==================================
+ Extending packages as frameworks
+==================================
+
+It is often required to extend the functionality of your package as a
+framework. :ref:`bob.bio.base <bob.bio.base>` is a good example; it provides an
+API and other packages build upon it. The utilities provided in this page are
+helpful in creating framework packages and building complex
+toolchians/pipelines.
+
+
 .. _bob.extension.config:
 
-===================================
- Python-based Configuration System
-===================================
+Python-based Configuration System
+---------------------------------
 
 This package also provides a configuration system that can be used by packages
 in the |project|-echosystem to load *run-time* configuration for applications
 (for package-level static variable configuration use :ref:`bob.extension.rc`).
+It can be used to accept complex configurations from users through
+command-line.
 The run-time configuration system is pretty simple and uses Python itself to
 load and validate input files, making no *a priori* requirements on the amount
 or complexity of data that needs to be configured.
@@ -56,7 +70,7 @@ operations, you can import modules, define functions and more.
 
 
 Chain Loading
--------------
+=============
 
 It is possible to implement chain configuration loading and overriding by
 passing iterables with more than one filename to
@@ -92,7 +106,7 @@ order in which the override happens.
 
 
 Entry Points
-------------
+============
 
 The function :py:func:`bob.extension.config.load` can also load config files
 through `Setuptools`_ entry points and module names. It is only needed
@@ -108,4 +122,63 @@ to provide the group name of the entry points:
    a = 1
    b = 6
 
+
+.. _bob.extension.processors:
+
+Stacked Processing
+------------------
+
+:any:`bob.extension.processors.SequentialProcessor` and
+:any:`bob.extension.processors.ParallelProcessor` are provided to help you
+build complex processing mechanisms. You can use these processors to apply a
+chain of processes on your data. For example,
+:any:`bob.extension.processors.SequentialProcessor` accepts a list of callables
+and applies them on the data one by one sequentially. :
+
+
+.. doctest::
+
+   >>> import numpy as np
+   >>> from functools import  partial
+   >>> from bob.extension.processors import SequentialProcessor
+   >>> raw_data = np.array([[1, 2, 3], [1, 2, 3]])
+   >>> seq_processor = SequentialProcessor(
+   ...     [np.cast['float64'], lambda x: x / 2, partial(np.mean, axis=1)])
+   >>> seq_processor(raw_data)
+   array([ 1.,  1.])
+   >>> np.all(seq_processor(raw_data) ==
+   ...        np.mean(np.cast['float64'](raw_data) / 2, axis=1))
+   True
+
+:any:`bob.extension.processors.ParallelProcessor` accepts a list of callables
+and applies each them on the data independently and returns all the results.
+For example:
+
+.. doctest::
+
+   >>> import numpy as np
+   >>> from functools import  partial
+   >>> from bob.extension.processors import ParallelProcessor
+   >>> raw_data = np.array([[1, 2, 3], [1, 2, 3]])
+   >>> parallel_processor = ParallelProcessor(
+   ...     [np.cast['float64'], lambda x: x / 2.0])
+   >>> list(parallel_processor(raw_data))
+   [array([[ 1.,  2.,  3.],
+          [ 1.,  2.,  3.]]), array([[ 0.5,  1. ,  1.5],
+          [ 0.5,  1. ,  1.5]])]
+
+The data may be further processed using a
+:any:`bob.extension.processors.SequentialProcessor`:
+
+.. doctest::
+
+   >>> from bob.extension.processors import SequentialProcessor
+   >>> total_processor = SequentialProcessor(
+   ...     [parallel_processor, list, partial(np.concatenate, axis=1)])
+   >>> total_processor(raw_data)
+   array([[ 1. ,  2. ,  3. ,  0.5,  1. ,  1.5],
+          [ 1. ,  2. ,  3. ,  0.5,  1. ,  1.5]])
+
+
 .. include:: links.rst
+

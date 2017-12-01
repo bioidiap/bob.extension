@@ -40,7 +40,7 @@ Documentation
    documenting
    additional
    rc
-   config
+   framework
    py_api
    cpp_api
    pip
