@@ -33,7 +33,7 @@ Documentation
 .. toctree::
    :maxdepth: 2
 
-   development_setup
+   development
    pure_python
    cplusplus_modules
    cplusplus_library
