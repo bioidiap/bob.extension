@@ -90,17 +90,25 @@ def _resolve_entry_point_or_modules(paths, entry_point_group):
   -------
   paths : [str]
       The resolved paths pointing to existing files.
+  names : [str]
+      The valid python module names to bind each of the files to
+
   """
+
   entries = {e.name: e for e in
              pkg_resources.iter_entry_points(entry_point_group)}
   files = []
+  names = []
 
   for i, path in enumerate(paths):
+
     old_path = path
-    # if it is already a file
-    if isfile(path):
-      pass
-    # If it is an entry point name
+    module_name = 'user_config' #fixed module name for files with full paths
+
+    # if it already points to a file
+    if isfile(path): pass
+
+    # If it is an entry point name, collect path and module name
     elif path in entries:
       module_name = entries[path].module_name
       path = _get_module_filename(module_name)
@@ -109,6 +117,7 @@ def _resolve_entry_point_or_modules(paths, entry_point_group):
             "The specified entry point: `{}' pointing to module: `{}' and "
             "resolved to: `{}' does not point to an existing "
             "file.".format(old_path, module_name, path))
+
     # If it is not a path nor an entry point name, it is a module name then?
     else:
       path = _get_module_filename(path)
@@ -116,8 +125,11 @@ def _resolve_entry_point_or_modules(paths, entry_point_group):
         raise ValueError(
             "The specified path: `{}' resolved to: `{}' is not a file, entry "
             "point name, or a module name".format(old_path, path))
+
     files.append(path)
-  return files
+    names.append(module_name)
+
+  return files, names
 
 
 def load(paths, context=None, entry_point_group=None):
@@ -147,22 +159,28 @@ def load(paths, context=None, entry_point_group=None):
   mod : :any:`module`
       A module representing the resolved context, after loading the provided
       modules and resolving all variables.
-  '''
 
-  mod = imp.new_module('config')
-  if context is not None:
-    mod.__dict__.update(context)
+  '''
 
   # resolve entry points to paths
   if entry_point_group is not None:
-    paths = _resolve_entry_point_or_modules(paths, entry_point_group)
+    paths, names = _resolve_entry_point_or_modules(paths, entry_point_group)
+  else:
+    names = len(paths)*['user_config']
 
-  for k in paths:
-    logger.debug("Loading configuration file `%s'...", k)
-    mod = _load_context(k, mod)
-
+  ctxt = imp.new_module('initial_context')
+  if context is not None:
+    ctxt.__dict__.update(context)
   # Small gambiarra (https://www.urbandictionary.com/define.php?term=Gambiarra)
   # to avoid the garbage collector to collect some already imported modules.
-  LOADED_CONFIGS.append(mod)
+  LOADED_CONFIGS.append(ctxt)
+
+  for k,n in zip(paths, names):
+    logger.debug("Loading configuration file `%s'...", k)
+    mod = imp.new_module(n)
+    mod.__dict__.update(ctxt.__dict__)
+    mod.__name__ = n #reverse module-name override
+    LOADED_CONFIGS.append(mod)
+    ctxt = _load_context(k, mod)
 
   return mod
