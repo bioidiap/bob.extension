@@ -47,8 +47,9 @@ def test_entry_point_configs():
   # test when all kinds of paths
   c = load([
       os.path.join(path, 'basic_config.py'),
-      'basic_config',
+      'resource_config',
       'bob.extension.data.basic_config',
   ], entry_point_group='bob.extension.test_config_load')
   assert hasattr(c, "a") and c.a == 1
   assert hasattr(c, "b") and c.b == 3
+  assert hasattr(c, "rc")
