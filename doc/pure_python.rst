@@ -181,6 +181,16 @@ After buildout has finished, you should now be able to execute ``./bin/bob_examp
      - setuptools: 15.1 ([PATH]/bob.example.project/eggs/setuptools-15.1-py2.7.egg)
 
 
+.. note::
+    We advise to *always* have two configuration files to be used with
+    buildout:
+
+    1. A simple minimal ``buildout.cfg`` file, such as the one in
+       bob.example.project
+    2. A more complete version, called ``develop.cfg`` that checks out whatever
+       (Bob) packages that your project depend on.
+
+
 Everything is now setup for you to continue the development of this package.
 Modify all required files to setup your own package name, description and
 dependencies. Start adding files to your library (or libraries) and, if you
