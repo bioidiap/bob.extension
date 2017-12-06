@@ -115,7 +115,7 @@ to provide the group name of the entry points:
 .. doctest:: entry_point
 
    >>> group = 'bob.extension.test_config_load'  # the group name of entry points
-   >>> file1 = 'resource_config'  # an entry point name
+   >>> file1 = 'basic_config'  # an entry point name
    >>> file2 = 'bob.extension.data.load_config' # module name
    >>> configuration = load([file1, file2], entry_point_group=group)
    >>> print("a = %d \nb = %d"%(configuration.a, configuration.b)) # doctest: +NORMALIZE_WHITESPACE
