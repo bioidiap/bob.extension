@@ -10,7 +10,7 @@
 .. _c++: http://www2.research.att.com/~bs/C++.html
 .. _distutils: https://docs.python.org/distutils/
 .. _git: http://git-scm.com/
-.. _gitlab: http://gitlab.idiap.ch/
+.. _gitlab: https://gitlab.idiap.ch/bob/
 .. _idiap: http://www.idiap.ch
 .. _ipython: http://ipython.scipy.org
 .. _nose: https://nose.readthedocs.org/en/latest/
