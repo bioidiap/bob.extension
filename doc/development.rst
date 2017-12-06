@@ -10,6 +10,117 @@ are managed by git_. First we will explain how to setup a local environment,
 later we will talk about how to checkout and build one or several packages from
 their git_ source.
 
+
+TLDR
+----
+
+Suppose you want to develop two packages, ``bob.extension`` and ``bob.blitz``,
+locally:
+
+* Install conda_.
+* Add our `conda channel`_ to your channels.
+
+.. code-block:: sh
+
+    $ conda config --set show_channel_urls True
+    $ conda config --add channels defaults
+    $ conda config --add channels https://www.idiap.ch/software/bob/conda
+
+* Create an isolated environment for the task.
+
+.. code-block:: sh
+
+    $ conda create --copy -n awesome-project \
+      python=3 bob-devel bob-extras
+    # bob-devel has all of our dependencies but no bob packages themselves and
+    # bob-extras has all of our bob packages.
+    $ source activate awesome-project
+
+* Create a folder with the following buildout configuration file.
+
+.. code-block:: sh
+
+    $ mkdir awesome-project
+    $ cd awesome-project
+    $ vi buildout.cfg
+
+.. code-block:: guess
+
+    [buildout]
+    parts = scripts
+
+    extensions = bob.buildout
+                 mr.developer
+
+    newest = false
+    verbose = true
+    debug = false
+
+    auto-checkout = *
+
+    develop = src/bob.extension
+              src/bob.blitz
+
+    eggs = bob.extension
+           bob.blitz
+
+    [scripts]
+    recipe = bob.buildout:scripts
+    dependent-scripts = true
+
+    [sources]
+    bob.extension = git https://gitlab.idiap.ch/bob/bob.extension
+    bob.blitz = git https://gitlab.idiap.ch/bob/bob.blitz
+    ; or
+    ; bob.extension = git git@gitlab.idiap.ch:bob/bob.extension.git
+    ; bob.blitz = git git@gitlab.idiap.ch:bob/bob.blitz.git
+
+* Run buildout and check if your desired package is being imported from the
+  ``awesome-project/src`` folder.
+
+.. code-block:: sh
+
+    $ buildout
+    $ ./bin/python
+
+.. code-block:: python
+
+    >>> import bob.blitz
+    >>> bob.blitz # should print from '.../awesome-project/src/bob.blitz/...'
+    <module 'bob.blitz' from 'awesome-project/src/bob.blitz/bob/blitz/__init__.py'>
+    >>> print(bob.blitz.get_config())
+    bob.blitz: 2.0.15b0 [api=0x0202] (awesome-project/src/bob.blitz)
+    * C/C++ dependencies:
+      - Blitz++: 0.10
+      - Boost: 1.61.0
+      - Compiler: {'version': '4.8.5', 'name': 'gcc'}
+      - NumPy: {'abi': '0x01000009', 'api': '0x0000000A'}
+      - Python: 2.7.13
+    * Python dependencies:
+      - bob.extension: 2.4.6b0 (awesome-project/src/bob.extension)
+      - numpy: 1.12.1 (miniconda/envs/bob3py27/lib/python2.7/site-packages)
+      - setuptools: 36.4.0 (miniconda/envs/bob3py27/lib/python2.7/site-packages)
+
+Optionally:
+
+* run nosetests (e.g. of bob.extension):
+
+.. code-block:: sh
+
+    $ ./bin/nosetests -sv bob.extension
+
+* build the docs (e.g. of bob.extension):
+
+.. code-block:: sh
+
+    $ export BOB_DOCUMENTATION_SERVER="https://www.idiap.ch/software/bob/docs/bob/%(name)s/master/"
+    # or with private docs also available at Idiap. Ask for its path from colleagues.
+    $ export BOB_DOCUMENTATION_SERVER="https://www.idiap.ch/software/bob/docs/bob/%(name)s/master/|http://path/to/private/docs/bob/%(name)s/master/"
+    $ cd src/bob.extension
+    $ ../../bin/sphinx-build -aEn doc sphinx  # make sure it finishes without warnings.
+    $ firefox sphinx/index.html  # view the docs.
+
+
 .. bob.extension.development_setup:
 
 Local development environment
@@ -25,6 +136,7 @@ Here are the instructions:
 .. code-block:: sh
 
     $ conda config --set show_channel_urls True
+    $ conda config --add channels defaults
     $ conda config --add channels https://www.idiap.ch/software/bob/conda
 
 .. note::
@@ -322,7 +434,7 @@ can access all packages that you have developed, including your own package:
 .. code-block:: python
 
     >>> import bob.blitz
-    >>> bob.blitz
+    >>> bob.blitz # should print from '.../awesome-project/src/bob.blitz/...'
     <module 'bob.blitz' from 'awesome-project/src/bob.blitz/bob/blitz/__init__.py'>
     >>> print(bob.blitz.get_config())
     bob.blitz: 2.0.15b0 [api=0x0202] (awesome-project/src/bob.blitz)
