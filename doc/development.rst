@@ -146,6 +146,16 @@ Then, invoke buildout:
 
     $ buildout
 
+.. note::
+
+    Buildout by default looks for ``buildout.cfg`` in your current folder and
+    uses that configuration file. You can specify a different config file with
+    the ``-c`` option:
+
+    .. code:: sh
+
+        $ buildout -c develop.cfg
+
 The buildout command with the configuration file above will install
 ``bob.extension`` in *development mode* in your local buildout environment.
 
@@ -296,16 +306,6 @@ them in order, you might face with some errors like this::
 If you see such errors, you may need to add the missing package to ``eggs`` and
 ``develop`` and ``sources`` (**of course, respecting the order of
 dependencies**).
-
-  .. note::
-
-    Buildout by default looks for ``buildout.cfg`` in your current folder and
-    uses that configuration file. You can specify a different config file with
-    the ``-c`` option:
-
-    .. code:: sh
-
-      $ buildout -c develop.cfg
 
 
 Your local environment
