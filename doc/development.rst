@@ -81,7 +81,7 @@ locally:
 .. code-block:: sh
 
     $ buildout
-    $ ./bin/python
+    $ ./bin/python  # you should use this python to run things from now on
 
 .. code-block:: python
 
