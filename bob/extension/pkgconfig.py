@@ -9,21 +9,42 @@ import subprocess
 import logging
 from .utils import uniq, uniq_paths, find_executable
 
-def call_pkgconfig(cmd, paths=None):
-  """Runs a command as a subprocess and raises if that does not work
 
-  Returns the exit status, stdout and stderr.
+def call_pkgconfig(cmd, paths=None):
+  """Calls pkg-config with a constructed PKG_CONFIG_PATH environment variable.
+
+  The PKG_CONFIG_PATH is set taking into consideration:
+  1. BOB_PREFIX_PATH, if set
+  2. The pkgconfig paths provided with the ``paths`` argument.
+  3. The current python executable prefix
+  4. The CONDA_PREFIX, if set.
+
+  Parameters
+  ----------
+  cmd : [str]
+      A list of commands to be given to pkg-config.
+  paths : [str]
+      A list of paths to be added to PKG_CONFIG_PATH.
+
+  Returns
+  -------
+  returncode : int
+      The exit status of pkg-config.
+  stdout : str
+      The stdout output of pkg-config.
+  stderr : str
+      The stderr output of pkg-config.
+
+  Raises
+  ------
+  OSError
+      If the `pkg-config' executable is not found.
   """
 
   # locates the pkg-config program
   pkg_config = find_executable('pkg-config')
   if not pkg_config:
     raise OSError("Cannot find `pkg-config' - did you install it?")
-
-  # sets the PKG_CONFIG_PATH taking into consideration:
-  # 1. BOB_PREFIX_PATH, if set
-  # 2. the paths set by the user
-  # 3. the current python executable prefix
 
   # 1. BOB_PREFIX_PATH
   bob_prefix = os.environ.get('BOB_PREFIX_PATH', False)
@@ -38,6 +59,11 @@ def call_pkgconfig(cmd, paths=None):
 
   # 3. adds the current python executable prefix
   pkg_path.append(os.path.join(os.path.dirname(os.path.dirname(sys.executable)), 'lib', 'pkgconfig'))
+
+  # 4. adds the conda path if it exists
+  conda_prefix = os.environ.get('CONDA_PREFIX')
+  if conda_prefix:
+    pkg_path.append(os.path.join(conda_prefix, 'lib', 'pkgconfig'))
 
   # Make unique to avoid searching twice
   pkg_path = uniq_paths(pkg_path)
