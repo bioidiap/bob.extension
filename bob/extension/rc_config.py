@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 ENVNAME = 'BOBRC'
 """Name of environment variable to look for an alternative for the RC file"""
 
-RCFILENAME = '.bobrc'
+RCFILENAME = '~' + os.sep + '.bobrc'
 """Default name to be used for the RC file to load"""
 
 
@@ -33,7 +33,7 @@ def _get_rc_path():
   if 'BOBRC' in os.environ:
     path = os.environ['BOBRC']
   else:
-    path = os.path.expanduser('~' + os.sep + RCFILENAME)
+    path = os.path.expanduser(RCFILENAME)
 
   return path
 
