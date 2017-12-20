@@ -44,7 +44,7 @@ def call_pkgconfig(cmd, paths=None):
     raise OSError("Cannot find `pkg-config' - did you install it?")
 
   pkg_path = construct_search_paths(
-      user_paths=paths, suffix=os.sep + 'lib' + os.sep + 'pkgconfig')
+      prefixes=paths, suffix=os.sep + 'lib' + os.sep + 'pkgconfig')
 
   env = os.environ.copy()
   var = os.pathsep.join(pkg_path)

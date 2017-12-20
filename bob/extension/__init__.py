@@ -16,9 +16,17 @@ import distutils.sysconfig
 
 from pkg_resources import resource_filename
 
+DEFAULT_PREFIXES = [
+    "/opt/local",
+    "/usr/local",
+    "/usr",
+]
+"""The list common places to search for library-related files."""
+
+
 from .pkgconfig import pkgconfig
 from .boost import boost
-from .utils import uniq, uniq_paths, find_executable, find_library
+from .utils import uniq, uniq_paths, find_executable, find_library, construct_search_paths
 from .cmake import CMakeListsGenerator
 from .rc_config import _loadrc
 

@@ -11,38 +11,34 @@ import sys
 import glob
 import platform
 import pkg_resources
-
-DEFAULT_PREFIXES = [
-    "/opt/local",
-    "/usr/local",
-    "/usr",
-]
-"""The list common places to search for library-related files."""
+from . import DEFAULT_PREFIXES
 
 
-def construct_search_paths(user_paths=None, sub_paths=None, suffix=None):
+def construct_search_paths(prefixes=None, subpaths=None, suffix=None):
   """Constructs a list of candidate paths to search for.
 
-  The list of paths is constructed using the following order:
-  1. BOB_PREFIX_PATH, if set. BOB_PREFIX_PATH can contain several paths divided
-     by :any:`os.pathsep`.
-  2. The paths provided with the ``user_paths`` argument.
+  The list of paths is constructed using the following order of priority:
+
+  1. ``BOB_PREFIX_PATH`` environment variable, if set. ``BOB_PREFIX_PATH`` can
+     contain several paths divided by :any:`os.pathsep`.
+  2. The paths provided with the ``prefixes`` parameter.
   3. The current python executable prefix.
-  4. The CONDA_PREFIX, if set.
+  4. The ``CONDA_PREFIX`` environment variable, if set.
   5. :any:`DEFAULT_PREFIXES`.
 
   Parameters
   ----------
-  user_paths : [str] or None, optional
+  prefixes : [:obj:`str`], optional
       The list of paths to be added to the results.
-  sub_paths : [str] or None, optional
-      A list of sub_paths to be appended to each path for the search. For
+  subpaths : [:obj:`str`], optional
+      A list of subpaths to be appended to each path at the end. For
       example, if you specify ``['foo', 'bar']`` for this parameter, then
       ``os.path.join(paths[0], 'foo')``,
-      ``os.path.join(paths[0], 'bar')``, and so on. Globs are accepted in
-      this list and resolved using the function :py:func:`glob.glob`.
-  suffix : str or None, optional
-      ``suffix`` will be appended to all paths except ``user_paths``.
+      ``os.path.join(paths[0], 'bar')``, and so on are added to the returned
+      paths. Globs are accepted in this list and resolved using the function
+      :py:func:`glob.glob`.
+  suffix : :obj:`str`, optional
+      ``suffix`` will be appended to all paths except ``prefixes``.
 
   Returns
   -------
@@ -58,8 +54,8 @@ def construct_search_paths(user_paths=None, sub_paths=None, suffix=None):
     search += [p + suffix for p in paths]
 
   # Priority 2: user passed paths
-  if user_paths:
-    search += user_paths
+  if prefixes:
+    search += prefixes
 
   # Priority 3: the current system executable
   search.append(os.path.dirname(os.path.dirname(sys.executable)) + suffix)
@@ -75,11 +71,11 @@ def construct_search_paths(user_paths=None, sub_paths=None, suffix=None):
   # Make unique to avoid searching twice
   search = uniq_paths(search)
 
-  # Exhaustive combination of paths and sub_paths
-  if sub_paths:
+  # Exhaustive combination of paths and subpaths
+  if subpaths:
     subsearch = []
     for s in search:
-      for p in sub_paths:
+      for p in subpaths:
         subsearch.append(os.path.join(s, p))
       subsearch.append(s)
     search = subsearch
@@ -94,37 +90,29 @@ def construct_search_paths(user_paths=None, sub_paths=None, suffix=None):
 
 
 def find_file(name, subpaths=None, prefixes=None):
-  """Finds a generic file on the file system. Returns all candidates.
+  """Finds a generic file on the file system. Returns all occurrences.
 
   This method will find all occurrences of a given name on the file system and
-  will return them to the user.
+  will return them to the user. It uses :any:`construct_search_paths` to
+  construct the candidate folders that file may exist in.
 
-  If the environment variable ``BOB_PREFIX_PATH`` is set, then it is
-  considered a unix path list that is prepended to the list of prefixes to
-  search for. The environment variable has the highest priority on the search
-  order. The order on the variable for each path is respected.
+  Parameters
+  ----------
+  name : str
+      The name of the file. For example, ``gcc``.
+  subpaths : [:obj:`str`], optional
+      See :any:`construct_search_paths`
+  subpaths : :obj:`str`, optional
+      See :any:`construct_search_paths`
 
-  Parameters:
-
-  name, str
-    The name of the file to be found, including extension
-
-  subpaths, str list
-    A list of subpaths to be appended to each prefix for the search. For
-    example, if you specificy ``['foo', 'bar']`` for this parameter, then
-    search on ``os.path.join(prefixes[0], 'foo')``, ``os.path.join(prefixes[0],
-    'bar')``, and so on. Globs are accepted in this list and resolved using
-    the function :py:func:`glob.glob`.
-
-  prefixes, str list
-    A list of prefixes that will be searched prioritarily to the
-    ``DEFAULT_PREFIXES`` defined in this module.
-
-  Returns a list of filenames that exist on the filesystem, matching your
-  description.
+  Returns
+  -------
+  [str]
+      A list of filenames that exist on the filesystem, matching your
+      description.
   """
 
-  search = construct_search_paths(user_paths=prefixes, sub_paths=subpaths)
+  search = construct_search_paths(prefixes=prefixes, subpaths=subpaths)
 
   retval = []
   for path in search:
@@ -139,30 +127,24 @@ def find_header(name, subpaths=None, prefixes=None):
   """Finds a header file on the file system. Returns all candidates.
 
   This method will find all occurrences of a given name on the file system and
-  will return them to the user.
+  will return them to the user. It uses :any:`construct_search_paths` to
+  construct the candidate folders that header may exist in accounting
+  automatically for typical header folder names.
 
-  If the environment variable ``BOB_PREFIX_PATH`` is set, then it is
-  considered a unix path list that is prepended to the list of prefixes to
-  search for. The environment variable has the highest priority on the search
-  order. The order on the variable for each path is respected.
+  Parameters
+  ----------
+  name : str
+      The name of the header file.
+  subpaths : [:obj:`str`], optional
+      See :any:`construct_search_paths`
+  subpaths : :obj:`str`, optional
+      See :any:`construct_search_paths`
 
-  Parameters:
-
-  name, str
-    The name of the file to be found, including extension
-
-  subpaths, str list
-    A list of subpaths to be appended to each prefix for the search. For
-    example, if you specificy ``['foo', 'bar']`` for this parameter, then
-    search on ``os.path.join(prefixes[0], 'foo')``, ``os.path.join(prefixes[0],
-    'bar')``, and so on.
-
-  prefixes, str list
-    A list of prefixes that will be searched prioritarily to the
-    ``DEFAULT_PREFIXES`` defined in this module.
-
-  Returns a list of filenames that exist on the filesystem, matching your
-  description.
+  Returns
+  -------
+  [str]
+      A list of filenames that exist on the filesystem, matching your
+      description.
   """
 
   headerpaths = []
@@ -196,39 +178,31 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
   """Finds a library file on the file system. Returns all candidates.
 
   This method will find all occurrences of a given name on the file system and
-  will return them to the user.
+  will return them to the user. It uses :any:`construct_search_paths` to
+  construct the candidate folders that the library may exist in accounting
+  automatically for typical library folder names.
 
-  If the environment variable ``BOB_PREFIX_PATH`` is set, then it is
-  considered a unix path list that is prepended to the list of prefixes to
-  search for. The environment variable has the highest priority on the search
-  order. The order on the variable for each path is respected.
+  Parameters
+  ----------
+  name : str
+      The name of the module to be found. If you'd like to find libz.so, for
+      example, specify ``"z"``. For libmath.so, specify ``"math"``.
+  version : :obj:`str`, optional
+      The version of the library we are searching for. If not specified, then
+      look only for the default names, such as ``libz.so`` and the such.
+  subpaths : [:obj:`str`], optional
+      See :any:`construct_search_paths`
+  subpaths : :obj:`str`, optional
+      See :any:`construct_search_paths`
+  only_static : :obj:`bool`, optional
+      A boolean, indicating if we should try only to search for static versions
+      of the libraries. If not set, any would do.
 
-  Parameters:
-
-  name, str
-    The name of the module to be found. If you'd like to find libz.so, for
-    example, specify ``"z"``. For libmath.so, specify ``"math"``.
-
-  version, str
-    The version of the library we are searching for. If not specified, then
-    look only for the default names, such as ``libz.so`` and the such.
-
-  subpaths, str list
-    A list of subpaths to be appended to each prefix for the search. For
-    example, if you specificy ``['foo', 'bar']`` for this parameter, then
-    search on ``os.path.join(prefixes[0], 'foo')``, ``os.path.join(prefixes[0],
-    'bar')``, and so on.
-
-  prefixes, str list
-    A list of prefixes that will be searched prioritarily to the
-    ``DEFAULT_PREFIXES`` defined in this module.
-
-  static (bool)
-    A boolean, indicating if we should try only to search for static versions
-    of the libraries. If not set, any would do.
-
-  Returns a list of filenames that exist on the filesystem, matching your
-  description.
+  Returns
+  -------
+  [str]
+      A list of filenames that exist on the filesystem, matching your
+      description.
   """
 
   libpaths = []
@@ -291,30 +265,24 @@ def find_executable(name, subpaths=None, prefixes=None):
   """Finds an executable on the file system. Returns all candidates.
 
   This method will find all occurrences of a given name on the file system and
-  will return them to the user.
+  will return them to the user. It uses :any:`construct_search_paths` to
+  construct the candidate folders that the executable may exist in accounting
+  automatically for typical executable folder names.
 
-  If the environment variable ``BOB_PREFIX_PATH`` is set, then it is
-  considered a unix path list that is prepended to the list of prefixes to
-  search for. The environment variable has the highest priority on the search
-  order. The order on the variable for each path is respected.
+  Parameters
+  ----------
+  name : str
+      The name of the file. For example, ``gcc``.
+  subpaths : [:obj:`str`], optional
+      See :any:`construct_search_paths`
+  subpaths : :obj:`str`, optional
+      See :any:`construct_search_paths`
 
-  Parameters:
-
-  name, str
-    The name of the executable to be found.
-
-  subpaths, str list
-    A list of subpaths to be appended to each prefix for the search. For
-    example, if you specificy ``['foo', 'bar']`` for this parameter, then
-    search on ``os.path.join(prefixes[0], 'foo')``, ``os.path.join(prefixes[0],
-    'bar')``, and so on.
-
-  prefixes, str list
-    A list of prefixes that will be searched prioritarily to the
-    ``DEFAULT_PREFIXES`` defined in this module.
-
-  Returns a list of filenames that exist on the filesystem, matching your
-  description.
+  Returns
+  -------
+  [str]
+      A list of filenames that exist on the filesystem, matching your
+      description.
   """
 
   binpaths = []
