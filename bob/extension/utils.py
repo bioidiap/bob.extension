@@ -16,7 +16,82 @@ DEFAULT_PREFIXES = [
     "/opt/local",
     "/usr/local",
     "/usr",
-    ]
+]
+"""The list common places to search for library-related files."""
+
+
+def construct_search_paths(user_paths=None, sub_paths=None, suffix=None):
+  """Constructs a list of candidate paths to search for.
+
+  The list of paths is constructed using the following order:
+  1. BOB_PREFIX_PATH, if set. BOB_PREFIX_PATH can contain several paths divided
+     by :any:`os.pathsep`.
+  2. The paths provided with the ``user_paths`` argument.
+  3. The current python executable prefix.
+  4. The CONDA_PREFIX, if set.
+  5. :any:`DEFAULT_PREFIXES`.
+
+  Parameters
+  ----------
+  user_paths : [str] or None, optional
+      The list of paths to be added to the results.
+  sub_paths : [str] or None, optional
+      A list of sub_paths to be appended to each path for the search. For
+      example, if you specify ``['foo', 'bar']`` for this parameter, then
+      ``os.path.join(paths[0], 'foo')``,
+      ``os.path.join(paths[0], 'bar')``, and so on. Globs are accepted in
+      this list and resolved using the function :py:func:`glob.glob`.
+  suffix : str or None, optional
+      ``suffix`` will be appended to all paths except ``user_paths``.
+
+  Returns
+  -------
+  paths : [str]
+      A list of unique and existing paths to be used in your search.
+  """
+  search = []
+  suffix = suffix or ''
+
+  # Priority 1: the environment
+  if 'BOB_PREFIX_PATH' in os.environ:
+    paths = os.environ['BOB_PREFIX_PATH'].split(os.pathsep)
+    search += [p + suffix for p in paths]
+
+  # Priority 2: user passed paths
+  if user_paths:
+    search += user_paths
+
+  # Priority 3: the current system executable
+  search.append(os.path.dirname(os.path.dirname(sys.executable)) + suffix)
+
+  # Priority 4: the conda prefix
+  conda_prefix = os.environ.get('CONDA_PREFIX')
+  if conda_prefix:
+    search.append(conda_prefix + suffix)
+
+  # Priority 5: the default search prefixes
+  search += [p + suffix for p in DEFAULT_PREFIXES]
+
+  # Make unique to avoid searching twice
+  search = uniq_paths(search)
+
+  # Exhaustive combination of paths and sub_paths
+  if sub_paths:
+    subsearch = []
+    for s in search:
+      for p in sub_paths:
+        subsearch.append(os.path.join(s, p))
+      subsearch.append(s)
+    search = subsearch
+
+  # Before we do a file-system check, filter out the un-existing paths
+  tmp = []
+  for k in search:
+    tmp += glob.glob(k)
+  search = tmp
+
+  return search
+
 
 def find_file(name, subpaths=None, prefixes=None):
   """Finds a generic file on the file system. Returns all candidates.
@@ -49,47 +124,16 @@ def find_file(name, subpaths=None, prefixes=None):
   description.
   """
 
-  search = []
-
-  # Priority 1: the environment
-  if 'BOB_PREFIX_PATH' in os.environ:
-    search += os.environ['BOB_PREFIX_PATH'].split(os.pathsep)
-
-  # Priority 2: user passed paths
-  if prefixes:
-    search += prefixes
-
-  # Priority 3: the current system executable
-  search.append(os.path.dirname(os.path.dirname(sys.executable)))
-
-  # Priority 4: the default search prefixes
-  search += DEFAULT_PREFIXES
-
-  # Make unique to avoid searching twice
-  search = uniq_paths(search)
-
-  # Exhaustive combination of paths and subpaths
-  if subpaths:
-    subsearch = []
-    for s in search:
-      for p in subpaths:
-        subsearch.append(os.path.join(s, p))
-      subsearch.append(s)
-    search = subsearch
-
-  # Before we do a filesystem check, filter out the unexisting paths
-  tmp = []
-  for k in search: tmp += glob.glob(k)
-  search = tmp
+  search = construct_search_paths(user_paths=prefixes, sub_paths=subpaths)
 
   retval = []
-  candidates = []
   for path in search:
     candidate = os.path.join(path, name)
-    candidates.append(candidate)
-    if os.path.exists(candidate): retval.append(candidate)
+    if os.path.exists(candidate):
+      retval.append(candidate)
 
   return retval
+
 
 def find_header(name, subpaths=None, prefixes=None):
   """Finds a header file on the file system. Returns all candidates.
@@ -145,6 +189,7 @@ def find_header(name, subpaths=None, prefixes=None):
     my_subpaths = headerpaths
 
   return find_file(name, my_subpaths, prefixes)
+
 
 def find_library(name, version=None, subpaths=None, prefixes=None,
     only_static=False):
