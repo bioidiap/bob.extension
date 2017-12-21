@@ -5,6 +5,7 @@ from ..rc_config import _saverc, _rc_to_str, _get_rc_path
 import logging
 import click
 
+# Use the normal logging module. Verbosity and format of logging is already set
 logger = logging.getLogger(__name__)
 
 
@@ -26,6 +27,8 @@ def show():
 
     Displays the content of bob's global configuration file.
     """
+    # always use click.echo instead of print
+    # always pass the log_file to the echo function
     log_file = click.get_current_context().meta['log_file']
     click.echo("Displaying `{}':".format(_get_rc_path()), log_file)
     click.echo(_rc_to_str(rc), log_file)
@@ -52,6 +55,7 @@ def get(key):
     log_file = click.get_current_context().meta['log_file']
     value = rc[key]
     if value is None:
+        # Exit the command line with ClickException in case of errors.
         raise click.ClickException(
             "The requested key `{}' does not exist".format(key))
     click.echo(value, log_file)
