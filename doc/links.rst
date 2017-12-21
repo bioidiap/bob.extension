@@ -8,6 +8,8 @@
 .. _bob: https://www.idiap.ch/software/bob
 .. _bob's installation: https://www.idiap.ch/software/bob/install
 .. _c++: http://www2.research.att.com/~bs/C++.html
+.. _click: http://click.pocoo.org/
+.. _click-plugins: https://github.com/click-contrib/click-plugins
 .. _distutils: https://docs.python.org/distutils/
 .. _git: http://git-scm.com/
 .. _gitlab: https://gitlab.idiap.ch/bob/

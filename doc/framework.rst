@@ -180,5 +180,51 @@ The data may be further processed using a
           [ 1. ,  2. ,  3. ,  0.5,  1. ,  1.5]])
 
 
+.. _bob.extension.cli:
+
+Unified Command Line Mechanism
+------------------------------
+
+|project| comes with a command line called ``bob`` which provides a set of
+commands by default::
+
+   $ bob --help
+   Usage: bob [OPTIONS] COMMAND [ARGS]...
+
+     The main command line interface for bob. Look below for available
+     commands.
+
+   Options:
+     -v, --verbose   Increase the verbosity level from 0 (only error messages) to
+                     1 (warnings), 2 (log messages), 3 (debug information) by
+                     adding the --verbose option as often as desired (e.g. '-vvv'
+                     for debug).
+     --log FILENAME  Redirects the prints of the scripts to FILENAME.
+     --help          Show this message and exit.
+
+   Commands:
+     config  The manager for bob's global configuration.
+     ...
+
+This command line is implemented using click_. You can extend the commands of
+this script through setuptools entry points (this is implemented using
+`click-plugins`_). To do so you implement your command-line using click_
+independently; then, advertise it as a command under bob script using the
+``bob.cli`` entry point.
+
+.. note::
+
+   If you are still not sure how this must be done, maybe you don't know how
+   to use click_ yet.
+
+This feature is experimental and may change and break compatibility in future.
+For a best practice example, please look at how the ``bob config`` command is
+implemented:
+
+.. literalinclude:: ../bob/extension/scripts/config.py
+   :caption: "bob/extension/scripts/config.py" implementation of the ``bob config`` command.
+   :language: python
+
+
 .. include:: links.rst
 

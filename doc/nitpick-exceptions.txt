@@ -1,3 +1,6 @@
+# Not available in Python 2.7, but ok in Python 3.x
+py:exc ValueError
+
 # we don't link against setuptools manual
 py:class setuptools.extension.Extension
 py:class distutils.extension.Extension

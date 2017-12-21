@@ -1,102 +1,87 @@
 """The manager for bob's main configuration.
 """
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
 from .. import rc
-from ..rc_config import _saverc, _dumprc, _get_rc_path
-from argparse import RawDescriptionHelpFormatter
+from ..rc_config import _saverc, _rc_to_str, _get_rc_path
 import logging
-import sys
+import click
+
+logger = logging.getLogger(__name__)
 
 
-def setup_parser(parser):
-    from . import __doc__ as docs
-    # creates a top-level parser for this database
-    top_level = parser.add_parser('config',
-                                  formatter_class=RawDescriptionHelpFormatter,
-                                  help=docs)
-
-    subparsers = top_level.add_subparsers(title="subcommands")
-
-    # add commands
-    show_command(subparsers)
-    get_command(subparsers)
-    set_command(subparsers)
-
-    return subparsers
+@click.group()
+def config():
+    """The manager for bob's global configuration."""
+    # Load the config file again. This may be needed since the environment
+    # variable might change the config path during the tests. Otherwise, this
+    # should not be important.
+    logger.debug('Reloading the global configuration file.')
+    from ..rc_config import _loadrc
+    rc.clear()
+    rc.update(_loadrc())
 
 
-def show(arguments=None):
-    """Shows the content of bob's global configuration file.
+@config.command()
+def show():
+    """Shows the configuration.
+
+    Displays the content of bob's global configuration file.
     """
-    print("Displaying `{}':".format(_get_rc_path()))
-    _dumprc(rc, sys.stdout)
-    print()
+    log_file = click.get_current_context().meta['log_file']
+    click.echo("Displaying `{}':".format(_get_rc_path()), log_file)
+    click.echo(_rc_to_str(rc), log_file)
 
 
-def show_command(subparsers):
-    parser = subparsers.add_parser('show', help=show.__doc__)
-    parser.set_defaults(func=show)
-    return parser
+@config.command()
+@click.argument('key')
+def get(key):
+    """Prints a key.
 
+    Retrieves the value of the requested key and displays it.
 
-def get(arguments):
-    """Gets the specified configuration from bob's global configuration file.
+    \b
+    Arguments
+    ---------
+    key : str
+        The key to return its value from the configuration.
 
-    Parameters
-    ----------
-    arguments : argparse.Namespace
-        A set of arguments passed by the command-line parser
-
-
-    Returns
-    -------
-    int
-        A POSIX compliant return value of ``0`` if the key exists, or ``1``
-        otherwise.
+    \b
+    Fails
+    -----
+    * If the key is not found.
     """
-    value = rc[arguments.key]
+    log_file = click.get_current_context().meta['log_file']
+    value = rc[key]
     if value is None:
-        return 1
-    print(value)
-    return 0
+        raise click.ClickException(
+            "The requested key `{}' does not exist".format(key))
+    click.echo(value, log_file)
 
 
-def get_command(subparsers):
-    parser = subparsers.add_parser('get', help=get.__doc__)
-    parser.add_argument("key", help="The requested key.")
-    parser.set_defaults(func=get)
-    return parser
+@config.command()
+@click.argument('key')
+@click.argument('value')
+def set(key, value):
+    """Sets the value for a key.
 
-
-def set(arguments):
-    """Sets the specified configuration to the provided value in bob's global
+    Sets the value of the specified configuration key in bob's global
     configuration file.
 
-    Parameters
-    ----------
-    arguments : argparse.Namespace
-        A set of arguments passed by the command-line parser
+    \b
+    Arguments
+    ---------
+    key : str
+        The key to set the value for.
+    value : str
+        The value of the key.
 
-
-    Returns
-    -------
-    int
-        A POSIX compliant return value of ``0`` if the operation is successful,
-        or ``1`` otherwise.
+    \b
+    Fails
+    -----
+    * If something goes wrong.
     """
     try:
-        rc[arguments.key] = arguments.value
+        rc[key] = value
         _saverc(rc)
     except Exception:
-        logging.warn("Could not configure the rc file", exc_info=True)
-        return 1
-    return 0
-
-
-def set_command(subparsers):
-    parser = subparsers.add_parser('set', help=set.__doc__)
-    parser.add_argument("key", help="The key.")
-    parser.add_argument("value", help="The value.")
-    parser.set_defaults(func=set)
-    return parser
+        logger.error("Could not configure the rc file", exc_info=True)
+        raise click.ClickException("Failed to change the configuration.")
