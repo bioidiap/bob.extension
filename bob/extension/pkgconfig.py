@@ -7,12 +7,35 @@ import os
 import sys
 import subprocess
 import logging
-from .utils import uniq, uniq_paths, find_executable
+from .utils import uniq, uniq_paths, find_executable, construct_search_paths
+
 
 def call_pkgconfig(cmd, paths=None):
-  """Runs a command as a subprocess and raises if that does not work
+  """Calls pkg-config with a constructed PKG_CONFIG_PATH environment variable.
 
-  Returns the exit status, stdout and stderr.
+  The PKG_CONFIG_PATH variable is constructed using
+  :any:`construct_search_paths`.
+
+  Parameters
+  ----------
+  cmd : [str]
+      A list of commands to be given to pkg-config.
+  paths : [str]
+      A list of paths to be added to PKG_CONFIG_PATH.
+
+  Returns
+  -------
+  returncode : int
+      The exit status of pkg-config.
+  stdout : str
+      The stdout output of pkg-config.
+  stderr : str
+      The stderr output of pkg-config.
+
+  Raises
+  ------
+  OSError
+      If the `pkg-config' executable is not found.
   """
 
   # locates the pkg-config program
@@ -20,27 +43,8 @@ def call_pkgconfig(cmd, paths=None):
   if not pkg_config:
     raise OSError("Cannot find `pkg-config' - did you install it?")
 
-  # sets the PKG_CONFIG_PATH taking into consideration:
-  # 1. BOB_PREFIX_PATH, if set
-  # 2. the paths set by the user
-  # 3. the current python executable prefix
-
-  # 1. BOB_PREFIX_PATH
-  bob_prefix = os.environ.get('BOB_PREFIX_PATH', False)
-  if bob_prefix:
-    bob_prefix = bob_prefix.split(os.pathsep)
-    pkg_path = [os.path.join(k, 'lib', 'pkgconfig') for k in bob_prefix]
-  else:
-    pkg_path = []
-
-  # 2. user path
-  if paths: pkg_path += paths
-
-  # 3. adds the current python executable prefix
-  pkg_path.append(os.path.join(os.path.dirname(os.path.dirname(sys.executable)), 'lib', 'pkgconfig'))
-
-  # Make unique to avoid searching twice
-  pkg_path = uniq_paths(pkg_path)
+  pkg_path = construct_search_paths(
+      prefixes=paths, suffix=os.sep + 'lib' + os.sep + 'pkgconfig')
 
   env = os.environ.copy()
   var = os.pathsep.join(pkg_path)
@@ -82,6 +86,7 @@ def version():
     raise RuntimeError("pkg-config is not installed - please do it")
 
   return stdout.strip()
+
 
 class pkgconfig:
   """A class for capturing configuration information from pkg-config
