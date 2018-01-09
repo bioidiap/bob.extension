@@ -45,6 +45,7 @@ setup(
       'bob.extension.test_config_load': [
         'basic_config = bob.extension.data.basic_config',
         'resource_config = bob.extension.data.resource_config',
+        'subpackage_config = bob.extension.data.subpackage.config',
       ],
     },
 

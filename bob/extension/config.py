@@ -178,8 +178,10 @@ def load(paths, context=None, entry_point_group=None):
   for k,n in zip(paths, names):
     logger.debug("Loading configuration file `%s'...", k)
     mod = imp.new_module(n)
+    # remove the keys that might break the loading of the next config file.
+    ctxt.__dict__.pop('__name__', None)
+    ctxt.__dict__.pop('__package__', None)
     mod.__dict__.update(ctxt.__dict__)
-    mod.__name__ = n #reverse module-name override
     LOADED_CONFIGS.append(mod)
     ctxt = _load_context(k, mod)
 

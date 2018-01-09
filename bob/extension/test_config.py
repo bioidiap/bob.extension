@@ -49,6 +49,7 @@ def test_entry_point_configs():
       os.path.join(path, 'basic_config.py'),
       'resource_config',
       'bob.extension.data.basic_config',
+      'subpackage_config',
   ], entry_point_group='bob.extension.test_config_load')
   assert hasattr(c, "a") and c.a == 1
   assert hasattr(c, "b") and c.b == 3
