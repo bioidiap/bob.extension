@@ -20,12 +20,9 @@ stages:
   before_script:
     - export PATH=$CONDA_FOLDER/bin:$PATH
     - mkdir _ci
-    - curl https://curl.haxx.se/ca/cacert.pem > _ci/cacert.pem
-    - export CURL_CA_BUNDLE=`pwd`/_ci/cacert.pem
-    - export SSL_CERT_FILE=`pwd`/_ci/cacert.pem
-    - curl "https://gitlab.idiap.ch/bob/bob.admin/raw/condapackage/gitlab/install.sh" > _ci/install.sh
+    - curl --silent "https://gitlab.idiap.ch/bob/bob.admin/raw/condapackage/gitlab/install.sh" > _ci/install.sh
     - chmod 755 _ci/install.sh
-    - ./_ci/install.sh _ci condapackage
+    - ./_ci/install.sh _ci condapackage #updates installation
   script:
     - ./_ci/build.sh
 
@@ -103,7 +100,7 @@ build_macosx_36:
 .deploy_template: &deploy_job
   stage: deploy
   before_script:
-    - ./_ci/install.sh _ci condapackage
+    - ./_ci/install.sh _ci condapackage #updates
   script:
     - ./_ci/deploy.sh
   dependencies:
@@ -138,7 +135,7 @@ pypi:
   except:
     - branches
   before_script:
-    - ./_ci/install.sh _ci condapackage
+    - ./_ci/install.sh _ci condapackage #updates
   script:
     - ./_ci/pypi.sh
   dependencies:
