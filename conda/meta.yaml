@@ -1,0 +1,61 @@
+{% set name = 'bob.extension' %}
+{% set project_dir = environ.get('RECIPE_DIR') + '/..' %}
+
+package:
+  name: {{ name }}
+  version: {{ environ.get('BOB_PACKAGE_VERSION', '0.0.1') }}
+
+build:
+  entry_points:
+    - bob_new_version.py = bob.extension.scripts:new_version
+    - bob_dependecy_graph.py = bob.extension.scripts:dependency_graph
+  number: {{ environ.get('BOB_BUILD_NUMBER', 0) }}
+  run_exports:
+    - {{ pin_subpackage(name) }}
+  script:
+    - cd {{ project_dir }}
+    {% if environ.get('BUILD_EGG') %}
+    - python setup.py sdist --formats=zip
+    {% endif %}
+    - python setup.py install --single-version-externally-managed --record record.txt
+
+requirements:
+  host:
+    - python {{ python }}
+    - setuptools {{ setuptools }}
+  run:
+    - python
+    - setuptools
+
+test:
+  imports:
+    - {{ name }}
+  commands:
+    - bob_new_version.py --help
+    - bob_dependecy_graph.py --help
+    - nosetests --with-coverage --cover-package={{ name }} -sv {{ name }} --exclude=test_extensions
+    - sphinx-build -aEW {{ project_dir }}/doc {{ project_dir }}/sphinx
+    - sphinx-build -aEb doctest {{ project_dir }}/doc sphinx
+    - conda inspect linkages -p $PREFIX {{ name }}  # [not win]
+    - conda inspect objects -p $PREFIX {{ name }}  # [osx]
+  requires:
+    - bob-devel {{ bob_devel }}.*
+    - nose
+    - coverage
+    - sphinx
+    - sphinx_rtd_theme
+    - boost
+    - cmake
+    - pkg-config
+    - freetype
+    - libblitz
+    - numpy
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - bob.buildout
+
+about:
+  home: https://www.idiap.ch/software/bob/
+  license: BSD 3-Clause
+  summary: Building of Python/C++ extensions for Bob
+  license_family: BSD
