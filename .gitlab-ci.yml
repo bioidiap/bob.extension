@@ -1,8 +1,10 @@
 # This build file uses template features from YAML so it is generic enough for
 # any Bob project. Don't modify it unless you know what you're doing.
 
+# Definition of global variables (all stages)
 variables:
   CONDA_ROOT: "${CI_PROJECT_DIR}/miniconda"
+
 
 # Definition of our build pipeline order
 stages:
@@ -61,14 +63,12 @@ stages:
 build_linux_27:
   <<: *linux_build_job
   variables:
-    <<: *build_variables
     PYTHON_VERSION: "2.7"
 
 
 build_linux_36:
   <<: *linux_build_job
   variables:
-    <<: *build_variables
     PYTHON_VERSION: "3.6"
     BUILD_EGG: "true"
   artifacts:
@@ -83,14 +83,12 @@ build_linux_36:
 build_macosx_27:
   <<: *macosx_build_job
   variables:
-    <<: *build_variables
     PYTHON_VERSION: "2.7"
 
 
 build_macosx_36:
   <<: *macosx_build_job
   variables:
-    <<: *build_variables
     PYTHON_VERSION: "3.6"
 
 
