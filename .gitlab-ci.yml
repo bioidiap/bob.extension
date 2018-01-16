@@ -65,13 +65,13 @@ stages:
 build_linux_27:
   <<: *linux_build_job
   variables:
-    <<: *linux_variables
+    <<: *build_variables
     PYTHON_VERSION: "2.7"
 
 build_linux_36:
   <<: *linux_build_job
   variables:
-    <<: *linux_variables
+    <<: *build_variables
     PYTHON_VERSION: "3.6"
     BUILD_EGG: "true"
   artifacts:
