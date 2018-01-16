@@ -1,11 +1,8 @@
 # This build file uses template features from YAML so it is generic enough for
 # any Bob project. Don't modify it unless you know what you're doing.
 
-# global variables
 variables:
-  CONDA_ENVS_PATH: "conda-env"
-  CONDA_BLD_PATH: "conda-env"
-
+  CONDA_ROOT: "${CI_PROJECT_DIR}/miniconda"
 
 # Definition of our build pipeline order
 stages:
@@ -18,26 +15,18 @@ stages:
 .build_template: &build_job
   stage: build
   before_script:
-    - export PATH=$CONDA_FOLDER/bin:$PATH
     - mkdir _ci
     - curl --silent "https://gitlab.idiap.ch/bob/bob.admin/raw/condapackage/gitlab/install.sh" > _ci/install.sh
     - chmod 755 _ci/install.sh
     - ./_ci/install.sh _ci condapackage #installs ci support scripts
     - ./_ci/before_build.sh
-  variables: &build_variables
-    CONDA_FOLDER: "${CI_PROJECT_DIR}/${CONDA_ENVS_PATH}"
   script:
     - ./_ci/build.sh
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - _ci/
-      - ${CONDA_ENVS_PATH}/osx-64/*.tar.bz2
   cache: &build_caches
     paths:
       - miniconda.sh
-      - ${CONDA_ENVS_PATH}/.pkgs/*.tar.bz2
-      - ${CONDA_ENVS_PATH}/.pkgs/urls.txt
+      - ${CONDA_ROOT}/pkgs/*.tar.bz2
+      - ${CONDA_ROOT}/pkgs/urls.txt
 
 
 .build_linux_template: &linux_build_job
@@ -45,6 +34,11 @@ stages:
   tags:
     - docker
   image: continuumio/conda-concourse-ci
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - _ci/
+      - ${CONDA_ROOT}/conda-bld/linux-64/*.tar.bz2
   cache:
     <<: *build_caches
     key: "linux-cache"
@@ -54,6 +48,11 @@ stages:
   <<: *build_job
   tags:
     - macosx
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - _ci/
+      - ${CONDA_ROOT}/conda-bld/osx-64/*.tar.bz2
   cache:
     <<: *build_caches
     key: "macosx-cache"
@@ -78,7 +77,7 @@ build_linux_36:
       - _ci/
       - dist/*.zip
       - sphinx
-      - ${CONDA_ENVS_PATH}/linux-64/*.tar.bz2
+      - ${CONDA_ROOT}/conda-bld/linux-64/*.tar.bz2
 
 
 build_macosx_27:
