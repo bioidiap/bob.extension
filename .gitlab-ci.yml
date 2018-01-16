@@ -28,38 +28,35 @@ stages:
     CONDA_FOLDER: "${CI_PROJECT_DIR}/${CONDA_ENVS_PATH}"
   script:
     - ./_ci/build.sh
-
-.build_linux_template: &linux_build_job
-  <<: *build_job
-  artifacts:
-    expire_in: 1 week
-    paths:
-      - _ci/
-      - ${CONDA_ENVS_PATH}/linux-64/*.tar.bz2
-  tags:
-    - docker
-  image: continuumio/conda-concourse-ci
-  cache:
-    key: "linux-cache"
-    paths:
-      - ${CONDA_ENVS_PATH}/.pkgs/*.tar.bz2
-      - ${CONDA_ENVS_PATH}/.pkgs/urls.txt
-
-.build_macosx_template: &macosx_build_job
-  <<: *build_job
   artifacts:
     expire_in: 1 week
     paths:
       - _ci/
       - ${CONDA_ENVS_PATH}/osx-64/*.tar.bz2
+  cache: &build_caches
+    paths:
+      - miniconda.sh
+      - ${CONDA_ENVS_PATH}/.pkgs/*.tar.bz2
+      - ${CONDA_ENVS_PATH}/.pkgs/urls.txt
+
+
+.build_linux_template: &linux_build_job
+  <<: *build_job
+  tags:
+    - docker
+  image: continuumio/conda-concourse-ci
+  cache:
+    <<: *build_caches
+    key: "linux-cache"
+
+
+.build_macosx_template: &macosx_build_job
+  <<: *build_job
   tags:
     - macosx
   cache:
+    <<: *build_caches
     key: "macosx-cache"
-    paths:
-      - miniconda.sh
-      - ${CONDA_ENVS_PATH}/pkgs/*.tar.bz2
-      - ${CONDA_ENVS_PATH}/pkgs/urls.txt
 
 
 build_linux_27:
@@ -67,6 +64,7 @@ build_linux_27:
   variables:
     <<: *build_variables
     PYTHON_VERSION: "2.7"
+
 
 build_linux_36:
   <<: *linux_build_job
@@ -82,11 +80,13 @@ build_linux_36:
       - sphinx
       - ${CONDA_ENVS_PATH}/linux-64/*.tar.bz2
 
+
 build_macosx_27:
   <<: *macosx_build_job
   variables:
     <<: *build_variables
     PYTHON_VERSION: "2.7"
+
 
 build_macosx_36:
   <<: *macosx_build_job
@@ -110,12 +110,14 @@ build_macosx_36:
   tags:
     - deployer
 
+
 deploy_beta:
   <<: *deploy_job
   environment: beta
   only:
     - master
     - condapackage
+
 
 deploy_stable:
   <<: *deploy_job
