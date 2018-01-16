@@ -22,7 +22,10 @@ stages:
     - mkdir _ci
     - curl --silent "https://gitlab.idiap.ch/bob/bob.admin/raw/condapackage/gitlab/install.sh" > _ci/install.sh
     - chmod 755 _ci/install.sh
-    - ./_ci/install.sh _ci condapackage #updates installation
+    - ./_ci/install.sh _ci condapackage #installs ci support scripts
+    - ./_ci/before_build.sh
+  variables: &build_variables
+    CONDA_FOLDER: "${CI_PROJECT_DIR}/${CONDA_ENVS_PATH}"
   script:
     - ./_ci/build.sh
 
@@ -36,8 +39,6 @@ stages:
   tags:
     - docker
   image: continuumio/conda-concourse-ci
-  variables: &linux_variables
-    CONDA_FOLDER: "/opt/miniconda"
   cache:
     key: "linux-cache"
     paths:
@@ -53,8 +54,6 @@ stages:
       - ${CONDA_ENVS_PATH}/osx-64/*.tar.bz2
   tags:
     - macosx
-  variables: &macosx_variables
-    CONDA_FOLDER: "${CI_PROJECT_DIR}/${CONDA_ENVS_PATH}"
   cache:
     key: "macosx-cache"
     paths:
@@ -86,13 +85,13 @@ build_linux_36:
 build_macosx_27:
   <<: *macosx_build_job
   variables:
-    <<: *macosx_variables
+    <<: *build_variables
     PYTHON_VERSION: "2.7"
 
 build_macosx_36:
   <<: *macosx_build_job
   variables:
-    <<: *macosx_variables
+    <<: *build_variables
     PYTHON_VERSION: "3.6"
 
 
@@ -100,7 +99,7 @@ build_macosx_36:
 .deploy_template: &deploy_job
   stage: deploy
   before_script:
-    - ./_ci/install.sh _ci condapackage #updates
+    - ./_ci/install.sh _ci condapackage #updates ci support scripts
   script:
     - ./_ci/deploy.sh
   dependencies:
@@ -135,7 +134,7 @@ pypi:
   except:
     - branches
   before_script:
-    - ./_ci/install.sh _ci condapackage #updates
+    - ./_ci/install.sh _ci condapackage #updates ci support scripts
   script:
     - ./_ci/pypi.sh
   dependencies:
