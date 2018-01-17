@@ -275,7 +275,7 @@ def find_executable(name, subpaths=None, prefixes=None):
       The name of the file. For example, ``gcc``.
   subpaths : [:obj:`str`], optional
       See :any:`construct_search_paths`
-  subpaths : :obj:`str`, optional
+  prefixes : :obj:`str`, optional
       See :any:`construct_search_paths`
 
   Returns
@@ -312,6 +312,12 @@ def find_executable(name, subpaths=None, prefixes=None):
       my_subpaths += [os.path.join(lp, k) for k in subpaths]
   else:
     my_subpaths = binpaths
+
+  # if conda-build's BUILD_PREFIX is set, use it as it may contain build tools
+  # which are not available on the host environment
+  prefixes = prefixes if prefixes is not None else []
+  if 'BUILD_PREFIX' in os.environ:
+    prefixes += [os.environ['BUILD_PREFIX']]
 
   # The module names can be set with or without version number
   return find_file(name, my_subpaths, prefixes)
