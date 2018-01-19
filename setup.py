@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Andre Anjos <andre.anjos@idiap.ch>
-# Thu 20 Sep 2012 14:43:19 CEST
-"""A package that contains a helper for Bob/Python C++ extension development
+"""A package that contains a helper for Bob Python/C++ extension development
 """
 
 from setuptools import setup, find_packages
@@ -44,7 +42,7 @@ setup(
     },
     classifiers=[
         'Framework :: Bob',
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
