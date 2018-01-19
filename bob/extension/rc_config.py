@@ -67,18 +67,21 @@ def _loadrc():
     return json.load(f, object_hook=_default_none_dict)
 
 
-def _dumprc(context, f):
-  """Saves the context into the global rc file.
+def _rc_to_str(context):
+  """Converts the configurations into a pretty JSON formatted string.
 
   Parameters
   ----------
   context : dict
       All the configurations to save into the rc file.
-  f : obj
-      An object that provides a ``f.write()`` function.
+
+  Returns
+  -------
+  str
+      The configurations in a JSON formatted string.
   """
 
-  json.dump(context, f, sort_keys=True, indent=4, separators=(',', ': '))
+  return json.dumps(context, sort_keys=True, indent=4, separators=(',', ': '))
 
 
 def _saverc(context):
@@ -92,4 +95,4 @@ def _saverc(context):
 
   path = _get_rc_path()
   with open(path, 'wt') as f:
-    _dumprc(context, f)
+    f.write(_rc_to_str(context))

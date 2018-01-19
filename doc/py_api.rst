@@ -96,6 +96,12 @@ Stacked Processors
     :special-members: __init__, __call__
 
 
+Logging
+-------
+
+.. automodule:: bob.extension.log
+
+
 Scripts
 -------
 

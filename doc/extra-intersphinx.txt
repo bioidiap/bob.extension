@@ -1,4 +1,5 @@
 python
+click
 bob.blitz
 bob.db.base
 bob.io.image

@@ -516,6 +516,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   _add_index('docopt', 'http://docopt.readthedocs.io/en/latest/')
   _add_index('scikit-image', 'http://scikit-image.org/docs/dev/')
   _add_index('pillow', 'http://pillow.readthedocs.io/en/latest/')
+  _add_index('click', 'http://click.pocoo.org/')
 
 
   # get the server for the other packages
