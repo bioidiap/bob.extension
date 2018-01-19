@@ -188,23 +188,18 @@ Unified Command Line Mechanism
 |project| comes with a command line called ``bob`` which provides a set of
 commands by default::
 
-   $ bob --help
-   Usage: bob [OPTIONS] COMMAND [ARGS]...
+    $ bob --help
+    Usage: bob [OPTIONS] COMMAND [ARGS]...
 
-     The main command line interface for bob. Look below for available
-     commands.
+      The main command line interface for bob. Look below for available
+      commands.
 
-   Options:
-     -v, --verbose   Increase the verbosity level from 0 (only error messages) to
-                     1 (warnings), 2 (log messages), 3 (debug information) by
-                     adding the --verbose option as often as desired (e.g. '-vvv'
-                     for debug).
-     --log FILENAME  Redirects the prints of the scripts to FILENAME.
-     --help          Show this message and exit.
+    Options:
+      --help  Show this message and exit.
 
-   Commands:
-     config  The manager for bob's global configuration.
-     ...
+    Commands:
+      config  The manager for bob's global configuration.
+      ...
 
 This command line is implemented using click_. You can extend the commands of
 this script through setuptools entry points (this is implemented using
@@ -222,7 +217,8 @@ For a best practice example, please look at how the ``bob config`` command is
 implemented:
 
 .. literalinclude:: ../bob/extension/scripts/config.py
-   :caption: "bob/extension/scripts/config.py" implementation of the ``bob config`` command.
+   :caption: "bob/extension/scripts/config.py" implementation of the ``bob
+       config`` command.
    :language: python
 
 
