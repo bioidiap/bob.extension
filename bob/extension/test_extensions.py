@@ -35,15 +35,15 @@ def _run(package, run_call):
     assert os.path.exists(_bin('python'))
 
     # nosetests
-    subprocess.call([_bin('nosetests'), '-sv'])
+    subprocess.call(['python', _bin('nosetests'), '-sv'])
 
     # check that the call is working
-    subprocess.call([_bin(run_call[0])] + run_call[1:])
+    subprocess.call(['python', _bin(run_call[0])] + run_call[1:])
 
-    subprocess.call([_bin('sphinx-build'), _join('doc'), _join('sphinx')])
+    subprocess.call(['python', _bin('sphinx-build'), _join('doc'), _join('sphinx')])
     assert os.path.exists(_join('sphinx', 'index.html'))
 
-    subprocess.call([_bin('python'), '-c', 'import pkg_resources; from bob.example.%s import get_config; print(get_config())'%package])
+    subprocess.call(['python', _bin('python'), '-c', 'import pkg_resources; from bob.example.%s import get_config; print(get_config())'%package])
 
   finally:
     shutil.rmtree(temp_dir)
