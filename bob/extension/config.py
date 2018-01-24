@@ -103,10 +103,11 @@ def _resolve_entry_point_or_modules(paths, entry_point_group):
   for i, path in enumerate(paths):
 
     old_path = path
-    module_name = 'user_config' #fixed module name for files with full paths
+    module_name = 'user_config'  # fixed module name for files with full paths
 
     # if it already points to a file
-    if isfile(path): pass
+    if isfile(path):
+      pass
 
     # If it is an entry point name, collect path and module name
     elif path in entries:
@@ -167,7 +168,7 @@ def load(paths, context=None, entry_point_group=None):
   if entry_point_group is not None:
     paths, names = _resolve_entry_point_or_modules(paths, entry_point_group)
   else:
-    names = len(paths)*['user_config']
+    names = len(paths) * ['user_config']
 
   ctxt = imp.new_module('initial_context')
   if context is not None:
@@ -176,7 +177,11 @@ def load(paths, context=None, entry_point_group=None):
   # to avoid the garbage collector to collect some already imported modules.
   LOADED_CONFIGS.append(ctxt)
 
-  for k,n in zip(paths, names):
+  # if no paths are provided, return context
+  if not paths:
+    return ctxt
+
+  for k, n in zip(paths, names):
     logger.debug("Loading configuration file `%s'...", k)
     mod = imp.new_module(n)
     # remove the keys that might break the loading of the next config file.
@@ -187,3 +192,21 @@ def load(paths, context=None, entry_point_group=None):
     ctxt = _load_context(k, mod)
 
   return mod
+
+
+def mod_to_context(mod):
+  """Converts the loaded module of :any:`load` to a dictionary context.
+  This function removes all the variables that start and end with ``__``.
+
+  Parameters
+  ----------
+  mod : object
+      What is returned by :any:`load`
+
+  Returns
+  -------
+  dict
+      The context that was in ``mod``.
+  """
+  return {k: v for k, v in mod.__dict__.items()
+          if not (k.startswith('__') and k.endswith('__'))}

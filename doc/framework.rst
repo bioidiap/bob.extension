@@ -201,6 +201,12 @@ commands by default::
       config  The manager for bob's global configuration.
       ...
 
+.. warning::
+
+   This feature is experimental and most probably will break compatibility.
+   If you are not willing to fix your code after changes are made here,
+   please do not use this feature.
+
 This command line is implemented using click_. You can extend the commands of
 this script through setuptools entry points (this is implemented using
 `click-plugins`_). To do so you implement your command-line using click_
@@ -220,6 +226,67 @@ implemented:
    :caption: "bob/extension/scripts/config.py" implementation of the ``bob
        config`` command.
    :language: python
+
+
+Command lines with configurations
+=================================
+
+Sometimes your command line takes so many parameters and you want to be able to
+accept this parameters as both in command-line options and through
+configuration files. |project| can help you with that. See below for an
+example:
+
+.. literalinclude:: ./annotate.py
+   :caption: A command line application that takes several complex parameters.
+   :language: python
+
+This will produce the following help message to the users::
+
+   Usage: bob annotate [OPTIONS] [CONFIG]...
+
+     Annotates a database. The annotations are written in text file (json)
+     format which can be read back using
+     :any:`bob.db.base.read_annotation_file` (annotation_type='json')
+
+     Parameters
+     ----------
+     database : :any:`bob.bio.database`
+         The database that you want to annotate. Can be a ``bob.bio.database``
+         entry point or a path to a Python file which contains a variable
+         named `database`.
+     annotator : callable
+         A function that takes the database and a sample (biofile) of the
+         database and returns the annotations in a dictionary. Can be a
+         ``bob.bio.annotator`` entry point or a path to a Python file which
+         contains a variable named `annotator`.
+     output_dir : str
+         The directory to save the annotations.
+     force : bool, optional
+         Wether to overwrite existing annotations.
+     verbose : int, optional
+         Increases verbosity (see help for --verbose).
+
+     [CONFIG]...            Configuration files. It is possible to pass one or
+                            several Python files (or names of ``bob.bio.config``
+                            entry points) which contain the parameters listed
+                            above as Python variables. The options through the
+                            command-line (see below) will override the values of
+                            configuration files.
+
+   Options:
+     -d, --database TEXT
+     -a, --annotator TEXT
+     -o, --output-dir TEXT
+     -f, --force
+     -v, --verbose          Increase the verbosity level from 0 (only error
+                            messages) to 1 (warnings), 2 (log messages), 3 (debug
+                            information) by adding the --verbose option as often
+                            as desired (e.g. '-vvv' for debug).
+     --help                 Show this message and exit.
+
+
+You can create a script similar to ``verify.py`` form ``bob.bio.base`` with
+minimal boilerplate as you can see.
 
 
 .. include:: links.rst

@@ -2,17 +2,17 @@
 """
 from .. import rc
 from ..rc_config import _saverc, _rc_to_str, _get_rc_path
-from .main_cli import verbosity_option
+from .click_helper import verbosity_option
 import logging
 import click
 
 # Use the normal logging module. Verbosity and format of logging will be set by
-# adding the verbosity_option form bob.extension.scripts.main_cli
+# adding the verbosity_option form bob.extension.scripts.click_helper
 logger = logging.getLogger(__name__)
 
 
 @click.group()
-@verbosity_option
+@verbosity_option()
 def config():
     """The manager for bob's global configuration."""
     # Load the config file again. This may be needed since the environment
