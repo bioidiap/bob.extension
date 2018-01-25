@@ -120,6 +120,8 @@ def _resolve_entry_point_or_modules(paths, entry_point_group):
 
     # If it is not a path nor an entry point name, it is a module name then?
     else:
+      # if we have gotten here so far then path is the module_name.
+      module_name = path
       path = _get_module_filename(path)
       if not isfile(path):
         raise ValueError(
@@ -161,7 +163,6 @@ def load(paths, context=None, entry_point_group=None):
       modules and resolving all variables.
 
   '''
-
   # resolve entry points to paths
   if entry_point_group is not None:
     paths, names = _resolve_entry_point_or_modules(paths, entry_point_group)
