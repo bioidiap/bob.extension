@@ -48,6 +48,7 @@ def test_entry_point_configs():
   c = load([
       os.path.join(path, 'basic_config.py'),
       'resource_config',
+      'bob.extension.data.resource_config',
       'bob.extension.data.basic_config',
       'subpackage_config',
   ], entry_point_group='bob.extension.test_config_load')
