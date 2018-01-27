@@ -162,6 +162,10 @@ def find_header(name, subpaths=None, prefixes=None):
   # Raspberry PI search directory (arch independent) + normal include
   headerpaths += ['include']
 
+  # Windows
+  if os.name == 'nt':
+    headerpaths += [os.path.join('Library','include')]
+
   # Exhaustive combination of paths and subpaths
   if subpaths:
     my_subpaths = []
@@ -224,6 +228,10 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
         ]
 
   libpaths += ['lib']
+
+  # Windows
+  if os.name == 'nt':
+    libpaths += [os.path.join('Library','lib')]
 
   # Exhaustive combination of paths and subpaths
   if subpaths:
@@ -304,6 +312,11 @@ def find_executable(name, subpaths=None, prefixes=None):
         ]
 
   binpaths += ['bin']
+
+  # Windows
+  if os.name == 'nt':
+    binpaths += [os.path.join('Library','bin'), os.path.join('Library','mingw-w64','bin')]
+    name = name + '.exe'
 
   # Exhaustive combination of paths and subpaths
   if subpaths:
