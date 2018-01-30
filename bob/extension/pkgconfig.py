@@ -51,10 +51,6 @@ def call_pkgconfig(cmd, paths=None):
   old = env.get('PKG_CONFIG_PATH', False)
   env['PKG_CONFIG_PATH'] = os.pathsep.join([var, old]) if old else var
 
-  # windows
-  if os.name == 'nt':
-    env['PKG_CONFIG_PATH'] = os.path.join(env.get("CONDA_PREFIX", False),"Library","lib","pkgconfig")
-
   # calls the program
   cmd = pkg_config[:1] + [str(k) for k in cmd]
   subproc = subprocess.Popen(

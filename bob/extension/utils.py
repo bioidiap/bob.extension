@@ -63,7 +63,10 @@ def construct_search_paths(prefixes=None, subpaths=None, suffix=None):
   # Priority 4: the conda prefix
   conda_prefix = os.environ.get('CONDA_PREFIX')
   if conda_prefix:
-    search.append(conda_prefix + suffix)
+    if os.name == 'nt':
+    	search.append(os.path.join(conda_prefix,'Library') + suffix)
+    else:
+    	search.append(conda_prefix + suffix)
 
   # Priority 5: the default search prefixes
   search += [p + suffix for p in DEFAULT_PREFIXES]
@@ -162,10 +165,6 @@ def find_header(name, subpaths=None, prefixes=None):
   # Raspberry PI search directory (arch independent) + normal include
   headerpaths += ['include']
 
-  # Windows
-  if os.name == 'nt':
-    headerpaths += [os.path.join('Library','include')]
-
   # Exhaustive combination of paths and subpaths
   if subpaths:
     my_subpaths = []
@@ -228,10 +227,6 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
         ]
 
   libpaths += ['lib']
-
-  # Windows
-  if os.name == 'nt':
-    libpaths += [os.path.join('Library','lib')]
 
   # Exhaustive combination of paths and subpaths
   if subpaths:
@@ -315,7 +310,7 @@ def find_executable(name, subpaths=None, prefixes=None):
 
   # Windows
   if os.name == 'nt':
-    binpaths += [os.path.join('Library','bin'), os.path.join('Library','mingw-w64','bin')]
+    binpaths += [os.path.join('mingw-w64','bin')]
     name = name + '.exe'
 
   # Exhaustive combination of paths and subpaths
