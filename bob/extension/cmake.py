@@ -122,7 +122,10 @@ class CMakeListsGenerator:
         f.write('link_directories(%s)\n' % directory)
       # add defines
       for macro in self.macros:
-        f.write('add_definitions(-D%s=%s)\n' % macro)
+        if os.name == 'nt':
+          f.write('add_definitions(/D%s=%s)\n' % macro)
+        else:
+          f.write('add_definitions(-D%s=%s)\n' % macro)
       # compile this library
       f.write('\nadd_library(${PROJECT_NAME} \n\t' + "\n\t".join(source_files) + '\n)\n')
       f.write('set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE)\n')

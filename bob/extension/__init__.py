@@ -425,7 +425,10 @@ class Extension(DistutilsExtension):
 
     # add the -isystem to all system include dirs
     for k in system_includes:
-      parameters['extra_compile_args'].extend(['-isystem', k])
+      if os.name == 'nt':
+        parameters['extra_compile_args'].extend(['-I' + k])
+      else:
+        parameters['extra_compile_args'].extend(['-isystem', k])
 
     # Filter and make unique
     for key in parameters.keys():
@@ -464,6 +467,9 @@ class Extension(DistutilsExtension):
 
     # Uniq'fy library directories
     kwargs['library_dirs'] = uniq_paths(kwargs['library_dirs'])
+
+    if os.name == 'nt':
+      kwargs['define_macros'] = [(x, y.replace('"', '\\"')) for x,y in kwargs['define_macros']]
 
     # Run the constructor for the base class
     DistutilsExtension.__init__(self, name, sources, **kwargs)
@@ -646,12 +652,13 @@ class build_ext(_build_ext):
     """
 
     # HACK: remove the "-Wstrict-prototypes" option keyword
-    self.compiler.compiler = [c for c in self.compiler.compiler if c != "-Wstrict-prototypes"]
-    self.compiler.compiler_so = [c for c in self.compiler.compiler_so if c != "-Wstrict-prototypes"]
-    if "-Wno-strict-aliasing" not in self.compiler.compiler:
-      self.compiler.compiler.append("-Wno-strict-aliasing")
-    if "-Wno-strict-aliasing" not in self.compiler.compiler_so:
-      self.compiler.compiler_so.append("-Wno-strict-aliasing")
+    if os.name != 'nt':
+      self.compiler.compiler = [c for c in self.compiler.compiler if c != "-Wstrict-prototypes"]
+      self.compiler.compiler_so = [c for c in self.compiler.compiler_so if c != "-Wstrict-prototypes"]
+      if "-Wno-strict-aliasing" not in self.compiler.compiler:
+        self.compiler.compiler.append("-Wno-strict-aliasing")
+      if "-Wno-strict-aliasing" not in self.compiler.compiler_so:
+        self.compiler.compiler_so.append("-Wno-strict-aliasing")
 
     # check if it is our type of extension
     if isinstance(ext, Library):
