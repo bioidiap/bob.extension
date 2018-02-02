@@ -249,7 +249,7 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
     if sys.platform == 'darwin':
       extensions = ['.dylib', '.a']
     elif os.name == 'nt':
-      extensions = ['.dll']
+      extensions = ['.lib', '.dll']
     else: # linux like
       extensions = ['.so', '.a']
 
