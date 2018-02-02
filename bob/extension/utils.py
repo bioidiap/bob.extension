@@ -228,6 +228,9 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
 
   libpaths += ['lib']
 
+  if os.name == 'nt':
+    libpaths += ['bin']
+
   # Exhaustive combination of paths and subpaths
   if subpaths:
     my_subpaths = []
@@ -238,12 +241,15 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
 
   # Extensions to consider
   if only_static:
-    extensions = ['.a']
+    if os.name == 'nt':
+      extensions = ['.lib']
+    else:
+      extensions = ['.a']
   else:
     if sys.platform == 'darwin':
       extensions = ['.dylib', '.a']
-    elif sys.platform == 'win32':
-      extensions = ['.dll', '.a']
+    elif os.name == 'nt':
+      extensions = ['.dll']
     else: # linux like
       extensions = ['.so', '.a']
 
@@ -253,6 +259,8 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
     for ext in extensions:
       if sys.platform == 'darwin': # version in the middle
         libname = 'lib' + name + '.' + version + ext
+      elif os.name == 'nt':
+        libname = 'lib' + name + '-' + '_'.join(version.split('.')[:2]) + ext
       else: # version at the end
         libname = 'lib' + name + ext + '.' + version
 
