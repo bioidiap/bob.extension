@@ -26,6 +26,8 @@ requirements:
   run:
     - python
     - setuptools
+    - click
+    - click-plugins
 
 test:
   imports:
