@@ -3,19 +3,19 @@
 import logging
 import click
 from bob.extension.scripts.click_helper import (
-    verbosity_option, Command, Option)
+    verbosity_option, ConfigCommand, ResourceOption)
 
 logger = logging.getLogger(__name__)
 
 
-@click.command(entry_point_group='bob.bio.config', cls=Command)
-@click.option('--database', '-d', required=True, cls=Option,
+@click.command(entry_point_group='bob.bio.config', cls=ConfigCommand)
+@click.option('--database', '-d', required=True, cls=ResourceOption,
               entry_point_group='bob.bio.database')
-@click.option('--annotator', '-a', required=True, cls=Option,
+@click.option('--annotator', '-a', required=True, cls=ResourceOption,
               entry_point_group='bob.bio.annotator')
-@click.option('--output-dir', '-o', required=True, cls=Option)
-@click.option('--force', '-f', is_flag=True, cls=Option)
-@verbosity_option(cls=Option)
+@click.option('--output-dir', '-o', required=True, cls=ResourceOption)
+@click.option('--force', '-f', is_flag=True, cls=ResourceOption)
+@verbosity_option(cls=ResourceOption)
 def annotate(database, annotator, output_dir, force, **kwargs):
     """Annotates a database.
     The annotations are written in text file (json) format which can be read

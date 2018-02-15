@@ -1,7 +1,7 @@
 import click
 from click.testing import CliRunner
 from bob.extension.scripts.click_helper import (
-    verbosity_option, Command, Option)
+    verbosity_option, ConfigCommand, ResourceOption)
 
 
 def test_verbosity_option():
@@ -23,7 +23,7 @@ def test_verbosity_option():
 def test_commands_with_config_1():
     # random test
     @click.command(
-        cls=Command, entry_point_group='bob.extension.test_config_load')
+        cls=ConfigCommand, entry_point_group='bob.extension.test_config_load')
     def cli(**kwargs):
         pass
 
@@ -35,9 +35,9 @@ def test_commands_with_config_1():
 def test_commands_with_config_2():
     # test option with valid default value
     @click.command(
-        cls=Command, entry_point_group='bob.extension.test_config_load')
+        cls=ConfigCommand, entry_point_group='bob.extension.test_config_load')
     @click.option(
-        '-a', cls=Option, default=3)
+        '-a', cls=ResourceOption, default=3)
     def cli(a, **kwargs):
         click.echo('{}'.format(a))
 
@@ -67,9 +67,9 @@ def test_commands_with_config_2():
 def test_commands_with_config_3():
     # test required options
     @click.command(
-        cls=Command, entry_point_group='bob.extension.test_config_load')
+        cls=ConfigCommand, entry_point_group='bob.extension.test_config_load')
     @click.option(
-        '-a', cls=Option, required=True)
+        '-a', cls=ResourceOption, required=True)
     def cli(a, **kwargs):
         click.echo('{}'.format(a))
 

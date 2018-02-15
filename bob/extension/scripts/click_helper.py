@@ -23,7 +23,7 @@ def verbosity_option(**kwargs):
   return custom_verbosity_option
 
 
-class Command(click.Command):
+class ConfigCommand(click.Command):
   """A click.Command that can take options both form command line options and
   configuration files. In order to use this class, you have to use the
   :any:`Option` class also.
@@ -75,7 +75,7 @@ class Command(click.Command):
         ctx.params[param.name] = param.full_process_value(
             ctx, ctx.params[param.name])
 
-    return super(Command, self).invoke(ctx)
+    return super(ConfigCommand, self).invoke(ctx)
 
 
 class Option(click.Option):
@@ -130,7 +130,7 @@ class Option(click.Option):
 
     if self.entry_point_group is not None:
       keyword = self.entry_point_group.split('.')[-1]
-      while isinstance(value, basestring):
+      while isinstance(value, str):
         value = load([value], entry_point_group=self.entry_point_group)
         value = getattr(value, keyword)
 
