@@ -4,7 +4,7 @@
 '''Tests for the python-based config functionality'''
 
 
-from .config import load
+from .config import load, mod_to_context
 import os
 import pkg_resources
 import numpy
@@ -16,6 +16,9 @@ def test_basic():
   c = load([os.path.join(path, 'basic_config.py')])
   assert hasattr(c, "a") and c.a == 1
   assert hasattr(c, "b") and c.b == 3
+
+  ctx = mod_to_context(c)
+  assert ctx == {'a': 1, 'b': 3}
 
 
 def test_basic_with_context():

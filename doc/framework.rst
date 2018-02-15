@@ -201,6 +201,12 @@ commands by default::
       config  The manager for bob's global configuration.
       ...
 
+.. warning::
+
+   This feature is experimental and most probably will break compatibility.
+   If you are not willing to fix your code after changes are made here,
+   please do not use this feature.
+
 This command line is implemented using click_. You can extend the commands of
 this script through setuptools entry points (this is implemented using
 `click-plugins`_). To do so you implement your command-line using click_
@@ -220,6 +226,113 @@ implemented:
    :caption: "bob/extension/scripts/config.py" implementation of the ``bob
        config`` command.
    :language: python
+
+
+.. _bob.extension.cli.config:
+
+Command line interfaces with configurations
+===========================================
+
+Sometimes your command line interface takes so many parameters and you want to
+be able to accept this parameters as both in command-line options and through
+configuration files. |project| can help you with that. See below for an
+example:
+
+.. literalinclude:: ./annotate.py
+   :caption: A command line application that takes several complex parameters.
+   :language: python
+
+This will produce the following help message to the users::
+
+   Usage: bob annotate [OPTIONS] [CONFIG]...
+
+     Annotates a database. The annotations are written in text file (json)
+     format which can be read back using
+     :any:`bob.db.base.read_annotation_file` (annotation_type='json')
+
+     Parameters
+     ----------
+     database : :any:`bob.bio.database`
+         The database that you want to annotate. Can be a ``bob.bio.database``
+         entry point or a path to a Python file which contains a variable
+         named `database`.
+     annotator : callable
+         A function that takes the database and a sample (biofile) of the
+         database and returns the annotations in a dictionary. Can be a
+         ``bob.bio.annotator`` entry point or a path to a Python file which
+         contains a variable named `annotator`.
+     output_dir : str
+         The directory to save the annotations.
+     force : bool, optional
+         Wether to overwrite existing annotations.
+     verbose : int, optional
+         Increases verbosity (see help for --verbose).
+
+     [CONFIG]...            Configuration files. It is possible to pass one or
+                            several Python files (or names of ``bob.bio.config``
+                            entry points) which contain the parameters listed
+                            above as Python variables. The options through the
+                            command-line (see below) will override the values of
+                            configuration files.
+
+   Options:
+     -d, --database TEXT
+     -a, --annotator TEXT
+     -o, --output-dir TEXT
+     -f, --force
+     -v, --verbose          Increase the verbosity level from 0 (only error
+                            messages) to 1 (warnings), 2 (log messages), 3 (debug
+                            information) by adding the --verbose option as often
+                            as desired (e.g. '-vvv' for debug).
+     --help                 Show this message and exit.
+
+
+This script takes configuration files (``CONFIG``) and command line options
+(e.g. ``--force``) as input and resolves the *Parameters* from the input.
+Command line options, if given, override the values of Parameters that may
+exist in configuration files. Configuration files are loaded through the
+:ref:`bob.extension.config` mechanism so chain loading is supported.
+
+``CONFIG`` can be a path to a file (e.g. ``/path/to/config.py``), a module name
+(e.g. ``bob.package.config2``), or setuptools entry points with a specified
+group name of the entry points. For example in the annotate script given above,
+``CONFIG`` can be the name of ``bob.bio.config`` entry points.
+
+Some command line options (e.g. ``--database`` in the example above) can be
+complex Python objects. The way to specify them in the command line is like
+``--database atnt`` and this string will be treated as a setuptools entry point
+here (``bob.bio.database`` entry points in this example). The mechanism to load
+this options is the same as loading ``CONFIG``'s but the entry point name is
+different for each option.
+
+By the time, the code enters into the implemented ``annotate`` function, all
+variables are resolved and validated and everything is ready to use.
+
+Below you can see several ways that this script can be invoked:
+
+.. code-block:: sh
+
+    # below, atnt is a bob.bio.database entry point
+    # below, face is a bob.bio.annotator entry point
+    $ bob annotate -d atnt -a face -o /tmp --force -vvv
+    # below, bob.db.atnt.config is a module name that resolves to a path to a config file
+    $ bob annotate -d bob.db.atnt.config -a face -o /tmp --force -vvv
+    # below, all parameters are inside a Python file and the path to that file is provided.
+    # If the configuration file has for example database defined as ``database = 'atnt'``
+    # the atnt name will be treated as a bob.bio.database entry point and will be loaded.
+    $ bob annotate /path/to/config_with_all_parameters.py
+    # below, the path of the config file is given as a module name
+    $ bob annotate bob.package.config_with_all_parameters
+    # below, the output will be /tmp even if there is an ``output`` variable inside the config file.
+    $ bob annotate bob.package.config_with_all_parameters -o /tmp
+    # below, each resource option can be loaded through config loading mechanism too.
+    $ bob annotate -d /path/to/config/database.py -a bob.package.annotate.config --output /tmp
+
+As you can see the command line interface can accept its inputs through several
+different mechanism. Normally to keep things simple, you would encourage users
+to just provide one or several configuration files as entry point names or as
+module names and maybe have them provide simple options like ``--verbose`` or
+``--force`` through the command line options.
 
 
 .. include:: links.rst
