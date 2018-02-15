@@ -126,8 +126,9 @@ def _resolve_entry_point_or_modules(paths, entry_point_group):
       path = _get_module_filename(path)
       if not isfile(path):
         raise ValueError(
-            "The specified path: `{}' resolved to: `{}' is not a file, entry "
-            "point name, or a module name".format(old_path, path))
+            "The specified path: `{}' resolved to: `{}' is not a file, not a "
+            "entry point name of `{}', nor a module name".format(
+                old_path, path, entry_point_group or ''))
 
     files.append(path)
     names.append(module_name)
