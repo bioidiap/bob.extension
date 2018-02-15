@@ -78,7 +78,7 @@ class ConfigCommand(click.Command):
     return super(ConfigCommand, self).invoke(ctx)
 
 
-class Option(click.Option):
+class ResourceOption(click.Option):
   """A click.Option that is aware if the user actually provided this option
   through command-line or it holds a default value. The option can also be a
   resource that will be automatically loaded.
@@ -125,7 +125,7 @@ class Option(click.Option):
     return value
 
   def full_process_value(self, ctx, value):
-    value = super(Option,
+    value = super(ResourceOption,
                   self).full_process_value(ctx, value)
 
     if self.entry_point_group is not None:
