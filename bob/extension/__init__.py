@@ -9,12 +9,16 @@
 import os
 import sys
 import platform
+import subprocess
 import pkg_resources
 from setuptools.extension import Extension as DistutilsExtension
 from setuptools.command.build_ext import build_ext as _build_ext
 import distutils.sysconfig
 
 from pkg_resources import resource_filename
+
+import logging
+logger = logging.getLogger(__name__)
 
 DEFAULT_PREFIXES = [
     "/opt/local",
@@ -253,6 +257,51 @@ def load_bob_library(name, _file_):
   ctypes.cdll.LoadLibrary(full_libname)
 
 
+def find_system_include_paths():
+  """Finds system include paths if the environment variable ``CC`` is set
+
+  Returns:
+
+    list: A list of include paths defined by the compiler
+
+  """
+
+  start1 = '#include "..." search starts here:\n'
+  start2 = '#include <...> search starts here:\n'
+  end = 'End of search list'
+
+  def make_list(s):
+    tmp = [k.strip() for k in s.split('\n') if k.strip()]
+    remove = ' (framework directory)'
+    ret = []
+    for k in tmp:
+      if k.endswith(remove): ret.append(k[:-len(remove)])
+      else: ret.append(k)
+    return ret
+
+  if 'CC' in os.environ:
+    try:
+      cmd = "echo | %s -v -E -" % os.environ['CC']
+      out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+      out = out.decode()
+      section1 = out[out.find(start1)+len(start1)+1:out.find(start2)]
+      section2 = out[out.find(start2)+len(start2)+1:out.find(end)]
+      section1 = make_list(section1)
+      section2 = make_list(section2)
+      return section1 + section2
+
+    except Exception as e:
+      logger.error('Cannot get system include paths even if CC is set on ' \
+          'the environment')
+      logger.error('The output of `%s\' was:\n%s', cmd, out)
+      return []
+  else:
+    logger.warn('Cannot get system include paths because CC is NOT set on ' \
+        'the environment - set it to fix possible "-isystem" usage issues ' \
+        '(see: https://stackoverflow.com/questions/37218953/isystem-on-a-system-include-directory-causes-errors)')
+    return []
+
+
 class Extension(DistutilsExtension):
   """Extension building with pkg-config packages.
 
@@ -424,6 +473,8 @@ class Extension(DistutilsExtension):
       parameters['extra_link_args'] += pkg.other_libraries()
 
     # add the -isystem to all system include dirs
+    compiler_includes = find_system_include_paths()
+    system_includes = [k for k in system_includes if k not in compiler_includes]
     for k in system_includes:
       parameters['extra_compile_args'].extend(['-isystem', k])
 
