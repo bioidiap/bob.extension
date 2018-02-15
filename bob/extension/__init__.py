@@ -279,25 +279,30 @@ def find_system_include_paths():
       else: ret.append(k)
     return ret
 
-  if 'CC' in os.environ:
-    try:
-      cmd = "echo | %s -v -E -" % os.environ['CC']
-      out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
-      out = out.decode()
-      section1 = out[out.find(start1)+len(start1)+1:out.find(start2)]
-      section2 = out[out.find(start2)+len(start2)+1:out.find(end)]
-      section1 = make_list(section1)
-      section2 = make_list(section2)
-      return section1 + section2
+  CC = find_executable("cc")
+  if CC: CC = CC[0]
+  else: CC = None
+  CC = os.environ.get('CC', CC)
 
-    except Exception as e:
-      logger.error('Cannot get system include paths even if CC is set on ' \
-          'the environment')
-      logger.error('The output of `%s\' was:\n%s', cmd, out)
-      return []
-  else:
+  try:
+    cmd = "echo | %s -v -E -" % CC
+    out = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=True)
+    out = out.decode()
+    section1 = out[out.find(start1)+len(start1)+1:out.find(start2)]
+    section2 = out[out.find(start2)+len(start2)+1:out.find(end)]
+    section1 = make_list(section1)
+    section2 = make_list(section2)
+    return section1 + section2
+
+  except Exception as e:
+    logger.error('Cannot get system include paths with CC=%s', CC)
+    logger.error('The output of `%s\' was:\n%s', cmd, out)
+    return []
+
+  if CC is None:
     logger.warn('Cannot get system include paths because CC is NOT set on ' \
-        'the environment - set it to fix possible "-isystem" usage issues ' \
+        'the environment nor it can be found on your PATH - set it to fix ' \
+        'possible "-isystem" usage issues ' \
         '(see: https://stackoverflow.com/questions/37218953/isystem-on-a-system-include-directory-causes-errors)')
     return []
 
