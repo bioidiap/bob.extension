@@ -131,6 +131,7 @@ class ResourceOption(click.Option):
   def full_process_value(self, ctx, value):
     value = super(ResourceOption,
                   self).full_process_value(ctx, value)
+
     if self.entry_point_group is not None:
       keyword = self.entry_point_group.split('.')[-1]
       while isinstance(value, basestring):
