@@ -1,4 +1,4 @@
-.. bob.extension.development:
+.. _bob.extension.development:
 
 =======================================
 Developing existing |project| packages
