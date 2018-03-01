@@ -57,6 +57,7 @@ def call_pkgconfig(cmd, paths=None):
 
   # calls the program
   cmd = pkg_config[:1] + [str(k) for k in cmd]
+
   subproc = subprocess.Popen(
       cmd,
       env=env,

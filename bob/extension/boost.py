@@ -103,7 +103,7 @@ class boost:
 
 
   def libconfig(self, modules, only_static=False,
-      templates=['boost_%(name)s-mt-%(py)s', 'boost_%(name)s-%(py)s', 'boost_%(name)s-mt', 'boost_%(name)s', 'boost_%(name)s-vc140-mt']):
+      templates=['boost_%(name)s-mt-%(py)s', 'boost_%(name)s-%(py)s', 'boost_%(name)s-mt', 'boost_%(name)s', 'boost_%(name)s-vc140-mt-1_65_1']):
     """Returns a tuple containing the library configuration for requested
     modules.
 
@@ -184,7 +184,7 @@ class boost:
     libraries = []
     for f in filenames:
       name, ext = os.path.splitext(os.path.basename(f))
-      if ext in ['.so', '.a', '.dylib', '.dll']:
+      if ext in ['.so', '.a', '.dylib', '.dll', '.lib']:
         libraries.append(name[3:]) #strip 'lib' from the name
       else: #link against the whole thing
         libraries.append(':' + os.path.basename(f))

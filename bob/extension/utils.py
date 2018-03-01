@@ -64,9 +64,9 @@ def construct_search_paths(prefixes=None, subpaths=None, suffix=None):
   conda_prefix = os.environ.get('CONDA_PREFIX')
   if conda_prefix:
     if os.name == 'nt':
-    	search.append(os.path.join(conda_prefix,'Library') + suffix)
+      search.append(os.path.join(conda_prefix,'Library') + suffix)
     else:
-    	search.append(conda_prefix + suffix)
+      search.append(conda_prefix + suffix)
 
   # Priority 5: the default search prefixes
   search += [p + suffix for p in DEFAULT_PREFIXES]
