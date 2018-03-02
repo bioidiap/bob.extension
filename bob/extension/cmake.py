@@ -113,13 +113,13 @@ class CMakeListsGenerator:
       f.write(HEADER)
       # add include directories
       for directory in self.includes:
-        f.write('include_directories(%s)\n' % directory.replace('\\','/'))
+        f.write('include_directories(%s)\n' % directory.replace('\\','\\\\'))
       for directory in self.system_includes:
-        f.write('include_directories(SYSTEM %s)\n' % directory.replace('\\','/'))
+        f.write('include_directories(SYSTEM %s)\n' % directory.replace('\\','\\\\'))
       # add link directories
       # TODO: handle RPATH and Non-RPATH differently (don't know, how, though)
       for directory in self.library_directories:
-        f.write('link_directories(%s)\n' % directory.replace('\\','/'))
+        f.write('link_directories(%s)\n' % directory.replace('\\','\\\\'))
       # add defines
       for macro in self.macros:
         if os.name == 'nt':
@@ -127,7 +127,11 @@ class CMakeListsGenerator:
         else:
           f.write('add_definitions(-D%s=%s)\n' % macro)
       # compile this library
-      f.write('\nadd_library(${PROJECT_NAME} \n\t' + "\n\t".join(source_files).replace('\\','/') + '\n)\n')
+      if os.name == 'nt':
+        static = 'STATIC'
+      else:
+        static = ''
+      f.write('\nadd_library(${PROJECT_NAME} {} \n\t'.format(static) + "\n\t".join(source_files).replace('\\','/') + '\n)\n')
       f.write('set_target_properties(${PROJECT_NAME} PROPERTIES POSITION_INDEPENDENT_CODE TRUE)\n')
       f.write('set_target_properties(${PROJECT_NAME} PROPERTIES LIBRARY_OUTPUT_DIRECTORY %s)\n\n' % self.target_directory.replace('\\','/'))
       # link libraries
