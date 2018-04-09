@@ -22,3 +22,8 @@ c:func PyInt_Check
 c:func PyInt_AS_LONG
 c:func PyString_Check
 c:func PyString_AS_STRING
+
+# These are not documented
+cpp:identifier bob
+cpp:identifier bob::extension
+cpp:identifier NULL
