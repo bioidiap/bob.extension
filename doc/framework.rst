@@ -138,14 +138,15 @@ and applies them on the data one by one sequentially. :
 
 .. doctest::
 
-   >>> import numpy as np
-   >>> from functools import  partial
+   >>> import numpy as np; from numpy import array
+   >>> from functools import partial
    >>> from bob.extension.processors import SequentialProcessor
    >>> raw_data = np.array([[1, 2, 3], [1, 2, 3]])
    >>> seq_processor = SequentialProcessor(
    ...     [np.cast['float64'], lambda x: x / 2, partial(np.mean, axis=1)])
-   >>> seq_processor(raw_data)
-   array([ 1.,  1.])
+   >>> np.allclose(seq_processor(raw_data),
+   ...             array([ 1.,  1.]))
+   True
    >>> np.all(seq_processor(raw_data) ==
    ...        np.mean(np.cast['float64'](raw_data) / 2, axis=1))
    True
@@ -156,28 +157,28 @@ For example:
 
 .. doctest::
 
-   >>> import numpy as np
-   >>> from functools import  partial
    >>> from bob.extension.processors import ParallelProcessor
    >>> raw_data = np.array([[1, 2, 3], [1, 2, 3]])
    >>> parallel_processor = ParallelProcessor(
    ...     [np.cast['float64'], lambda x: x / 2.0])
-   >>> list(parallel_processor(raw_data))
-   [array([[ 1.,  2.,  3.],
-          [ 1.,  2.,  3.]]), array([[ 0.5,  1. ,  1.5],
-          [ 0.5,  1. ,  1.5]])]
+   >>> np.allclose(list(parallel_processor(raw_data)),
+   ...             [array([[ 1.,  2.,  3.],
+   ...                     [ 1.,  2.,  3.]]),
+   ...              array([[ 0.5,  1. ,  1.5],
+   ...                     [ 0.5,  1. ,  1.5]])])
+   True
 
 The data may be further processed using a
 :any:`bob.extension.processors.SequentialProcessor`:
 
 .. doctest::
 
-   >>> from bob.extension.processors import SequentialProcessor
    >>> total_processor = SequentialProcessor(
    ...     [parallel_processor, list, partial(np.concatenate, axis=1)])
-   >>> total_processor(raw_data)
-   array([[ 1. ,  2. ,  3. ,  0.5,  1. ,  1.5],
-          [ 1. ,  2. ,  3. ,  0.5,  1. ,  1.5]])
+   >>> np.allclose(total_processor(raw_data),
+   ...             array([[ 1. ,  2. ,  3. ,  0.5,  1. ,  1.5],
+   ...                    [ 1. ,  2. ,  3. ,  0.5,  1. ,  1.5]]))
+   True
 
 
 .. _bob.extension.cli:
