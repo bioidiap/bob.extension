@@ -9,86 +9,128 @@ try:
 except NameError:
   basestring = str
 
+
 def bool_option(name, short_name, desc, dflt=False, **kwargs):
-    '''Generic provider for boolean options
-    Parameters
-    ----------
+  '''Generic provider for boolean options
 
-    name: str
-        name of the option
-    short_name: str
-        short name for the option
-    desc: str
-        short description for the option
-    dflt: bool or None
-        Default value
-     '''
-    def custom_bool_option(func):
-        def callback(ctx, param, value):
-            ctx.meta[name.replace('-', '_')] = value
-            return value
-        return click.option(
-            '-' + short_name, '--%s/--no-%s' % (name, name), default=dflt,
-            help=desc,
-            show_default=True, callback=callback, is_eager=True, **kwargs)(func)
-    return custom_bool_option
+  Parameters
+  ----------
+  name : str
+      name of the option
+  short_name : str
+      short name for the option
+  desc : str
+      short description for the option
+  dflt : bool or None
+      Default value
+  **kwargs
+      All kwargs are passed to click.option.
 
-def list_float_option(name, short_name, desc, nitems=None, dflt=None, **kwargs):
-    '''Get option to get a list of float f
-    Parameters
-    ----------
+  Returns
+  -------
+  callable
+      A decorator to be used for adding this option.
+  '''
+  def custom_bool_option(func):
+    def callback(ctx, param, value):
+      ctx.meta[name.replace('-', '_')] = value
+      return value
+    return click.option(
+        '-' + short_name, '--%s/--no-%s' % (name, name), default=dflt,
+        help=desc,
+        show_default=True, callback=callback, is_eager=True, **kwargs)(func)
+  return custom_bool_option
 
-    name: str
-        name of the option
-    short_name: str
-        short name for the option
-    desc: str
-        short description for the option
-    nitems: :obj:`int`
-        if given, the parsed list must contains this number of items
-    dflt: :any:`list`
-        List of default  values for axes.
-    '''
-    def custom_list_float_option(func):
-        def callback(ctx, param, value):
-            if value is not None:
-                tmp = value.split(',')
-                if nitems is not None and len(tmp) != nitems:
-                    raise click.BadParameter(
-                        '%s Must provide %d axis limits' % (name, nitems)
-                    )
-                try:
-                    value = [float(i) for i in tmp]
-                except:
-                    raise click.BadParameter('Inputs of %s be floats' % name)
-                if None in value:
-                    value = None
-                elif dflt is not None and None not in dflt and len(dflt) == nitems:
-                    value = dflt if not all(
-                        isinstance(x, float) for x in dflt
-                    ) else None
-            ctx.meta[name.replace('-', '_')] = value
-            return value
-        return click.option(
-            '-'+short_name, '--'+name, default=None, show_default=True,
-            help=desc, callback=callback, **kwargs)(func)
-    return custom_list_float_option
+
+def list_float_option(name, short_name, desc, nitems=None, dflt=None,
+                      **kwargs):
+  '''Get option to get a list of float f
+
+  Parameters
+  ----------
+  name : str
+      name of the option
+  short_name : str
+      short name for the option
+  desc : str
+      short description for the option
+  nitems : obj:`int`, optional
+      If given, the parsed list must contains this number of items.
+  dflt : :any:`list`, optional
+      List of default  values for axes.
+  **kwargs
+      All kwargs are passed to click.option.
+
+  Returns
+  -------
+  callable
+      A decorator to be used for adding this option.
+  '''
+  def custom_list_float_option(func):
+    def callback(ctx, param, value):
+      if value is not None:
+        tmp = value.split(',')
+        if nitems is not None and len(tmp) != nitems:
+          raise click.BadParameter(
+              '%s Must provide %d axis limits' % (name, nitems)
+          )
+        try:
+          value = [float(i) for i in tmp]
+        except Exception:
+          raise click.BadParameter('Inputs of %s be floats' % name)
+        if None in value:
+          value = None
+        elif dflt is not None and None not in dflt and len(dflt) == nitems:
+          value = dflt if not all(
+              isinstance(x, float) for x in dflt
+          ) else None
+      ctx.meta[name.replace('-', '_')] = value
+      return value
+    return click.option(
+        '-' + short_name, '--' + name, default=None, show_default=True,
+        help=desc, callback=callback, **kwargs)(func)
+  return custom_list_float_option
+
 
 def open_file_mode_option(**kwargs):
-    '''Get open mode file option'''
-    def custom_open_file_mode_option(func):
-        def callback(ctx, param, value):
-            if value not in ['w', 'a', 'w+', 'a+']:
-                raise click.BadParameter('Incorrect open file mode')
-            ctx.meta['open_mode'] = value
-            return value
-        return click.option(
-            '-om', '--open-mode', default='w',
-            help='File open mode',
-            callback=callback, **kwargs)(func)
-    return custom_open_file_mode_option
+  '''Get open mode file option
+
+  Parameters
+  ----------
+  **kwargs
+      All kwargs are passed to click.option.
+
+  Returns
+  -------
+  callable
+      A decorator to be used for adding this option.
+  '''
+  def custom_open_file_mode_option(func):
+    def callback(ctx, param, value):
+      if value not in ['w', 'a', 'w+', 'a+']:
+        raise click.BadParameter('Incorrect open file mode')
+      ctx.meta['open_mode'] = value
+      return value
+    return click.option(
+        '-om', '--open-mode', default='w',
+        help='File open mode',
+        callback=callback, **kwargs)(func)
+  return custom_open_file_mode_option
+
 
 def verbosity_option(**kwargs):
+  """Adds a -v/--verbose option to a click command.
+
+  Parameters
+  ----------
+  **kwargs
+      All kwargs are passed to click.option.
+
+  Returns
+  -------
+  callable
+      A decorator to be used for adding this option.
+  """
   def custom_verbosity_option(f):
     def callback(ctx, param, value):
       ctx.meta['verbosity'] = value
@@ -108,14 +150,14 @@ def verbosity_option(**kwargs):
 class ConfigCommand(click.Command):
   """A click.Command that can take options both form command line options and
   configuration files. In order to use this class, you have to use the
-  :any:`Option` class also.
+  :any:`ResourceOption` class also.
 
   Attributes
   ----------
-  config_argument_name : TYPE
-      Description
-  entry_point_group : TYPE
-      Description
+  config_argument_name : str
+      The name of the config argument.
+  entry_point_group : str
+      The name of entry point that will be used to load the config files.
   """
 
   def __init__(self, name, context_settings=None, callback=None, params=None,
