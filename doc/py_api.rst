@@ -36,6 +36,7 @@ Core Functionality
     bob.extension.reorganize_isystem
     bob.extension.uniq
     bob.extension.uniq_paths
+    bob.extension.download.download_file
     bob.extension.download.download_and_unzip
 
 

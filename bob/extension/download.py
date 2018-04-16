@@ -21,7 +21,7 @@ def _untar(tar_file, directory, mode):
         t.extractall(directory)
 
 
-def _download_file(url, out_file):
+def download_file(url, out_file):
   """Downloads a file from a given url
 
   Parameters
@@ -51,7 +51,7 @@ def _download_file(url, out_file):
 
 def download_and_unzip(urls, filename):
     """
-    Download a file from a given URL list and save it somewhere
+    Download a file from a given URL list, save it somewhere and unzip/untar if necessary
     
     Example:
        download_and_unzip(["https://mytesturl.co/my_file_example.tag.bz2"], filename="~/my_file_example.tag.bz2")
@@ -78,7 +78,7 @@ def download_and_unzip(urls, filename):
             logger.info(
                 "Downloading from "
                 "{} ...".format(url))
-            _download_file(url, filename)
+            download_file(url, filename)
 
             break
         except Exception:
