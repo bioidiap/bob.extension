@@ -66,6 +66,17 @@ Stacked Processors
     bob.extension.processors.SequentialProcessor
     bob.extension.processors.ParallelProcessor
 
+Scripts
+^^^^^^^
+
+.. autosummary::
+    bob.extension.scripts.click_helper.ConfigCommand
+    bob.extension.scripts.click_helper.ResourceOption
+    bob.extension.scripts.click_helper.verbosity_option
+    bob.extension.scripts.click_helper.bool_option
+    bob.extension.scripts.click_helper.list_float_option
+    bob.extension.scripts.click_helper.open_file_mode_option
+
 
 Core Functionality
 ------------------
@@ -110,3 +121,5 @@ Scripts
 -------
 
 .. automodule:: bob.extension.scripts
+
+.. automodule:: bob.extension.scripts.click_helper
