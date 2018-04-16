@@ -9,6 +9,84 @@ try:
 except NameError:
   basestring = str
 
+def bool_option(name, short_name, desc, dflt=False, **kwargs):
+    '''Generic provider for boolean options
+    Parameters
+    ----------
+
+    name: str
+        name of the option
+    short_name: str
+        short name for the option
+    desc: str
+        short description for the option
+    dflt: bool or None
+        Default value
+     '''
+    def custom_bool_option(func):
+        def callback(ctx, param, value):
+            ctx.meta[name.replace('-', '_')] = value
+            return value
+        return click.option(
+            '-' + short_name, '--%s/--no-%s' % (name, name), default=dflt,
+            help=desc,
+            show_default=True, callback=callback, is_eager=True, **kwargs)(func)
+    return custom_bool_option
+
+def list_float_option(name, short_name, desc, nitems=None, dflt=None, **kwargs):
+    '''Get option to get a list of float f
+    Parameters
+    ----------
+
+    name: str
+        name of the option
+    short_name: str
+        short name for the option
+    desc: str
+        short description for the option
+    nitems: :obj:`int`
+        if given, the parsed list must contains this number of items
+    dflt: :any:`list`
+        List of default  values for axes.
+    '''
+    def custom_list_float_option(func):
+        def callback(ctx, param, value):
+            if value is not None:
+                tmp = value.split(',')
+                if nitems is not None and len(tmp) != nitems:
+                    raise click.BadParameter(
+                        '%s Must provide %d axis limits' % (name, nitems)
+                    )
+                try:
+                    value = [float(i) for i in tmp]
+                except:
+                    raise click.BadParameter('Inputs of %s be floats' % name)
+                if None in value:
+                    value = None
+                elif dflt is not None and None not in dflt and len(dflt) == nitems:
+                    value = dflt if not all(
+                        isinstance(x, float) for x in dflt
+                    ) else None
+            ctx.meta[name.replace('-', '_')] = value
+            return value
+        return click.option(
+            '-'+short_name, '--'+name, default=None, show_default=True,
+            help=desc, callback=callback, **kwargs)(func)
+    return custom_list_float_option
+
+def open_file_mode_option(**kwargs):
+    '''Get open mode file option'''
+    def custom_open_file_mode_option(func):
+        def callback(ctx, param, value):
+            if value not in ['w', 'a', 'w+', 'a+']:
+                raise click.BadParameter('Incorrect open file mode')
+            ctx.meta['open_mode'] = value
+            return value
+        return click.option(
+            '-om', '--open-mode', default='w',
+            help='File open mode',
+            callback=callback, **kwargs)(func)
+    return custom_open_file_mode_option
 
 def verbosity_option(**kwargs):
   def custom_verbosity_option(f):

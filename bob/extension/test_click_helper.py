@@ -1,7 +1,8 @@
 import click
 from click.testing import CliRunner
 from bob.extension.scripts.click_helper import (
-    verbosity_option, ConfigCommand, ResourceOption)
+    verbosity_option, bool_option, list_float_option,
+    open_file_mode_option, ConfigCommand, ResourceOption)
 
 
 def test_verbosity_option():
@@ -19,6 +20,44 @@ def test_verbosity_option():
         result = runner.invoke(cli, OPTIONS, catch_exceptions=False)
         assert result.exit_code == 0, (result.exit_code, result.output)
 
+def test_bool_option():
+
+    @click.command()
+    @bool_option('i-am-test', 'T', 'test test test', True)
+    def cli(i_am_test):
+        ctx = click.get_current_context()
+        is_test = ctx.meta['i_am_test']
+        assert i_am_test == is_test
+        assert is_test
+
+    @click.command()
+    @bool_option('i-am-test', 'T', 'test test test', False)
+    def cli2(i_am_test):
+        ctx = click.get_current_context()
+        is_test = ctx.meta['i_am_test']
+        assert i_am_test == is_test
+        assert not is_test
+
+    runner = CliRunner()
+    result = runner.invoke(cli)
+    assert result.exit_code == 0, (result.exit_code, result.output)
+
+    result = runner.invoke(cli2)
+    assert result.exit_code == 0, (result.exit_code, result.output)
+
+def test_list_float_option():
+
+    @click.command()
+    @list_float_option('test-list', 'T', 'Test list')
+    def cli(test_list):
+        ctx = click.get_current_context()
+        test = ctx.meta['test_list']
+        assert test == test_list
+        assert test == [1, 2, 3]
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ['-T', '1,2,3'])
+    assert result.exit_code == 0, (result.exit_code, result.output)
 
 def test_commands_with_config_1():
     # random test
