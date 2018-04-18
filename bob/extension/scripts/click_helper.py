@@ -80,10 +80,10 @@ def list_float_option(name, short_name, desc, nitems=None, dflt=None,
           raise click.BadParameter('Inputs of %s be floats' % name)
         if None in value:
           value = None
-        elif dflt is not None and None not in dflt and len(dflt) == nitems:
-          value = dflt if not all(
+          if dflt is not None and None not in dflt and len(dflt) == nitems:
+            value = dflt if not all(
               isinstance(x, float) for x in dflt
-          ) else None
+            ) else None
       ctx.meta[name.replace('-', '_')] = value
       return value
     return click.option(
