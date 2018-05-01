@@ -114,6 +114,9 @@ def test_commands_with_config_3():
 
     runner = CliRunner()
 
+    result = runner.invoke(cli, [])
+    assert result.exit_code == 2, (result.exit_code, result.output)
+
     result = runner.invoke(cli, ['basic_config'])
     assert result.exit_code == 0, (result.exit_code, result.output)
     assert result.output.strip() == '1', result.output
@@ -129,7 +132,3 @@ def test_commands_with_config_3():
     result = runner.invoke(cli, ['basic_config', '-a', 3])
     assert result.exit_code == 0, (result.exit_code, result.output)
     assert result.output.strip() == '3', result.output
-
-    # somehow this test breaks the following tests so I test it last
-    result = runner.invoke(cli, [])
-    assert result.exit_code == 2, (result.exit_code, result.output)
