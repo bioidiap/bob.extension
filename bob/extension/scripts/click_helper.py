@@ -2,7 +2,8 @@ from ..log import set_verbosity_level
 from ..config import load, mod_to_context
 import click
 import logging
-# This needs to bob so that logger is configured for all bob packages.
+
+# This needs to be bob so that logger is configured for all bob packages.
 logger = logging.getLogger('bob')
 try:
   basestring
@@ -82,7 +83,7 @@ def list_float_option(name, short_name, desc, nitems=None, dflt=None,
           value = None
           if dflt is not None and None not in dflt and len(dflt) == nitems:
             value = dflt if not all(
-              isinstance(x, float) for x in dflt
+                isinstance(x, float) for x in dflt
             ) else None
       ctx.meta[name.replace('-', '_')] = value
       return value
@@ -196,8 +197,12 @@ class ConfigCommand(click.Command):
       # raise exceptions if the value is required.
       if hasattr(param, 'real_required'):
         param.required = param.real_required
-        ctx.params[param.name] = param.full_process_value(
-            ctx, ctx.params[param.name])
+        try:
+          ctx.params[param.name] = param.full_process_value(
+              ctx, ctx.params[param.name])
+        finally:
+          # make sure to set this back to False for future invocations
+          param.required = False
 
     return super(ConfigCommand, self).invoke(ctx)
 
