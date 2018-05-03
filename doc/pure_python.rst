@@ -20,6 +20,13 @@ existing one. The guide heavily relies on the use of Python `setuptools`_ and
   Python package index and distribution portal. `Python packaging guide`_ can
   also be useful to learn about setuptools_.
 
+.. note::
+  You should also go through the `new package instructions`_ page when creating a new
+  package. It is a step-by-step guide on how to setup your package, and in particular
+  contains various templates that you must use. Among other stuff, you will find
+  templates for ``README.rst``, ``setup.py``, ``buildout.cfg`` files, 
+  for continuous integration and for the conda recipe of your package.
+
 Anatomy of a package
 --------------------
 

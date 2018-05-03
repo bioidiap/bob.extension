@@ -39,3 +39,5 @@
 .. _bob-devel: https://gitlab.idiap.ch/bob/bob.conda/tree/master/recipes/bob-devel
 .. _pip: https://pip.pypa.io/en/stable/
 .. _discuss: https://www.idiap.ch/software/bob/discuss
+.. _numpydoc docstring guide: https://numpydoc.readthedocs.io/en/latest/format.html
+.. _new package instructions: https://gitlab.idiap.ch/bob/bob.admin/tree/master/templates
