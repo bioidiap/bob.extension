@@ -59,6 +59,19 @@ def test_list_float_option():
     result = runner.invoke(cli, ['-T', '1,2,3'])
     assert result.exit_code == 0, (result.exit_code, result.output)
 
+def test_list_float_option_empty():
+
+    @click.command()
+    @list_float_option('test-list', 'T', 'Test list')
+    def cli(test_list):
+        ctx = click.get_current_context()
+        test = ctx.meta['test_list']
+        assert test is None
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ['-T', ' '])
+    assert result.exit_code == 0, (result.exit_code, result.output)
+
 def test_commands_with_config_1():
     # random test
     @click.command(

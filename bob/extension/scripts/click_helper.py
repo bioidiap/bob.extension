@@ -70,8 +70,8 @@ def list_float_option(name, short_name, desc, nitems=None, dflt=None,
   def custom_list_float_option(func):
     def callback(ctx, param, value):
       if value is None or not value.replace(' ', ''):
-        return None
-      if value is not None:
+        value = None
+      elif value is not None:
         tmp = value.split(',')
         if nitems is not None and len(tmp) != nitems:
           raise click.BadParameter(
@@ -85,7 +85,7 @@ def list_float_option(name, short_name, desc, nitems=None, dflt=None,
       return value
     return click.option(
         '-' + short_name, '--' + name, default=dflt, show_default=True,
-        help=desc + 'Provide just a space (\' \') to cancel default values.',
+        help=desc + ' Provide just a space (\' \') to cancel default values.',
         callback=callback, **kwargs)(func)
   return custom_list_float_option
 
