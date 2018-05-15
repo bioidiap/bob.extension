@@ -520,6 +520,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   _add_index('six', 'https://six.readthedocs.io')
   _add_index('sqlalchemy', 'https://docs.sqlalchemy.org/en/latest/')
   _add_index('docopt', 'http://docopt.readthedocs.io/en/latest/')
+  _add_index('scikit-learn', 'http://scikit-learn.org/stable/')
   _add_index('scikit-image', 'http://scikit-image.org/docs/dev/')
   _add_index('pillow', 'http://pillow.readthedocs.io/en/latest/')
   _add_index('click', 'http://click.pocoo.org/')
