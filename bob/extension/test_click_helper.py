@@ -155,7 +155,19 @@ def test_prefix_aliasing():
     def test():
         click.echo("OK")
 
+    @cli.command()
+    def test_aaa():
+        click.echo("AAA")
+
+
     runner = CliRunner()
     result = runner.invoke(cli, ['te'], catch_exceptions=False)
+    assert result.exit_code != 0, (result.exit_code, result.output)
+
+    result = runner.invoke(cli, ['test'], catch_exceptions=False)
     assert result.exit_code == 0, (result.exit_code, result.output)
     assert 'OK' in result.output, (result.exit_code, result.output)
+
+    result = runner.invoke(cli, ['test_a'], catch_exceptions=False)
+    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert 'AAA' in result.output, (result.exit_code, result.output)
