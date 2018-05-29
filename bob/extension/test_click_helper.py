@@ -2,7 +2,7 @@ import click
 from click.testing import CliRunner
 from bob.extension.scripts.click_helper import (
     verbosity_option, bool_option, list_float_option,
-    open_file_mode_option, ConfigCommand, ResourceOption)
+    open_file_mode_option, ConfigCommand, ResourceOption, AliasedGroup)
 
 
 def test_verbosity_option():
@@ -145,3 +145,29 @@ def test_commands_with_config_3():
     result = runner.invoke(cli, ['basic_config', '-a', 3])
     assert result.exit_code == 0, (result.exit_code, result.output)
     assert result.output.strip() == '3', result.output
+
+def test_prefix_aliasing():
+    @click.group(cls=AliasedGroup)
+    def cli():
+        pass
+
+    @cli.command()
+    def test():
+        click.echo("OK")
+
+    @cli.command()
+    def test_aaa():
+        click.echo("AAA")
+
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ['te'], catch_exceptions=False)
+    assert result.exit_code != 0, (result.exit_code, result.output)
+
+    result = runner.invoke(cli, ['test'], catch_exceptions=False)
+    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert 'OK' in result.output, (result.exit_code, result.output)
+
+    result = runner.invoke(cli, ['test_a'], catch_exceptions=False)
+    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert 'AAA' in result.output, (result.exit_code, result.output)

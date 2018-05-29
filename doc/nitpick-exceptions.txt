@@ -30,3 +30,4 @@ cpp:identifier NULL
 
 py:class click.core.Command
 py:class click.core.Option
+py:class click.core.Group

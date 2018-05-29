@@ -2,7 +2,7 @@
 """
 from .. import rc
 from ..rc_config import _saverc, _rc_to_str, _get_rc_path
-from .click_helper import verbosity_option
+from .click_helper import verbosity_option, AliasedGroup
 import logging
 import click
 
@@ -11,7 +11,7 @@ import click
 logger = logging.getLogger(__name__)
 
 
-@click.group()
+@click.group(cls=AliasedGroup)
 @verbosity_option()
 def config():
     """The manager for bob's global configuration."""
