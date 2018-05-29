@@ -261,3 +261,26 @@ class ResourceOption(click.Option):
         value = getattr(value, keyword)
 
     return value
+
+class AliasedGroup(click.Group):
+  ''' Class that handles prefix aliasing for commands
+
+  Basically just implements get_command that is used by click to choose the
+  comamnd based on the name.
+
+  Example
+  -------
+  To enable prefix aliasing of commands for a given group,
+  just set ``cls=AliasedGroup`` parameter in click.group decorator.
+  '''
+  def get_command(self, ctx, cmd_name):
+    rv = click.Group.get_command(self, ctx, cmd_name)
+    if rv is not None:
+      return rv
+    matches = [x for x in self.list_commands(ctx)
+               if x.startswith(cmd_name)]
+    if not matches:
+      return None
+    elif len(matches) == 1:
+      return click.Group.get_command(self, ctx, matches[0])
+    ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))

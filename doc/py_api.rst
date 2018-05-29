@@ -76,6 +76,7 @@ Scripts
     bob.extension.scripts.click_helper.bool_option
     bob.extension.scripts.click_helper.list_float_option
     bob.extension.scripts.click_helper.open_file_mode_option
+    bob.extension.scripts.click_helper.AliasedGroup
 
 
 Core Functionality
