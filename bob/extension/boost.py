@@ -207,7 +207,7 @@ class boost:
        >>> from bob.extension import boost
        >>> pkg = boost('>= 1.34')
        >>> pkg.macros()
-       [('HAVE_BOOST', '1'), ('BOOST_VERSION', '"..."')]
+       [('HAVE_BOOST', '1'), ('BOOST_VERSION', '...')]
 
     """
-    return [('HAVE_BOOST', '1'), ('BOOST_VERSION', '"%s"' % self.version)]
+    return [('HAVE_BOOST', '1'), ('BOOST_VERSION', '%s' % self.version)]
