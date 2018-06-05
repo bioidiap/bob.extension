@@ -45,10 +45,10 @@ def test_cflags_other():
   #assert obj['extra_compile_args']
   #assert isinstance(obj['extra_compile_args'], list)
   #assert isinstance(obj['extra_compile_args'][0], tuple)
- 
+
   #assert obj['define_macros']
   #assert isinstance(obj['define_macros'], list)
-  #assert isinstance(obj['define_macros'][0], tuple) 
+  #assert isinstance(obj['define_macros'][0], tuple)
 
   assert isinstance(obj, dict)
 
@@ -107,9 +107,7 @@ def test_macros():
   pkg = pkgconfig(test_package)
   macros = pkg.package_macros()
   assert isinstance(macros, list)
-  assert macros
+  assert len(macros) == 1
+  assert len(macros[0]) == 2
   assert macros[0][0].find('HAVE_') == 0
   assert macros[0][1] == '1'
-  assert macros[1][0].find('_VERSION') > 0
-  assert macros[1][1].find('"') == 0
-  assert macros[1][1].rfind('"') == (len(macros[1][1]) - 1)
