@@ -15,11 +15,17 @@ def _unzip(zip_file, directory):
 
 
 def _untar(tar_file, directory, mode):
-    import tarfile
-  
-    with tarfile.open(name=tar_file, mode='r:'+mode) as t:
-        t.extractall(directory)
-
+    if ".tar" in tar_file:
+        import tarfile
+        with tarfile.open(name=tar_file, mode='r:'+mode) as t:
+            t.extractall(directory)
+    else:
+        if mode=="bz2":
+            import bz2
+            with bz2.BZ2File(tar_file) as t:
+                open(os.path.splitext(tar_file)[0:-1][0], 'wb').write(t.read())
+        else:
+           raise ValueError("It was not possible to extract {0}".format(tar_file))
 
 def download_file(url, out_file):
   """Downloads a file from a given url
