@@ -372,9 +372,9 @@ class pkgconfig:
   def package_macros(self):
     """Returns package availability and version number macros
 
-    This method returns a python list with 2 macros indicating package
-    availability and a version number, using standard GNU compatible names. For
-    example, if the package is named ``foo`` and its version is ``1.4``, this
+    This method returns a python list with 1 macro indicating package
+    availability, using standard GNU compatible names. For
+    example, if the package is named ``blitz``, this
     command would return:
 
     .. doctest::
@@ -383,11 +383,11 @@ class pkgconfig:
        >>> from bob.extension import pkgconfig
        >>> blitz = pkgconfig('blitz')
        >>> blitz.package_macros()
-       [('HAVE_BLITZ', '1'), ('BLITZ_VERSION', '"..."')]
+       [('HAVE_BLITZ', '1')]
 
     """
     from re import sub
     NAME = sub(r'[\.\-\s]', '_', self.name.upper())
-    return [('HAVE_' + NAME, '1'), (NAME + '_VERSION', '"%s"' % self.version)]
+    return [('HAVE_' + NAME, '1')]
 
 __all__ = ['pkgconfig']
