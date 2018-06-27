@@ -44,8 +44,10 @@ To write documentation, use the `Sphinx`_ Documentation Generator.
 Get familiar with Sphinx and then unleash the writer in you.
 
 To automatically generate API documentation, we make use of the `Napoleon`_ Sphinx extension 
-that enables Sphinx to parse both NumPy and Google style docstrings. To get familiar on how to document your Python code, 
-you can have a look on the `Napoleon`_ website (and the links within) or in existing bob packages.
+that enables Sphinx to parse both NumPy and Google style docstrings. It has been agreed
+that the style used to document bob packages is the NumPy style. To get familiar on how to document your Python code, 
+you can have a look on the `Napoleon`_ website (and the links within) or in existing bob packages. You can also
+refer to the official `numpydoc docstring guide`_.
 
 .. note::
 
