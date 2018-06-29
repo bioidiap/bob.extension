@@ -37,9 +37,9 @@ def bool_option(name, short_name, desc, dflt=False, **kwargs):
       ctx.meta[name.replace('-', '_')] = value
       return value
     return click.option(
-        '-' + short_name, '--%s/--no-%s' % (name, name), default=dflt,
-        help=desc,
-        show_default=True, callback=callback, is_eager=True, **kwargs)(func)
+        '-%s/-n%s' % (short_name, short_name), '--%s/--no-%s' % (name, name),
+        default=dflt, help=desc, show_default=True, callback=callback,
+        is_eager=True, **kwargs)(func)
   return custom_bool_option
 
 
@@ -262,6 +262,7 @@ class ResourceOption(click.Option):
 
     return value
 
+
 class AliasedGroup(click.Group):
   ''' Class that handles prefix aliasing for commands
 
@@ -273,6 +274,7 @@ class AliasedGroup(click.Group):
   To enable prefix aliasing of commands for a given group,
   just set ``cls=AliasedGroup`` parameter in click.group decorator.
   '''
+
   def get_command(self, ctx, cmd_name):
     rv = click.Group.get_command(self, ctx, cmd_name)
     if rv is not None:
