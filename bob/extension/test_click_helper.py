@@ -171,3 +171,20 @@ def test_prefix_aliasing():
     result = runner.invoke(cli, ['test_a'], catch_exceptions=False)
     assert result.exit_code == 0, (result.exit_code, result.output)
     assert 'AAA' in result.output, (result.exit_code, result.output)
+
+
+def test_config_dump():
+    @click.group(cls=AliasedGroup)
+    def cli():
+        pass
+
+    @click.command(cls=ConfigCommand)
+    @click.option('-t', '--test', required=True, default="/my/path/test.txt",
+    help="Path leading to test blablabla", cls=ResourceOption)
+    @verbosity_option()
+    def test(config, test, **kwargs):
+        pass
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(cli, ['test', '-dc', 'TEST_CONF'], catch_exceptions=False)
+        assert result.exit_code != 0, (result.exit_code, result.output)

@@ -1,5 +1,6 @@
 from ..log import set_verbosity_level
 from ..config import load, mod_to_context
+import time
 import click
 import logging
 
@@ -172,6 +173,9 @@ class ConfigCommand(click.Command):
         **kwargs)
     # Add the config argument to the command
     click.argument(config_argument_name, nargs=-1)(self)
+    # Option for config file generation
+    click.option('-dc', '--dump-config', type=click.Path(exists=False),
+                 help="Name of the config file to be generated")(self)
 
   def invoke(self, ctx):
     config_files = ctx.params[self.config_argument_name.lower()]
@@ -180,7 +184,7 @@ class ConfigCommand(click.Command):
         config_files, entry_point_group=self.entry_point_group)
     config_context = mod_to_context(config_context)
     for param in self.params:
-      if param.name not in ctx.params:
+      if param.name not in ctx.params or param.name == 'dump_config':
         continue
       value = ctx.params[param.name]
       if not hasattr(param, 'user_provided'):
@@ -200,8 +204,26 @@ class ConfigCommand(click.Command):
         finally:
           # make sure to set this back to False for future invocations
           param.required = False
+    if 'dump_config' in ctx.params:
+      self.dump_config(ctx)
 
     return super(ConfigCommand, self).invoke(ctx)
+
+  def dump_config(self, ctx):
+    config_file = open(ctx.params.get('dump_config'), 'w')
+    config_file.write('# Configuration file automatically generated at %s '
+                      'for %s.\n\n\n' % (time.strftime("%d/%m/%Y"),
+                                   ctx.command_path))
+    for param in self.params:
+      if param.name not in ctx.params or param.name == 'dump_config':
+        continue
+      if not isinstance(param, click.Option):
+          continue
+
+      config_file.write('# %s.\n\n' % param.help)
+      config_file.write('# %s = %s \n\n' % (param.name,
+                                       str(ctx.params[param.name])))
+      config_file.write('\n\n\n')
 
 
 class ResourceOption(click.Option):
