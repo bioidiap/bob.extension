@@ -193,3 +193,47 @@ def test_config_dump():
         assert result.exit_code == 0, (result.exit_code, result.output)
         with open('TEST_CONF', 'r') as f, open(ref, 'r') as f2:
             assert f2.read() in f.read()
+
+
+def test_config_dump2():
+    @click.group(cls=AliasedGroup)
+    def cli():
+        pass
+
+    @cli.command(cls=ConfigCommand, entry_point_group='bob.bio.database')
+    @click.option('--database', '-d', required=True, cls=ResourceOption,
+                  entry_point_group='bob.bio.database', help="bla bla bla")
+    @click.option('--annotator', '-a', required=True, cls=ResourceOption,
+                  entry_point_group='bob.bio.annotator', help="bli bli bli")
+    @click.option('--output-dir', '-o', required=True, cls=ResourceOption,
+                 help="blo blo blo")
+    @click.option('--force', '-f', is_flag=True, cls=ResourceOption,
+                 help="lalalalalala")
+    @click.option('--array', type=click.INT, default=1, cls=ResourceOption,
+                 help="lililili")
+    @click.option('--database-directories-file', cls=ResourceOption,
+                  default='~/databases.txt', help="lklklklk")
+    @verbosity_option(cls=ResourceOption)
+    def test(**kwargs):
+      """Blablabla bli blo
+
+      \b
+      Parameters
+      ----------
+      xxx : :any:`list`
+          blabla blablo
+      yyy : callable
+          bli bla blo bla bla bla
+      \b
+      [CONFIG]...           BLA BLA BLA BLA
+      """
+      pass
+
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        result = runner.invoke(cli, ['test', '-H', 'TEST_CONF'], catch_exceptions=False)
+        ref = pkg_resources.resource_filename('bob.extension',
+                                                'data/test_dump_config2.py')
+        assert result.exit_code == 0, (result.exit_code, result.output)
+        with open('TEST_CONF', 'r') as f, open(ref, 'r') as f2:
+            assert f2.read() in f.read()
