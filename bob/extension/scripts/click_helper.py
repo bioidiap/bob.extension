@@ -204,14 +204,14 @@ class ConfigCommand(click.Command):
         finally:
           # make sure to set this back to False for future invocations
           param.required = False
-    if 'dump_config' in ctx.params:
+    if ctx.params.get('dump_config') is not None:
       self.dump_config(ctx)
 
     return super(ConfigCommand, self).invoke(ctx)
 
   def dump_config(self, ctx):
     config_file = open(ctx.params.get('dump_config'), 'w')
-    config_file.write('# Configuration file automatically generated at %s '
+    config_file.write('## Configuration file automatically generated at %s '
                       'for %s.\n\n\n' % (time.strftime("%d/%m/%Y"),
                                    ctx.command_path))
     for param in self.params:
@@ -219,9 +219,8 @@ class ConfigCommand(click.Command):
         continue
       if not isinstance(param, click.Option):
           continue
-
-      config_file.write('# %s.\n\n' % param.help)
-      config_file.write('# %s = %s \n\n' % (param.name,
+      config_file.write('## %s.\n' % param.help)
+      config_file.write('# %s = %s\n\n' % (param.name,
                                        str(ctx.params[param.name])))
       config_file.write('\n\n\n')
 
