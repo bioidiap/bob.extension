@@ -192,4 +192,4 @@ def test_config_dump():
                                                 'data/test_dump_config.py')
         assert result.exit_code == 0, (result.exit_code, result.output)
         with open('TEST_CONF', 'r') as f, open(ref, 'r') as f2:
-            assert f.read() == f2.read()
+            assert f2.read() in f.read()
