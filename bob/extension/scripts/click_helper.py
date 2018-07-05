@@ -174,7 +174,7 @@ class ConfigCommand(click.Command):
     # Add the config argument to the command
     click.argument(config_argument_name, nargs=-1)(self)
     # Option for config file generation
-    click.option('-dc', '--dump-config', type=click.Path(exists=False),
+    click.option('-H', '--dump-config', type=click.Path(exists=False),
                  help="Name of the config file to be generated")(self)
 
   def invoke(self, ctx):
