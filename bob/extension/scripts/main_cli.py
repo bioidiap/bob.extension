@@ -3,7 +3,7 @@
 import pkg_resources
 import click
 from click_plugins import with_plugins
-from .click_helper import AliasedGroup, ConfigCommand
+from .click_helper import AliasedGroup
 from ..log import setup
 logger = setup('bob')
 
