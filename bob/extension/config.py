@@ -216,6 +216,16 @@ def mod_to_context(mod):
 
 
 def dump_config(params, ctx):
+  """ Generate configuration file from parameters and context
+
+  Parameters
+  ----------
+  params : :any:`list`
+      List of parameters. For example, params attributes of click.Option.
+  ctx : dict
+      Click context dictionary.
+
+  """
   config_file = open(ctx.params.get('dump_config'), 'w')
   logger.debug("Generating configuration file `%s'...", config_file)
   config_file.write('## Configuration file automatically generated at %s '
