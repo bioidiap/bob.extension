@@ -220,6 +220,11 @@ class ConfigCommand(click.Command):
       if not isinstance(param, click.Option):
           continue
       config_file.write('## %s.\n' % param.help)
+      config_file.write(
+          '## Option: %s [default: %s]\n' % (
+              ', '.join(param.opts), str(param.default)
+          )
+      )
       config_file.write('# %s = %s\n\n' % (param.name,
                                        str(ctx.params[param.name])))
       config_file.write('\n\n\n')
