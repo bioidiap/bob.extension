@@ -5,10 +5,12 @@
 '''
 
 import imp
-import pkg_resources
 import pkgutil
+import time
 from os.path import isfile
 import logging
+import pkg_resources
+import click
 
 logger = logging.getLogger(__name__)
 
@@ -211,3 +213,25 @@ def mod_to_context(mod):
   """
   return {k: v for k, v in mod.__dict__.items()
           if not (k.startswith('__') and k.endswith('__'))}
+
+
+def dump_config(params, ctx):
+  config_file = open(ctx.params.get('dump_config'), 'w')
+  logger.debug("Generating configuration file `%s'...", config_file)
+  config_file.write('## Configuration file automatically generated at %s '
+                    'for %s.\n\n\n' % (time.strftime("%d/%m/%Y"),
+                                 ctx.command_path))
+  for param in params:
+    if param.name not in ctx.params or param.name == 'dump_config':
+      continue
+    if not isinstance(param, click.Option):
+      continue
+    config_file.write('## %s.\n' % param.help)
+    config_file.write(
+      '## Option: %s [default: %s]\n' % (
+        ', '.join(param.opts), str(param.default)
+      )
+    )
+    config_file.write('# %s = %s\n\n' % (param.name,
+                                     str(ctx.params[param.name])))
+    config_file.write('\n\n\n')

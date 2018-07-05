@@ -1,6 +1,5 @@
 from ..log import set_verbosity_level
-from ..config import load, mod_to_context
-import time
+from ..config import load, mod_to_context, dump_config
 import click
 import logging
 
@@ -205,29 +204,9 @@ class ConfigCommand(click.Command):
           # make sure to set this back to False for future invocations
           param.required = False
     if ctx.params.get('dump_config') is not None:
-      self.dump_config(ctx)
+      dump_config(self.params, ctx)
 
     return super(ConfigCommand, self).invoke(ctx)
-
-  def dump_config(self, ctx):
-    config_file = open(ctx.params.get('dump_config'), 'w')
-    config_file.write('## Configuration file automatically generated at %s '
-                      'for %s.\n\n\n' % (time.strftime("%d/%m/%Y"),
-                                   ctx.command_path))
-    for param in self.params:
-      if param.name not in ctx.params or param.name == 'dump_config':
-        continue
-      if not isinstance(param, click.Option):
-          continue
-      config_file.write('## %s.\n' % param.help)
-      config_file.write(
-          '## Option: %s [default: %s]\n' % (
-              ', '.join(param.opts), str(param.default)
-          )
-      )
-      config_file.write('# %s = %s\n\n' % (param.name,
-                                       str(ctx.params[param.name])))
-      config_file.write('\n\n\n')
 
 
 class ResourceOption(click.Option):

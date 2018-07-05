@@ -58,6 +58,7 @@ Configuration
     bob.extension.rc_config.ENVNAME
     bob.extension.rc_config.RCFILENAME
     bob.extension.config.load
+    bob.extension.config.dump_config
 
 Stacked Processors
 ^^^^^^^^^^^^^^^^^^
