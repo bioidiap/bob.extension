@@ -1,4 +1,5 @@
 import click
+import pkg_resources
 from click.testing import CliRunner
 from bob.extension.scripts.click_helper import (
     verbosity_option, bool_option, list_float_option,
@@ -178,7 +179,7 @@ def test_config_dump():
     def cli():
         pass
 
-    @click.command(cls=ConfigCommand)
+    @cli.command(cls=ConfigCommand)
     @click.option('-t', '--test', required=True, default="/my/path/test.txt",
     help="Path leading to test blablabla", cls=ResourceOption)
     @verbosity_option()
@@ -186,5 +187,9 @@ def test_config_dump():
         pass
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cli, ['test', '-dc', 'TEST_CONF'], catch_exceptions=False)
-        assert result.exit_code != 0, (result.exit_code, result.output)
+        result = runner.invoke(cli, ['test', '-H', 'TEST_CONF'], catch_exceptions=False)
+        ref = pkg_resources.resource_filename('bob.extension',
+                                                'data/test_dump_config.py')
+        assert result.exit_code == 0, (result.exit_code, result.output)
+        with open('TEST_CONF', 'r') as f, open(ref, 'r') as f2:
+            assert f.read() == f2.read()
