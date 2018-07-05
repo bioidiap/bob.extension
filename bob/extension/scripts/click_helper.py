@@ -1,5 +1,6 @@
 from ..log import set_verbosity_level
-from ..config import load, mod_to_context, dump_config
+from ..config import load, mod_to_context
+import time
 import click
 import logging
 
@@ -145,6 +146,41 @@ def verbosity_option(**kwargs):
   return custom_verbosity_option
 
 
+def dump_config(command, params, ctx):
+  """ Generate configuration file from parameters and context
+
+  Parameters
+  ----------
+  params : :any:`list`
+      List of parameters. For example, params attributes of click.Option.
+  ctx : dict
+      Click context dictionary.
+
+  """
+  with open(ctx.params.get('dump_config'), 'w') as config_file:
+    logger.debug("Generating configuration file `%s'...", config_file)
+    config_file.write('## Configuration file automatically generated at %s '
+                      'for %s.\n\n\n' % (time.strftime("%d/%m/%Y"),
+                                   ctx.command_path))
+    if command.help is not None:
+      config_file.write("'''" + command.help + "'''\n\n\n")
+    for param in params:
+      if param.name not in ctx.params or param.name == 'dump_config':
+        continue
+      if not isinstance(param, click.Option):
+        continue
+      if param.help is not None:
+        config_file.write('## %s.\n' % param.help)
+      config_file.write(
+        '## Option: %s [default: %s]\n' % (
+          ', '.join(param.opts), str(param.default)
+        )
+      )
+      config_file.write('# %s = %s\n\n' % (param.name,
+                                       str(ctx.params[param.name])))
+      config_file.write('\n\n\n')
+
+
 class ConfigCommand(click.Command):
   """A click.Command that can take options both form command line options and
   configuration files. In order to use this class, you have to use the
@@ -177,6 +213,8 @@ class ConfigCommand(click.Command):
                  help="Name of the config file to be generated")(self)
 
   def invoke(self, ctx):
+    if ctx.params.get('dump_config') is not None:
+      return dump_config(self, self.params, ctx)
     config_files = ctx.params[self.config_argument_name.lower()]
     # load and normalize context from config files
     config_context = load(
@@ -203,8 +241,6 @@ class ConfigCommand(click.Command):
         finally:
           # make sure to set this back to False for future invocations
           param.required = False
-    if ctx.params.get('dump_config') is not None:
-      dump_config(self.params, ctx)
 
     return super(ConfigCommand, self).invoke(ctx)
 
