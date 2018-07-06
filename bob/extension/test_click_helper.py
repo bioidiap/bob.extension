@@ -200,11 +200,11 @@ def test_config_dump2():
     def cli():
         pass
 
-    @cli.command(cls=ConfigCommand, entry_point_group='bob.bio.database')
+    @cli.command(cls=ConfigCommand, entry_point_group='bob.extension.test_config_load')
     @click.option('--database', '-d', required=True, cls=ResourceOption,
-                  entry_point_group='bob.bio.database', help="bla bla bla")
+                  entry_point_group='bob.extension.test_config_load', help="bla bla bla")
     @click.option('--annotator', '-a', required=True, cls=ResourceOption,
-                  entry_point_group='bob.bio.annotator', help="bli bli bli")
+                  entry_point_group='bob.extension.test_config_load', help="bli bli bli")
     @click.option('--output-dir', '-o', required=True, cls=ResourceOption,
                  help="blo blo blo")
     @click.option('--force', '-f', is_flag=True, cls=ResourceOption,

@@ -1,4 +1,3 @@
-
 ## Path leading to test blablabla.
-## Option: -t, --test [default: /my/path/test.txt]
+## Option: -t, --test 
 # test = /my/path/test.txt
