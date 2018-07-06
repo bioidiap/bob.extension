@@ -217,14 +217,13 @@ def test_config_dump2():
     def test(**kwargs):
       """Blablabla bli blo
 
-      \b
       Parameters
       ----------
       xxx : :any:`list`
           blabla blablo
       yyy : callable
           bli bla blo bla bla bla
-      \b
+
       [CONFIG]...           BLA BLA BLA BLA
       """
       pass
