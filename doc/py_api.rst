@@ -58,7 +58,6 @@ Configuration
     bob.extension.rc_config.ENVNAME
     bob.extension.rc_config.RCFILENAME
     bob.extension.config.load
-    bob.extension.config.dump_config
 
 Stacked Processors
 ^^^^^^^^^^^^^^^^^^
@@ -78,6 +77,7 @@ Scripts
     bob.extension.scripts.click_helper.list_float_option
     bob.extension.scripts.click_helper.open_file_mode_option
     bob.extension.scripts.click_helper.AliasedGroup
+    bob.extension.scripts.click_helper.dump_config
 
 
 Core Functionality
