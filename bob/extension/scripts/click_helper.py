@@ -1,5 +1,6 @@
 from ..log import set_verbosity_level
 from ..config import load, mod_to_context
+from ..utils import resource_keys
 import time
 import click
 import logging
@@ -171,11 +172,16 @@ def dump_config(command, params, ctx):
         continue
       if param.help is not None:
         config_file.write('## %s.\n' % param.help)
-        dflt='' if (param.required or False) else \
-                "[default: {}]".format(param.default)
+      dflt='' if param.required or (isinstance(param, ResourceOption) and
+                                    param.real_required) else \
+           "[default: {}]".format(param.default)
       config_file.write(
         '## Option: %s %s\n' % (', '.join(param.opts), dflt)
       )
+      if isinstance(param, ResourceOption) and param.entry_point_group is not\
+      None:
+        config_file.write("## registered entries are: {}\n".format(
+            resource_keys(param.entry_point_group)))
       config_file.write('# %s = %s\n\n' % (param.name,
                                        str(ctx.params[param.name])))
 
@@ -303,7 +309,6 @@ class ResourceOption(click.Option):
       while isinstance(value, basestring):
         value = load([value], entry_point_group=self.entry_point_group)
         value = getattr(value, keyword)
-
     return value
 
 
