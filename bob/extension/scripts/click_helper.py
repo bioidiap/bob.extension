@@ -178,7 +178,6 @@ def dump_config(command, params, ctx):
       )
       config_file.write('# %s = %s\n\n' % (param.name,
                                        str(ctx.params[param.name])))
-      config_file.write('\n\n\n')
 
 
 class ConfigCommand(click.Command):
