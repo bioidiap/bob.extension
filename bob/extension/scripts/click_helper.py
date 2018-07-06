@@ -171,10 +171,10 @@ def dump_config(command, params, ctx):
         continue
       if param.help is not None:
         config_file.write('## %s.\n' % param.help)
+        dflt='' if (param.required or False) else \
+                "[default: {}]".format(param.default)
       config_file.write(
-        '## Option: %s [default: %s]\n' % (
-          ', '.join(param.opts), str(param.default)
-        )
+        '## Option: %s %s\n' % (', '.join(param.opts), dflt)
       )
       config_file.write('# %s = %s\n\n' % (param.name,
                                        str(ctx.params[param.name])))
@@ -212,7 +212,11 @@ class ConfigCommand(click.Command):
                  help="Name of the config file to be generated")(self)
 
   def invoke(self, ctx):
-    if ctx.params.get('dump_config') is not None:
+    dump_file = ctx.params.get('dump_config')
+    if dump_file is not None:
+      click.echo(
+          "Configuration file '{}' was written; exiting".format(dump_file)
+      )
       return dump_config(self, self.params, ctx)
     config_files = ctx.params[self.config_argument_name.lower()]
     # load and normalize context from config files
