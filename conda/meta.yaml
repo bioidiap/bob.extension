@@ -33,6 +33,10 @@ test:
     - {{ name }}
   commands:
     - bob_dependecy_graph.py --help
+    - bob -h
+    - bob --help
+    - bob config -h
+    - bob config --help
     - nosetests --with-coverage --cover-package={{ name }} -sv {{ name }} --exclude=test_extensions
     - sphinx-build -aEW {{ project_dir }}/doc {{ project_dir }}/sphinx
     - sphinx-build -aEb doctest {{ project_dir }}/doc sphinx
