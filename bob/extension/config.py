@@ -212,3 +212,28 @@ def mod_to_context(mod):
   return {k: v for k, v in mod.__dict__.items()
           if not (k.startswith('__') and k.endswith('__'))}
 
+
+def resource_keys(entry_point_group, exclude_packages=[], strip=['dummy']):
+  """Reads and returns all resources that are registered with the given
+  entry_point_group. Entry points from the given ``exclude_packages`` are
+  ignored.
+
+  Parameters
+  ----------
+  entry_point_group : str
+      The entry point group name.
+  exclude_packages : :any:`list`, optional
+      List of packages to exclude when finding resources.
+  strip : :any:`list`, optional
+      Entrypoint names that start with any value in ``strip`` will be ignored.
+
+  Returns
+  -------
+  :any:`list`
+      List of found resources.
+  """
+  ret_list = [entry_point.name for entry_point in
+              pkg_resources.iter_entry_points(entry_point_group)
+              if (entry_point.dist.project_name not in exclude_packages and
+                  not entry_point.name.startswith(tuple(strip)))]
+  return sorted(ret_list)

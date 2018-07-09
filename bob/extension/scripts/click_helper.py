@@ -1,6 +1,5 @@
 from ..log import set_verbosity_level
-from ..config import load, mod_to_context
-from ..utils import resource_keys
+from ..config import load, mod_to_context, resource_keys
 import time
 import click
 import logging
@@ -139,51 +138,11 @@ def verbosity_option(**kwargs):
       return value
     return click.option(
         '-v', '--verbose', count=True,
-        expose_value=False,
         help="Increase the verbosity level from 0 (only error messages) to 1 "
         "(warnings), 2 (log messages), 3 (debug information) by adding the "
         "--verbose option as often as desired (e.g. '-vvv' for debug).",
         callback=callback, **kwargs)(f)
   return custom_verbosity_option
-
-
-def dump_config(command, params, ctx):
-  """ Generate configuration file from parameters and context
-
-  Parameters
-  ----------
-  params : :any:`list`
-      List of parameters. For example, params attributes of click.Option.
-  ctx : dict
-      Click context dictionary.
-
-  """
-  with open(ctx.params.get('dump_config'), 'w') as config_file:
-    logger.debug("Generating configuration file `%s'...", config_file)
-    config_file.write('## Configuration file automatically generated at %s '
-                      'for %s.\n\n\n' % (time.strftime("%d/%m/%Y"),
-                                   ctx.command_path))
-    if command.help is not None:
-      config_file.write("'''" + command.help + "'''\n\n\n")
-    for param in params:
-      if param.name not in ctx.params or param.name == 'dump_config':
-        continue
-      if not isinstance(param, click.Option):
-        continue
-      if param.help is not None:
-        config_file.write('## %s.\n' % param.help)
-      dflt='' if param.required or (isinstance(param, ResourceOption) and
-                                    param.real_required) else \
-           "[default: {}]".format(param.default)
-      config_file.write(
-        '## Option: %s %s\n' % (', '.join(param.opts), dflt)
-      )
-      if isinstance(param, ResourceOption) and param.entry_point_group is not\
-      None:
-        config_file.write("## registered entries are: {}\n".format(
-            resource_keys(param.entry_point_group)))
-      config_file.write('# %s = %s\n\n' % (param.name,
-                                       str(ctx.params[param.name])))
 
 
 class ConfigCommand(click.Command):
@@ -206,6 +165,17 @@ class ConfigCommand(click.Command):
                config_argument_name='CONFIG', **kwargs):
     self.config_argument_name = config_argument_name
     self.entry_point_group = entry_point_group
+    # Augment help for the config file argument
+    self.extra_help = '''\n\nIt is possible to pass one or several Python files
+(or names of ``{entry_point_group}`` entry points or module names) as {CONFIG}
+arguments to the command line which contain the parameters listed below as
+Python variables. The options through the command-line (see below) will
+override the values of configuration files. You can run this command with
+``<COMMAND> -H example_config.py`` to create a template config
+file.'''.format(CONFIG=config_argument_name,
+                entry_point_group=entry_point_group)
+    help = (help or '').rstrip() + self.extra_help
+    # kwargs['help'] = help
     click.Command.__init__(
         self, name, context_settings=context_settings, callback=callback,
         params=params, help=help, epilog=epilog, short_help=short_help,
@@ -214,23 +184,28 @@ class ConfigCommand(click.Command):
     # Add the config argument to the command
     click.argument(config_argument_name, nargs=-1)(self)
     # Option for config file generation
-    click.option('-H', '--dump-config', type=click.Path(exists=False),
+    click.option('-H', '--dump-config', type=click.File(mode='wt'),
                  help="Name of the config file to be generated")(self)
+
+  def is_resource(self, param, ctx):
+    """Checks if the param is an option and is also in the current context."""
+    return (param.name in ctx.params and
+            param.name != 'dump_config' and
+            isinstance(param, click.Option))
 
   def invoke(self, ctx):
     dump_file = ctx.params.get('dump_config')
     if dump_file is not None:
-      click.echo(
-          "Configuration file '{}' was written; exiting".format(dump_file)
-      )
-      return dump_config(self, self.params, ctx)
+      click.echo("Configuration file '{}' was written; exiting".format(
+          dump_file.name))
+      return self.dump_config(ctx)
     config_files = ctx.params[self.config_argument_name.lower()]
     # load and normalize context from config files
     config_context = load(
         config_files, entry_point_group=self.entry_point_group)
     config_context = mod_to_context(config_context)
     for param in self.params:
-      if param.name not in ctx.params or param.name == 'dump_config':
+      if not self.is_resource(param, ctx):
         continue
       value = ctx.params[param.name]
       if not hasattr(param, 'user_provided'):
@@ -252,6 +227,58 @@ class ConfigCommand(click.Command):
           param.required = False
 
     return super(ConfigCommand, self).invoke(ctx)
+
+  def dump_config(self, ctx):
+    """Generate configuration file from parameters and context
+
+    Parameters
+    ----------
+    ctx : object
+        Click context
+    """
+    config_file = ctx.params['dump_config']
+    logger.debug("Generating configuration file `%s'...", config_file)
+    config_file.write("'''")
+    config_file.write('Configuration file automatically generated at '
+                      '%s\n%s\n' % (time.strftime("%d/%m/%Y"),
+                                    ctx.command_path))
+
+    if self.help:
+      h = self.help.replace(self.extra_help, '').replace('\b\n', '')
+      config_file.write('\n{}'.format(h.rstrip()))
+
+    if self.epilog:
+      config_file.write('\n\n{}'.format(self.epilog.replace('\b\n', '')))
+
+    config_file.write("'''\n")
+
+    for param in self.params:
+      if not self.is_resource(param, ctx):
+        continue
+
+      config_file.write('\n# %s = %s\n' % (param.name,
+                                           str(ctx.params[param.name])))
+      config_file.write("'''")
+
+      if param.required or (isinstance(param, ResourceOption) and
+                            param.real_required):
+        begin, dflt = 'Required parameter', ''
+      else:
+        begin, dflt = 'Optional parameter', ' [default: {}]'.format(
+            param.default)
+      config_file.write(
+          "%s: %s (%s)%s" % (
+              begin, param.name, ', '.join(param.opts), dflt))
+
+      if param.help is not None:
+        config_file.write("\n%s" % param.help)
+
+      if isinstance(param, ResourceOption) and \
+              param.entry_point_group is not None:
+        config_file.write("\nRegistered entries are: {}".format(
+            resource_keys(param.entry_point_group)))
+
+      config_file.write("'''\n")
 
 
 class ResourceOption(click.Option):
@@ -281,6 +308,13 @@ class ResourceOption(click.Option):
     self.entry_point_group = entry_point_group
     self.real_required = required
     kwargs['required'] = False
+    if entry_point_group is not None:
+      name, _, _ = self._parse_decls(param_decls, kwargs.get('expose_value'))
+      help = help or ''
+      help += (
+          ' Can be a ``{entry_point_group}`` entry point, a module name, or '
+          'a path to a Python file which contains a variable named `{name}`.')
+      help = help.format(entry_point_group=entry_point_group, name=name)
     click.Option.__init__(
         self, param_decls=param_decls, show_default=show_default,
         prompt=prompt, confirmation_prompt=confirmation_prompt,
@@ -335,3 +369,26 @@ class AliasedGroup(click.Group):
     elif len(matches) == 1:
       return click.Group.get_command(self, ctx, matches[0])
     ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
+
+
+def log_parameters(logger_handle):
+  """Logs the click parameters with the logging module.
+
+  Parameters
+  ----------
+  logger_handle : object
+      The logger handle to write debug information into.
+  """
+  ctx = click.get_current_context()
+  # do not sort the ctx.params dict. The insertion order is kept in Python 3
+  # and is useful (but not necessary so works on Python 2 too).
+  for k, v in ctx.params.items():
+    logger_handle.debug('%s: %s', k, v)
+
+
+def assert_click_runner_result(result, exit_code=0):
+  """Helper for asserting click runner results"""
+  m = ("Click command exited with code `{}' and exception:\n{}"
+       "\nThe output was:\n{}")
+  m = m.format(result.exit_code, result.exception, result.output)
+  assert result.exit_code == exit_code, m

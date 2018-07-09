@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 @click.group(cls=AliasedGroup)
 @verbosity_option()
-def config():
+def config(**kwargs):
     """The manager for bob's global configuration."""
     # Load the config file again. This may be needed since the environment
     # variable might change the config path during the tests. Otherwise, this

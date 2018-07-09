@@ -2,6 +2,7 @@
 
 from .rc_config import _loadrc, ENVNAME
 from .scripts import main_cli
+from .scripts.click_helper import assert_click_runner_result
 from click.testing import CliRunner
 import os
 import pkg_resources
@@ -27,19 +28,19 @@ def test_bob_config():
 
   # test config show
   result = runner.invoke(main_cli, ['config', 'show'])
-  assert result.exit_code == 0, result.exit_code
+  assert_click_runner_result(result, 0)
   assert 'defaults-config' in result.output, result.output
   assert open(defaults_config).read() in result.output, result.output
 
   # test config get (existing key)
   result = runner.invoke(main_cli,
                          ['config', 'get', 'bob.db.atnt.directory'])
-  assert result.exit_code == 0, result.exit_code
+  assert_click_runner_result(result, 0)
   assert result.output == '/home/bob/databases/atnt\n', result.output
 
   # test config get (non-existing key)
   result = runner.invoke(main_cli, ['config', 'get', 'bob.db.atnt'])
-  assert result.exit_code == 1, result.exit_code
+  assert_click_runner_result(result, 1)
 
   # test config set
   runner = CliRunner()
@@ -53,14 +54,14 @@ def test_bob_config():
         env={
             ENVNAME: bobrcfile
         })
-    assert result.exit_code == 0, result.exit_code
+    assert_click_runner_result(result, 0)
 
     # read the config back to make sure it is ok.
     result = runner.invoke(
         main_cli, ['config', 'show'], env={
             ENVNAME: bobrcfile
         })
-    assert result.exit_code == 0, result.exit_code
+    assert_click_runner_result(result, 0)
     expected_output = '''Displaying `bobrc':
 {
     "bob.db.atnt.directory": "/home/bob/databases/orl_faces"

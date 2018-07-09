@@ -35,7 +35,7 @@ def _run(package, run_call):
     assert os.path.exists(_bin('python'))
 
     # nosetests
-    subprocess.call(['python', _bin('nosetests'), '-sv'])
+    subprocess.call(['python', _bin('nosetests'), '-sv', 'bob.example.{0}'.format(package)])
 
     # check that the call is working
     subprocess.call(['python', _bin(run_call[0])] + run_call[1:])

@@ -245,47 +245,49 @@ example:
 
 This will produce the following help message to the users::
 
-   Usage: bob annotate [OPTIONS] [CONFIG]...
+  Usage: bob bio annotate [OPTIONS] [CONFIG]...
 
-     Annotates a database. The annotations are written in text file (json)
-     format which can be read back using
-     :any:`bob.db.base.read_annotation_file` (annotation_type='json')
+    Annotates a database.
 
-     Parameters
-     ----------
-     database : :any:`bob.bio.database`
-         The database that you want to annotate. Can be a ``bob.bio.database``
-         entry point or a path to a Python file which contains a variable
-         named `database`.
-     annotator : callable
-         A function that takes the database and a sample (biofile) of the
-         database and returns the annotations in a dictionary. Can be a
-         ``bob.bio.annotator`` entry point or a path to a Python file which
-         contains a variable named `annotator`.
-     output_dir : str
-         The directory to save the annotations.
-     force : bool, optional
-         Wether to overwrite existing annotations.
-     verbose : int, optional
-         Increases verbosity (see help for --verbose).
+    The annotations are written in text file (json) format which can be read
+    back using :any:`bob.db.base.read_annotation_file`
+    (annotation_type='json')
 
-     [CONFIG]...            Configuration files. It is possible to pass one or
-                            several Python files (or names of ``bob.bio.config``
-                            entry points) which contain the parameters listed
-                            above as Python variables. The options through the
-                            command-line (see below) will override the values of
-                            configuration files.
+    It is possible to pass one or several Python files (or names of
+    ``bob.bio.config`` entry points or module names) as CONFIG arguments to
+    the command line which contain the parameters listed below as Python
+    variables. The options through the command-line (see below) will override
+    the values of configuration files. You can run this command with
+    ``<COMMAND> -H example_config.py`` to create a template config file.
 
-   Options:
-     -d, --database TEXT
-     -a, --annotator TEXT
-     -o, --output-dir TEXT
-     -f, --force
-     -v, --verbose          Increase the verbosity level from 0 (only error
-                            messages) to 1 (warnings), 2 (log messages), 3 (debug
-                            information) by adding the --verbose option as often
-                            as desired (e.g. '-vvv' for debug).
-     --help                 Show this message and exit.
+  Options:
+    -d, --database TEXT             The database that you want to annotate. Can
+                                    be a ``bob.bio.database`` entry point, a
+                                    module name, or a path to a Python file
+                                    which contains a variable named `database`.
+    -a, --annotator TEXT            A callable that takes the database and a
+                                    sample (biofile) of the database and returns
+                                    the annotations in a dictionary. Can be a
+                                    ``bob.bio.annotator`` entry point, a module
+                                    name, or a path to a Python file which
+                                    contains a variable named `annotator`.
+    -o, --output-dir TEXT           The directory to save the annotations.
+    -f, --force                     Whether to overwrite existing annotations.
+    --array INTEGER                 Use this option alongside gridtk to submit
+                                    this script as an array job.
+                                    databases.
+    -v, --verbose                   Increase the verbosity level from 0 (only
+                                    error messages) to 1 (warnings), 2 (log
+                                    messages), 3 (debug information) by adding
+                                    the --verbose option as often as desired
+                                    (e.g. '-vvv' for debug).
+    -H, --dump-config FILENAME      Name of the config file to be generated
+    -?, -h, --help                  Show this message and exit.
+
+    Examples:
+
+      $ bob bio annotate -vvv -d <database> -a <annotator> -o /tmp/annotations
+      $ jman submit --array 64 -- bob bio annotate ... --array 64
 
 
 This script takes configuration files (``CONFIG``) and command line options
@@ -328,6 +330,8 @@ Below you can see several ways that this script can be invoked:
     $ bob annotate bob.package.config_with_all_parameters -o /tmp
     # below, each resource option can be loaded through config loading mechanism too.
     $ bob annotate -d /path/to/config/database.py -a bob.package.annotate.config --output /tmp
+    # Using the command below users can generate a template config file
+    $ bob annotate -H example_config.py
 
 As you can see the command line interface can accept its inputs through several
 different mechanism. Normally to keep things simple, you would encourage users

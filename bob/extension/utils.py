@@ -586,14 +586,3 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
         print ("Path %s does not exist. The error was: %s" % (url, exc))
 
   return mapping
-
-
-def resource_keys(entry_point_group, exclude_packages=[], strip=['dummy']):
-  """Reads and returns all resources that are registered with the given
-  entry_point_group.
-  Entry points from the given ``exclude_packages`` are ignored."""
-  ret_list = [entry_point.name for entry_point in
-              pkg_resources.iter_entry_points(entry_point_group) 
-              if (entry_point.dist.project_name not in exclude_packages and
-                  not entry_point.name.startswith(tuple(strip)))]
-  return sorted(ret_list)
