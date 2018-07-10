@@ -14,12 +14,12 @@ yyy : callable
 
 # database = None
 '''Required parameter: database (--database, -d)
-bla bla bla Can be a ``bob.extension.test_config_load`` entry point, a module name, or a path to a Python file which contains a variable named `database`.
+bla bla bla Can be a ``bob.extension.test_dump_config`` entry point, a module name, or a path to a Python file which contains a variable named `database`.
 Registered entries are: ['basic_config', 'resource_config', 'subpackage_config']'''
 
 # annotator = None
 '''Required parameter: annotator (--annotator, -a)
-bli bli bli Can be a ``bob.extension.test_config_load`` entry point, a module name, or a path to a Python file which contains a variable named `annotator`.
+bli bli bli Can be a ``bob.extension.test_dump_config`` entry point, a module name, or a path to a Python file which contains a variable named `annotator`.
 Registered entries are: ['basic_config', 'resource_config', 'subpackage_config']'''
 
 # output_dir = None

@@ -37,6 +37,13 @@ setup(
             'basic_config = bob.extension.data.basic_config',
             'resource_config = bob.extension.data.resource_config',
             'subpackage_config = bob.extension.data.subpackage.config',
+            'resource1 = bob.extension.data.resource_config2',
+            'resource2 = bob.extension.data.resource_config2:b',
+        ],
+        'bob.extension.test_dump_config': [
+            'basic_config = bob.extension.data.basic_config',
+            'resource_config = bob.extension.data.resource_config',
+            'subpackage_config = bob.extension.data.subpackage.config',
         ],
     },
     classifiers=[

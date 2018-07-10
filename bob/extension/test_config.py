@@ -58,3 +58,27 @@ def test_entry_point_configs():
   assert hasattr(c, "a") and c.a == 1
   assert hasattr(c, "b") and c.b == 3
   assert hasattr(c, "rc")
+
+
+def test_load_resource():
+  for p, ref in [
+      (os.path.join(path, 'resource_config2.py'), 1),
+      (os.path.join(path, 'resource_config2.py:test_config_load'), 1),
+      (os.path.join(path, 'resource_config2.py:b'), 2),
+      ('resource1', 1),
+      ('resource2', 2),
+      ('bob.extension.data.resource_config2', 1),
+      ('bob.extension.data.resource_config2:test_config_load', 1),
+      ('bob.extension.data.resource_config2:b', 2),
+  ]:
+    c = load([p], entry_point_group='bob.extension.test_config_load',
+             common_keyword='test_config_load')
+    assert c == ref, c
+
+  try:
+    load(['bob.extension.data.resource_config2:c'],
+         entry_point_group='bob.extension.test_config_load',
+         common_keyword='test_config_load')
+    assert False, 'The code above should have raised an ImportError'
+  except ImportError:
+    pass
