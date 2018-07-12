@@ -371,18 +371,22 @@ class AliasedGroup(click.Group):
     ctx.fail('Too many matches: %s' % ', '.join(sorted(matches)))
 
 
-def log_parameters(logger_handle):
+def log_parameters(logger_handle, ignore=tuple()):
   """Logs the click parameters with the logging module.
 
   Parameters
   ----------
   logger_handle : object
       The logger handle to write debug information into.
+  ignore : tuple
+      The keys in ignore will not be logged.
   """
   ctx = click.get_current_context()
   # do not sort the ctx.params dict. The insertion order is kept in Python 3
   # and is useful (but not necessary so works on Python 2 too).
   for k, v in ctx.params.items():
+    if k in ignore:
+      continue
     logger_handle.debug('%s: %s', k, v)
 
 
