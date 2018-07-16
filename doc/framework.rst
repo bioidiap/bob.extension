@@ -123,6 +123,32 @@ to provide the group name of the entry points:
    b = 6
 
 
+Resource Loading
+================
+
+The function :py:func:`bob.extension.config.load` can also only return
+variables from paths. To do this, you need provide a attribute_name. For
+example, given the following config file:
+
+.. literalinclude:: ../bob/extension/data/resource_config2.py
+   :caption: "resource_config2.py" with two variables inside
+   :language: python
+   :linenos:
+
+The loaded value can be either 1 or 2:
+
+.. doctest:: load_resource
+
+   >>> group = 'bob.extension.test_config_load'  # the group name of entry points
+   >>> attribute_name = 'test_config_load'  # the common variable name
+   >>> value = load(['bob.extension.data.resource_config2'], entry_point_group=group, attribute_name=attribute_name)
+   >>> value == 1
+   True
+   >>> value = load(['bob.extension.data.resource_config2:b'], entry_point_group=group, attribute_name=attribute_name)
+   >>> value == 2
+   True
+
+
 .. _bob.extension.processors:
 
 Stacked Processing

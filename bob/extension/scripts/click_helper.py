@@ -339,10 +339,10 @@ class ResourceOption(click.Option):
                   self).full_process_value(ctx, value)
 
     if self.entry_point_group is not None:
-      keyword = self.entry_point_group.split('.')[-1]
+      attribute_name = self.entry_point_group.split('.')[-1]
       while isinstance(value, basestring):
-        value = load([value], entry_point_group=self.entry_point_group)
-        value = getattr(value, keyword)
+        value = load([value], entry_point_group=self.entry_point_group,
+                     attribute_name=attribute_name)
     return value
 
 

@@ -1,5 +1,6 @@
 # Not available in Python 2.7, but ok in Python 3.x
 py:exc ValueError
+py:exc ImportError
 
 # we don't link against setuptools manual
 py:class setuptools.extension.Extension
