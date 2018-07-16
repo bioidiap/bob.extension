@@ -72,13 +72,13 @@ def test_load_resource():
       ('bob.extension.data.resource_config2:b', 2),
   ]:
     c = load([p], entry_point_group='bob.extension.test_config_load',
-             common_keyword='test_config_load')
+             attribute_name='test_config_load')
     assert c == ref, c
 
   try:
     load(['bob.extension.data.resource_config2:c'],
          entry_point_group='bob.extension.test_config_load',
-         common_keyword='test_config_load')
+         attribute_name='test_config_load')
     assert False, 'The code above should have raised an ImportError'
   except ImportError:
     pass

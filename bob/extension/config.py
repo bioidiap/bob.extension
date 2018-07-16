@@ -90,7 +90,7 @@ def _resolve_entry_point_or_modules(paths, entry_point_group,
       The entry point group name to search in entry points.
   common_name : None or str
       It will be used as a default name for object names. See the
-      common_keyword parameter from :any:`load`.
+      attribute_name parameter from :any:`load`.
 
   Raises
   ------
@@ -154,7 +154,7 @@ def _resolve_entry_point_or_modules(paths, entry_point_group,
   return files, module_names, object_names
 
 
-def load(paths, context=None, entry_point_group=None, common_keyword=None):
+def load(paths, context=None, entry_point_group=None, attribute_name=None):
   '''Loads a set of configuration files, in sequence
 
   This method will load one or more configuration files. Every time a
@@ -175,37 +175,37 @@ def load(paths, context=None, entry_point_group=None, common_keyword=None):
   entry_point_group : :py:class:`str`, optional
       If provided, it will treat non-existing file paths as entry point names
       under the ``entry_point_group`` name.
-  common_keyword : None or str
-      If provided, will look for the common_keyword variable inside the loaded
+  attribute_name : None or str
+      If provided, will look for the attribute_name variable inside the loaded
       files. Paths ending with `some_path:variable_name` can override the
-      common_keyword. The entry_point_group must provided as well
-      common_keyword is not None.
+      attribute_name. The entry_point_group must provided as well
+      attribute_name is not None.
 
   Returns
   -------
   mod : :any:`module` or object
       A module representing the resolved context, after loading the provided
-      modules and resolving all variables. If common_keyword is given, the
-      object with the common_keyword name (or the name provided by user) is
+      modules and resolving all variables. If attribute_name is given, the
+      object with the attribute_name name (or the name provided by user) is
       returned instead of the module.
 
   Raises
   ------
   ImportError
-      If common_keyword is given but the object does not exist in the paths.
+      If attribute_name is given but the object does not exist in the paths.
   ValueError
-      If common_keyword is given but entry_point_group is not given.
+      If attribute_name is given but entry_point_group is not given.
 
   '''
-  if common_keyword and not entry_point_group:
+  if attribute_name and not entry_point_group:
     raise ValueError(
         "entry_point_group must be provided when using the "
-        "common_keyword parameter.")
+        "attribute_name parameter.")
 
   # resolve entry points to paths
   if entry_point_group is not None:
     paths, names, object_names = _resolve_entry_point_or_modules(
-        paths, entry_point_group, common_keyword)
+        paths, entry_point_group, attribute_name)
   else:
     names = len(paths) * ['user_config']
 
@@ -230,18 +230,18 @@ def load(paths, context=None, entry_point_group=None, common_keyword=None):
     LOADED_CONFIGS.append(mod)
     ctxt = _load_context(k, mod)
 
-  if not common_keyword:
+  if not attribute_name:
     return mod
 
   # We pick the last object_name here. Normally users should provide just one
-  # path when enabling the common_keyword parameter.
-  common_keyword = object_names[-1]
-  if not hasattr(mod, common_keyword):
+  # path when enabling the attribute_name parameter.
+  attribute_name = object_names[-1]
+  if not hasattr(mod, attribute_name):
     raise ImportError(
         "The desired variable '%s' does not exist in any of "
-        "your configuration files: %s" % (common_keyword, ', '.join(paths)))
+        "your configuration files: %s" % (attribute_name, ', '.join(paths)))
 
-  return getattr(mod, common_keyword)
+  return getattr(mod, attribute_name)
 
 
 def mod_to_context(mod):
