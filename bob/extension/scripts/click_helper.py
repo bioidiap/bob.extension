@@ -3,6 +3,7 @@ from ..config import load, mod_to_context, resource_keys
 import time
 import click
 import logging
+import traceback
 
 # This needs to be bob so that logger is configured for all bob packages.
 logger = logging.getLogger('bob')
@@ -394,5 +395,9 @@ def assert_click_runner_result(result, exit_code=0):
   """Helper for asserting click runner results"""
   m = ("Click command exited with code `{}' and exception:\n{}"
        "\nThe output was:\n{}")
-  m = m.format(result.exit_code, result.exception, result.output)
+  m = m.format(
+      result.exit_code, ''.join(traceback.format_exception(*result.exc_info)),
+      result.output)
   assert result.exit_code == exit_code, m
+  if exit_code == 0:
+    assert not result.exception, m
