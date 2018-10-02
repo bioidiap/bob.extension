@@ -37,6 +37,8 @@ test:
     - bob --help
     - bob config -h
     - bob config --help
+    # fix for the CONDA_BUILD_SYSROOT variable missing at test time
+    - export CONDA_BUILD_SYSROOT={{ CONDA_BUILD_SYSROOT }}  # [osx]
     - nosetests --with-coverage --cover-package={{ name }} -sv {{ name }} --exclude=test_extensions
     - sphinx-build -aEW {{ project_dir }}/doc {{ project_dir }}/sphinx
     - sphinx-build -aEb doctest {{ project_dir }}/doc sphinx
