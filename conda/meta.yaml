@@ -37,7 +37,8 @@ test:
     - bob --help
     - bob config -h
     - bob config --help
-    - nosetests --with-coverage --cover-package={{ name }} -sv {{ name }} --exclude=test_extensions
+    - export CONDA_BUILD_SYSROOT=/opt/MacOSX10.9.sdk
+    - nosetests --with-coverage --cover-package={{ name }} -sv bob.extension.test_cmake:test_library
     - sphinx-build -aEW {{ project_dir }}/doc {{ project_dir }}/sphinx
     - sphinx-build -aEb doctest {{ project_dir }}/doc sphinx
     - conda inspect linkages -p $PREFIX {{ name }}  # [not win]
