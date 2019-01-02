@@ -397,14 +397,20 @@ class Extension(DistutilsExtension):
     # Mixing
     parameters = {
         'define_macros': generate_self_macros(name, version) + bob_macros,
-        'extra_compile_args': ['-std=c++0x'], #synonym for c++11?
+        'extra_compile_args': os.environ.get('CXXFLAGS', '').split(),
         'extra_link_args': [],
         'library_dirs': [],
         'libraries': bob_libraries,
         }
 
-    # Compilation options
+    # Compilation options for macOS builds
     if platform.system() == 'Darwin':
+
+      sdkroot = os.environ.get('SDKROOT')
+      if sdkroot is not None and sdkroot:
+        parameters['extra_compile_args'] = ['-isysroot', sdkroot] + \
+            parameters['extra_compile_args']
+
       parameters['extra_compile_args'] += ['-Wno-#warnings']
 
     user_includes = kwargs.get('include_dirs', [])
