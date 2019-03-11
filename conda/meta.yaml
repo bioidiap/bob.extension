@@ -22,11 +22,13 @@ requirements:
   host:
     - python {{ python }}
     - setuptools {{ setuptools }}
+    - click {{ click }}
+    - click-plugins {{ click_plugins }}
   run:
     - python
     - setuptools
-    - click
-    - click-plugins
+    - {{ pin_compatible('click') }}
+    - {{ pin_compatible('click-plugins') }}
 
 test:
   imports:
