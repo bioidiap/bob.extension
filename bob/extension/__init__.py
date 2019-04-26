@@ -406,9 +406,31 @@ class Extension(DistutilsExtension):
     # Compilation options for macOS builds
     if platform.system() == 'Darwin':
 
+      target = os.environ.get('MACOSX_DEPLOYMENT_TARGET')
+      if target is None:
+        logger.warn('${MACOSX_DEPLOYMENT_TARGET} environment variable is ' \
+            '**NOT** set - assuming minimum deployment target of 10.9. ' \
+            'To avoid this warning, set MACOSX_DEPLOYMENT_TARGET before ' \
+            'trying to build C/C++ extensions')
+        target = os.environ.setdefault('MACOSX_DEPLOYMENT_TARGET', '10.9')
+
+      sdkroot = None
+
       sdkroot = os.environ.get('SDKROOT')
-      if sdkroot is not None and sdkroot:
-        parameters['extra_compile_args'] = ['-isysroot', sdkroot] + \
+      if sdkroot is None:
+        logger.warn('${SDKROOT} environment variable is **NOT** set - ' \
+            'Trying to find an SDK for %s on stock locations...', target)
+        candidates = ['/opt/MacOSX%s.sdk' % target,
+            '/Library/Developer/CommandLineTools/SDKs/MacOSX%s.sdk' % target]
+        for k in candidates:
+          if os.path.exists(k):
+            logger.warn('Using macOS SDK at %s' % k)
+            sdkroot = os.environ.setdefault('SDKROOT', k)
+
+      if sdkroot is not None and sdkroot and os.path.exists(sdkroot):
+        parameters['extra_compile_args'] = \
+            ['-mmacosx-version-min=%s' % target] + \
+            ['-isysroot', sdkroot] + \
             parameters['extra_compile_args']
 
       parameters['extra_compile_args'] += ['-Wno-#warnings']
