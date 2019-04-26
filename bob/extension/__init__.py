@@ -36,6 +36,11 @@ from .rc_config import _loadrc
 
 __version__ = pkg_resources.require(__name__)[0].version
 
+# Loads the rc user preferences
+rc = _loadrc()
+"""The content of the global configuration file loaded as a dictionary.
+The value for any non-existing key is ``None``."""
+
 def check_packages(packages):
   """Checks if the requirements for the given packages are satisfied.
 
@@ -406,12 +411,45 @@ class Extension(DistutilsExtension):
     # Compilation options for macOS builds
     if platform.system() == 'Darwin':
 
-      sdkroot = os.environ.get('SDKROOT')
-      if sdkroot is not None and sdkroot:
-        parameters['extra_compile_args'] = ['-isysroot', sdkroot] + \
-            parameters['extra_compile_args']
+      target = os.environ.get('MACOSX_DEPLOYMENT_TARGET')
+      if target is None:  #not set on the environment, try resource
+        target = rc['bob.extension.macosx_deployment_target']
+      if target is None or not target:
+        raise EnvironmentError('${MACOSX_DEPLOYMENT_TARGET} environment ' \
+            'variable is **NOT** set - To avoid this error, either set ' \
+            '${MACOSX_DEPLOYMENT_TARGET} or Bob\'s resource ' \
+            '"bob.extension.macosx_deployment_target" to a suitable ' \
+            'value (e.g. ' \
+            '"bob config set bob.extension.macosx_deployment_target 10.9") ' \
+            'before trying to build C/C++ extensions')
+      os.environ.setdefault('MACOSX_DEPLOYMENT_TARGET', target)
 
-      parameters['extra_compile_args'] += ['-Wno-#warnings']
+      sdkroot = os.environ.get('SDKROOT', os.environ.get('CONDA_BUILD_SYSROOT'))
+      if sdkroot is None:  #not set on the environment, try resource
+        sdkroot = rc['bob.extension.macosx_sdkroot']
+      if sdkroot is None or not sdkroot:
+        raise EnvironmentError('${SDKROOT} environment variable is **NOT** ' \
+            'set - To avoid this error, either set ${SDKROOT} or Bob\'s ' \
+            'resource "bob.extension.macosx_sdkroot" to a suitable value ' \
+            '(e.g. "bob config ' \
+            'set bob.extension.macosx_sdkroot /opt/MacOSX10.9.sdk")' \
+            'before trying to build C/C++ extensions')
+
+      # test for the compatibility between deployment target and sdk root
+      sdkversion = os.path.basename(sdkroot)[6:-4]
+      if sdkversion != target:
+        logger.warn('There is an inconsistence between the value ' \
+            'set for ${MACOSX_DEPLOYMENT_TARGET} (%s) and ' \
+            '${SDKROOT}/${CONDA_BUILD_SYSROOT} (%s) - Fix it by properly ' \
+            'setting up these environment variables via Bob\'s ' \
+            'configuration (refer to bob.extension\'s user guide for ' \
+            'detailed instructions)', target, sdkroot)
+
+      os.environ.setdefault('SDKROOT', sdkroot)
+
+      parameters['extra_compile_args'] = \
+          ['-mmacosx-version-min=%s' % target] + ['-isysroot', sdkroot] + \
+          parameters['extra_compile_args'] + ['-Wno-#warnings']
 
     user_includes = kwargs.get('include_dirs', [])
     self.pkg_includes = []
@@ -829,11 +867,6 @@ def get_config(package=__name__, externals=None, api_version=None):
       retval += "  - %s: %s (%s)\n" % (deps_dict[k].key, deps_dict[k].version, deps_dict[k].location)
 
   return retval.strip()
-
-# Loads the rc user preferences
-rc = _loadrc()
-"""The content of the global configuration file loaded as a dictionary.
-The value for any non-existing key is ``None``."""
 
 # gets sphinx autodoc done right - don't remove it
 __all__ = [_ for _ in dir() if not _.startswith('_')]
