@@ -431,6 +431,17 @@ class Extension(DistutilsExtension):
             'resource "bob.extension.macosx_sdkroot" to a suitable value ' \
             '(e.g. "/opt/MacOSX10.9.sdk") before trying to build C/C++ ' \
             'extensions')
+
+      # test for the compatibility between deployment target and sdk root
+      sdkversion = os.path.basename(sdkroot)[6:-4]
+      if sdkversion != target:
+        raise EnvironmentError('There is an inconsistence between the value ' \
+            'set for ${MACOSX_DEPLOYMENT_TARGET} (%s) and ' \
+            '${SDKROOT}/${CONDA_BUILD_SYSROOT} (%s) - Fix it by properly ' \
+            'setting up these environment variables via Bob\'s ' \
+            'configuration (refer to bob.extension\'s user guide for ' \
+            'detailed instructions)' % (target, sdkroot))
+
       os.environ.setdefault('SDKROOT', sdkroot)
 
       parameters['extra_compile_args'] = \
