@@ -422,7 +422,7 @@ class Extension(DistutilsExtension):
             'value (e.g. "10.9") before trying to build C/C++ extensions')
       os.environ.setdefault('MACOSX_DEPLOYMENT_TARGET', target)
 
-      sdkroot = os.environ.get('SDKROOT')
+      sdkroot = os.environ.get('SDKROOT', os.environ.get('CONDA_BUILD_SYSROOT'))
       if sdkroot is None:  #not set on the environment, try resource
         sdkroot = rc.get('bob.extension.macosx_sdkroot')
       if sdkroot is None or not sdkroot:
