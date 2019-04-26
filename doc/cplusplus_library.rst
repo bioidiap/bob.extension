@@ -6,9 +6,12 @@ C/C++ libraries in your package
 
 Typically, |project|'s core packages include both a pure C++ library as well as Python bindings for the C++ code.
 
-If you want to provide a library with pure C++ code in your package as well, you can use the :py:class:`bob.extension.Library` class.
-It will automatically compile your C/C++ code using `CMake <http://www.cmake.org>`_ into a shared library that you can link to your own C/C++-Python bindings, 
-as well as in the C++ code of other C++/Python packages. Again, a complete example can be downloaded via:
+If you want to provide a library with pure C++ code in your package as well,
+you can use the :py:class:`bob.extension.Library` class.  It will automatically
+compile your C/C++ code using `CMake <http://www.cmake.org>`_ into a shared
+library that you can link to your own C/C++-Python bindings, as well as in the
+C++ code of other C++/Python packages. Again, a complete example can be
+downloaded via:
 
 .. code-block:: sh
 
@@ -63,7 +66,7 @@ If you would like to generate a Library out of your C++ code, simply add it in t
     ...
   )
 
-  
+
 
 Again, we use the overloaded library class
 :py:class:`bob.blitz.extension.Library` instead of the
@@ -96,7 +99,7 @@ No worries, if the library is not used in the extension, the linker should be ab
 
 .. note::
    You can also export a library without bindings, for it to be used in other C++/Python packages.
-   
+
 
 ---------------------
 Building your package
@@ -126,4 +129,7 @@ Again, after compilation this directory can be safely removed.
 Another environment variable enables parallel compilation of C or C++ code.
 Use ``BOB_BUILD_PARALLEL=X`` (where ``X`` is the number of parallel processes you want) to enable parallel building.
 
-
+.. note::
+   For macOS-based builds, you may need to setup additional environment
+   variables **before** successfully building libraries.  Refer to the section
+   :ref:`extension-c++` for details.

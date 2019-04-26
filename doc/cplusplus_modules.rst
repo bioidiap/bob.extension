@@ -26,7 +26,7 @@ You can check it out by:
 Setting up your package
 -----------------------
 
-Typically, Python extensions written in C/C++ for Bob should use a set of standard APIs allowing C++ Blitz++ Arrays to be transparently converted to Python NumPy Arrays. 
+Typically, Python extensions written in C/C++ for Bob should use a set of standard APIs allowing C++ Blitz++ Arrays to be transparently converted to Python NumPy Arrays.
 The build of your package will therefore depend on, at least, two packages: (1) bob.extension (this package): will provide build instructions and resources for defining and building your extension (2) bob.blitz: will provide a bridge between pure C++ code, depending on Blitz++ Arrays and NumPy arrays.
 To be able to import ``bob.extension`` and ``bob.blitz`` in the setup.py, we need to include some code:
 
@@ -46,7 +46,7 @@ In our example, we only depend on ``bob.blitz``, and we can leave the list empty
 
 .. warning::
 
-   ``bob.blitz`` is required in all C++/Python packages since it contains all the mechanisms 
+   ``bob.blitz`` is required in all C++/Python packages since it contains all the mechanisms
    to deal with arrays amongst other things.
 
 As the second step, we need to add some lines in the header of the file to tell the ``setuptools`` system to compile our library with our ``Extension`` class:
@@ -122,7 +122,7 @@ Basically, there are two C++ files for our extension.
 In ``bob/example/extension/main.cpp``, we define the Python bindings to that function.
 Finally, the function ``reverse`` from the module ``_library`` is imported into our module in the ``bob/example/extension/__init__.py`` file.
 
-.. 
+..
   including the creation of a complete Python module called ``_library``.
   Additionally, we give a short example of how to use our documentation classes provided in this module (see below for more details).
 
@@ -134,7 +134,7 @@ Finally, the function ``reverse`` from the module ``_library`` is imported into 
 Building your package
 ---------------------
 
-To compile your C++ Python bindings and the corresponding  C++ implementation, 
+To compile your C++ Python bindings and the corresponding  C++ implementation,
 just do:
 
 .. code-block:: sh
@@ -145,6 +145,84 @@ just do:
 .. note::
    By default, we compile the source code (of this and **all dependent packages**, both the ones installed as ``eggs``, and the ones developed using ``mr.developer``) in debug mode.
    If you want to change that, switch the according flag in the ``buildout.cfg`` to ``debug = False``, and the compilation will be done with optimization flags and C++ exception handling enabled.
+
+.. note::
+   For macOS-based builds, one also needs to ensure the environment variables
+   MACOSX_DEPLOYMENT_TARGET and SDKROOT are properly set.  This is
+   automatically handled for conda-build based runs.  If you are using
+   buildout or any other setuptools-based system (such as pip installs) to
+   build your package, you should ensure that is the case with one of these 3
+   methods (more to least recommended):
+
+   1. You set the RC variables (see: :ref:`bob.extension.rc`)
+      `bob.extension.macosx_deployment_target` and
+      `bob.extension.macosx_sdkroot` to suitable values.  Example:
+
+      .. code-block:: sh
+
+         $ bob config get bob.extension.macosx_deployment_target
+         Error: The requested key `bob.extension.macosx_deployment_target` does not exist
+         $ bob config set bob.extension.macosx_deployment_target "10.9"
+
+         $ bob config get bob.extension.macosx_sdkroot
+         Error: The requested key `bob.extension.macosx_sdkroot` does not exist
+         $ bob config set bob.extension.macosx_sdkroot "/opt/MacOSX10.9.sdk"
+
+      With this method you set the default for your particular machine.  It is
+      the recommended way to set up such variables as those settings do not
+      affect builds in other machines and are preserved across package builds,
+      guaranteeing uniformity.
+
+   2. You set buildout environment variables MACOSX_DEPLOYMENT_TARGET and
+      SDKROOT directly on your buildout configuration file.  Example:
+
+      .. code-block:: ini
+
+         [buildout]
+         parts = scripts
+         develop = .
+         eggs = <PACKAGE>
+         extensions = bob.buildout
+         newest = false
+         verbose = true
+         default = true
+
+         [environ]
+         MACOSX_DEPLOYMENT_TARGET = '10.9'
+         SDKROOT = '/opt/MacOSX10.9.sdk'
+
+      Please refer to bob.buildout's user guide for more details.
+
+      With this method you affect **only** the current package and risk not
+      having uniform builds across different packages.  You also run on the
+      risk to commit/push changes back to the original package, which may
+      affect builds in other machines.
+
+   3. You set the environment variables directly on the current environment.
+      Example:
+
+      .. code-block:: sh
+
+         $ export MACOSX_DEPLOYMENT_TARGET="10.9"
+         $ export SDKROOT="/opt/MacOSX10.9.sdk"
+
+      Note that this technique is the least ephemeral from all available
+      options.  As soon as you leave the current environment, the variables
+      will not be available anymore.
+
+   **Precedence**: Values set on the environment have precedence over values
+   set on your Bob RC configuration.  Values setup on your buildout
+   configuration file override the environment variables.
+
+   **Compatibility**: We recommend you check our stock
+   `conda_build_config.yaml` for ensuring cross-package compatibility
+   (currently available through our admin package "bob.devtools").  At the time
+   of writing, we use a "10.9" macOS SDK for Bob packages.  That may change in
+   the future.
+
+   **Obtaining an SDK**: We recommend `Phracker macOS SDKs available on Github
+   <https://github.com/phracker/MacOSX-SDKs>`_.  Install the SDK on
+   ``/opt/MacOSX<version>.sdk``.
 
 
 Now, we can use the script ``./bin/bob_example_extension_reverse.py`` (that we have registered in the ``setup.py``) to reverse a list of floats, using the C++ implementation of the ``reverse`` function:
@@ -213,5 +291,3 @@ After including the above mentioned header, we also re-define the functions
 :c:func:`PyInt_Check`, :c:func:`PyInt_AS_LONG`, :c:func:`PyString_Check` and
 :c:func:`PyString_AS_STRING` (which doesn't exist in the bindings for Python3)
 so that they can be used in bindings for both Python2 and Python3.
-
-
