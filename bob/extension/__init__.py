@@ -36,6 +36,11 @@ from .rc_config import _loadrc
 
 __version__ = pkg_resources.require(__name__)[0].version
 
+# Loads the rc user preferences
+rc = _loadrc()
+"""The content of the global configuration file loaded as a dictionary.
+The value for any non-existing key is ``None``."""
+
 def check_packages(packages):
   """Checks if the requirements for the given packages are satisfied.
 
@@ -407,33 +412,30 @@ class Extension(DistutilsExtension):
     if platform.system() == 'Darwin':
 
       target = os.environ.get('MACOSX_DEPLOYMENT_TARGET')
-      if target is None:
-        logger.warn('${MACOSX_DEPLOYMENT_TARGET} environment variable is ' \
-            '**NOT** set - assuming minimum deployment target of 10.9. ' \
-            'To avoid this warning, set MACOSX_DEPLOYMENT_TARGET before ' \
-            'trying to build C/C++ extensions')
-        target = os.environ.setdefault('MACOSX_DEPLOYMENT_TARGET', '10.9')
-
-      sdkroot = None
+      if target is None:  #not set on the environment, try resource
+        target = rc.get('bob.extension.macosx_deployment_target')
+      if target is None or not target:
+        raise EnvironmentError('${MACOSX_DEPLOYMENT_TARGET} environment ' \
+            'variable is **NOT** set - To avoid this error, either set ' \
+            '${MACOSX_DEPLOYMENT_TARGET} or Bob\'s resource ' \
+            '"bob.extension.macosx_deployment_target" to a suitable ' \
+            'value (e.g. "10.9") before trying to build C/C++ extensions')
+      os.environ.setdefault('MACOSX_DEPLOYMENT_TARGET', target)
 
       sdkroot = os.environ.get('SDKROOT')
-      if sdkroot is None:
-        logger.warn('${SDKROOT} environment variable is **NOT** set - ' \
-            'Trying to find an SDK for %s on stock locations...', target)
-        candidates = ['/opt/MacOSX%s.sdk' % target,
-            '/Library/Developer/CommandLineTools/SDKs/MacOSX%s.sdk' % target]
-        for k in candidates:
-          if os.path.exists(k):
-            logger.warn('Using macOS SDK at %s' % k)
-            sdkroot = os.environ.setdefault('SDKROOT', k)
+      if sdkroot is None:  #not set on the environment, try resource
+        sdkroot = rc.get('bob.extension.macosx_sdkroot')
+      if sdkroot is None or not sdkroot:
+        raise EnvironmentError('${SDKROOT} environment variable is **NOT** ' \
+            'set - To avoid this error, either set ${SDKROOT} or Bob\'s ' \
+            'resource "bob.extension.macosx_sdkroot" to a suitable value ' \
+            '(e.g. "/opt/MacOSX10.9.sdk") before trying to build C/C++ ' \
+            'extensions')
+      os.environ.setdefault('SDKROOT', sdkroot)
 
-      if sdkroot is not None and sdkroot and os.path.exists(sdkroot):
-        parameters['extra_compile_args'] = \
-            ['-mmacosx-version-min=%s' % target] + \
-            ['-isysroot', sdkroot] + \
-            parameters['extra_compile_args']
-
-      parameters['extra_compile_args'] += ['-Wno-#warnings']
+      parameters['extra_compile_args'] = \
+          ['-mmacosx-version-min=%s' % target] + ['-isysroot', sdkroot] + \
+          parameters['extra_compile_args'] + ['-Wno-#warnings']
 
     user_includes = kwargs.get('include_dirs', [])
     self.pkg_includes = []
@@ -851,11 +853,6 @@ def get_config(package=__name__, externals=None, api_version=None):
       retval += "  - %s: %s (%s)\n" % (deps_dict[k].key, deps_dict[k].version, deps_dict[k].location)
 
   return retval.strip()
-
-# Loads the rc user preferences
-rc = _loadrc()
-"""The content of the global configuration file loaded as a dictionary.
-The value for any non-existing key is ``None``."""
 
 # gets sphinx autodoc done right - don't remove it
 __all__ = [_ for _ in dir() if not _.startswith('_')]
