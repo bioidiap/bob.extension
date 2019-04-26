@@ -413,34 +413,37 @@ class Extension(DistutilsExtension):
 
       target = os.environ.get('MACOSX_DEPLOYMENT_TARGET')
       if target is None:  #not set on the environment, try resource
-        target = rc.get('bob.extension.macosx_deployment_target')
+        target = rc['bob.extension.macosx_deployment_target']
       if target is None or not target:
         raise EnvironmentError('${MACOSX_DEPLOYMENT_TARGET} environment ' \
             'variable is **NOT** set - To avoid this error, either set ' \
             '${MACOSX_DEPLOYMENT_TARGET} or Bob\'s resource ' \
             '"bob.extension.macosx_deployment_target" to a suitable ' \
-            'value (e.g. "10.9") before trying to build C/C++ extensions')
+            'value (e.g. ' \
+            '"bob config set bob.extension.macosx_deployment_target 10.9") ' \
+            'before trying to build C/C++ extensions')
       os.environ.setdefault('MACOSX_DEPLOYMENT_TARGET', target)
 
       sdkroot = os.environ.get('SDKROOT', os.environ.get('CONDA_BUILD_SYSROOT'))
       if sdkroot is None:  #not set on the environment, try resource
-        sdkroot = rc.get('bob.extension.macosx_sdkroot')
+        sdkroot = rc['bob.extension.macosx_sdkroot']
       if sdkroot is None or not sdkroot:
         raise EnvironmentError('${SDKROOT} environment variable is **NOT** ' \
             'set - To avoid this error, either set ${SDKROOT} or Bob\'s ' \
             'resource "bob.extension.macosx_sdkroot" to a suitable value ' \
-            '(e.g. "/opt/MacOSX10.9.sdk") before trying to build C/C++ ' \
-            'extensions')
+            '(e.g. "bob config ' \
+            'set bob.extension.macosx_sdkroot /opt/MacOSX10.9.sdk")' \
+            'before trying to build C/C++ extensions')
 
       # test for the compatibility between deployment target and sdk root
       sdkversion = os.path.basename(sdkroot)[6:-4]
       if sdkversion != target:
-        raise EnvironmentError('There is an inconsistence between the value ' \
+        logger.warn('There is an inconsistence between the value ' \
             'set for ${MACOSX_DEPLOYMENT_TARGET} (%s) and ' \
             '${SDKROOT}/${CONDA_BUILD_SYSROOT} (%s) - Fix it by properly ' \
             'setting up these environment variables via Bob\'s ' \
             'configuration (refer to bob.extension\'s user guide for ' \
-            'detailed instructions)' % (target, sdkroot))
+            'detailed instructions)', target, sdkroot)
 
       os.environ.setdefault('SDKROOT', sdkroot)
 

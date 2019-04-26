@@ -151,7 +151,7 @@ just do:
    MACOSX_DEPLOYMENT_TARGET and SDKROOT are properly set.  This is
    automatically handled for conda-build based runs.  If you are using
    buildout or any other setuptools-based system (such as pip installs) to
-   build your package, you should ensure that is the case with one of these 3
+   build your package, you should ensure that is the case with one of these 2
    methods (more to least recommended):
 
    1. You set the RC variables (see: :ref:`bob.extension.rc`)
@@ -173,32 +173,7 @@ just do:
       affect builds in other machines and are preserved across package builds,
       guaranteeing uniformity.
 
-   2. You set buildout environment variables MACOSX_DEPLOYMENT_TARGET and
-      SDKROOT directly on your buildout configuration file.  Example:
-
-      .. code-block:: ini
-
-         [buildout]
-         parts = scripts
-         develop = .
-         eggs = <PACKAGE>
-         extensions = bob.buildout
-         newest = false
-         verbose = true
-         default = true
-
-         [environ]
-         MACOSX_DEPLOYMENT_TARGET = '10.9'
-         SDKROOT = '/opt/MacOSX10.9.sdk'
-
-      Please refer to bob.buildout's user guide for more details.
-
-      With this method you affect **only** the current package and risk not
-      having uniform builds across different packages.  You also run on the
-      risk to commit/push changes back to the original package, which may
-      affect builds in other machines.
-
-   3. You set the environment variables directly on the current environment.
+   2. You set the environment variables directly on the current environment.
       Example:
 
       .. code-block:: sh
@@ -211,8 +186,7 @@ just do:
       will not be available anymore.
 
    **Precedence**: Values set on the environment have precedence over values
-   set on your Bob RC configuration.  Values setup on your buildout
-   configuration file override the environment variables.
+   set on your Bob RC configuration.
 
    **Compatibility**: We recommend you check our stock
    `conda_build_config.yaml` for ensuring cross-package compatibility
