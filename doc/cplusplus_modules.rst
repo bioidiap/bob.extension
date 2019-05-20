@@ -148,11 +148,11 @@ just do:
 
 .. note::
    For macOS-based builds, one also needs to ensure the environment variables
-   MACOSX_DEPLOYMENT_TARGET and SDKROOT are properly set.  This is
-   automatically handled for conda-build based runs.  If you are using
-   buildout or any other setuptools-based system (such as pip installs) to
-   build your package, you should ensure that is the case with one of these 2
-   methods (more to least recommended):
+   ``MACOSX_DEPLOYMENT_TARGET``, ``SDKROOT``, and ``CONDA_BUILD_SYSROOT`` are
+   properly set.  This is automatically handled for conda-build based runs.  If
+   you are using buildout or any other setuptools-based system (such as pip
+   installs) to build your package, you should ensure that is the case with one
+   of these 2 methods (more to least recommended):
 
    1. You set the RC variables (see: :ref:`bob.extension.rc`)
       `bob.extension.macosx_deployment_target` and
@@ -173,6 +173,14 @@ just do:
       affect builds in other machines and are preserved across package builds,
       guaranteeing uniformity.
 
+      Unfortunately, the variable `CONDA_BUILD_SYSROOT` must be set on the
+      environment (conda will preset it otherwise).  Change your login profile
+      shell or similar to add the following:
+
+      .. code-block:: sh
+
+         $ export CONDA_BUILD_SYSROOT="/opt/MacOSX10.9.sdk"
+
    2. You set the environment variables directly on the current environment.
       Example:
 
@@ -180,6 +188,7 @@ just do:
 
          $ export MACOSX_DEPLOYMENT_TARGET="10.9"
          $ export SDKROOT="/opt/MacOSX10.9.sdk"
+         $ export CONDA_BUILD_SYSROOT="${SDKROOT}"
 
       Note that this technique is the least ephemeral from all available
       options.  As soon as you leave the current environment, the variables
