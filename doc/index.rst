@@ -38,7 +38,6 @@ Documentation
    cplusplus_modules
    cplusplus_library
    documenting
-   additional
    rc
    framework
    py_api
