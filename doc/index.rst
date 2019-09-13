@@ -42,7 +42,6 @@ Documentation
    framework
    py_api
    cpp_api
-   pip
 
 Indices and tables
 ------------------
