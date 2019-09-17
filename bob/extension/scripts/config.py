@@ -1,7 +1,7 @@
 """The manager for bob's main configuration.
 """
 from .. import rc
-from ..rc_config import _saverc, _rc_to_str, _get_rc_path, _loadrc
+from ..rc_config import _saverc, _rc_to_str, _get_rc_path 
 from .click_helper import verbosity_option, AliasedGroup
 import logging
 import click
@@ -122,7 +122,8 @@ def unset(substr, contain=False):
                 del rc[key]
                 found = True
     _saverc(rc) 
-    if not found and not contain:
-      logger.error("The key starting with '{}' was not found in the rc file".format(substr))
-    if not found and contain:
-      logger.error("The key containing '{}' was not found in the rc file".format(substr))
+    if not found:
+        if not contain:
+            logger.error("The key starting with '{}' was not found in the rc file".format(substr))
+        else:
+            logger.error("The key containing '{}' was not found in the rc file".format(substr))
