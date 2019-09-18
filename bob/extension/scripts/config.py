@@ -133,13 +133,17 @@ def unset(substr, contain=False, force=False):
             logger.error("The key containing '{}' was not found in the rc file".format(substr))
    
         raise click.ClickException("Failed to change the configuration.")
-   
-    click.echo("Registered for deletion:")
-    for key in to_delete:
-      click.echo('- "{}" : "{}"'.format(key, rc[key]))
-    delete = click.confirm("Are you sure you want to delete all this ?")
-    if delete:
+  
+    if force:
         for key in to_delete:
             del rc[key]
+    else:
+        click.echo("Registered for deletion:")
+        for key in to_delete:
+            click.echo('- "{}" : "{}"'.format(key, rc[key]))
+        delete = click.confirm("Are you sure you want to delete all this ?")
+        if delete:
+            for key in to_delete:
+                del rc[key]
 
     _saverc(rc) 
