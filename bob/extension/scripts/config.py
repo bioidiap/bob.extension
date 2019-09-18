@@ -93,7 +93,8 @@ def set(key, value):
 @config.command()
 @click.argument('substr')
 @click.option('-c', '--contain',  is_flag=True, default=False, type=click.BOOL, show_default=True)
-def unset(substr, contain=False):
+@click.option('-f', '--force',  is_flag=True, default=False, type=click.BOOL, show_default=True)
+def unset(substr, contain=False, force=False):
     """Clear all variables starting (containing) with substring.
 
     Clear all the variables that starts with the provided substring.
@@ -111,19 +112,38 @@ def unset(substr, contain=False):
     ----------
     contain : bool
         If set, check also for keys containing substring
+    force : bool
+        If set, unset values without confirmation
     """
     found = False
+    to_delete = []
     for key in list(rc.keys()):
         if key.startswith(substr):
             found = True
-            del rc[key]
+            to_delete.append(key)
         if contain:
             if substr in key:
-                del rc[key]
+                to_delete.append(key)
                 found = True
-    _saverc(rc) 
+   
     if not found:
         if not contain:
             logger.error("The key starting with '{}' was not found in the rc file".format(substr))
         else:
             logger.error("The key containing '{}' was not found in the rc file".format(substr))
+   
+        raise click.ClickException("Failed to change the configuration.")
+  
+    if force:
+        for key in to_delete:
+            del rc[key]
+    else:
+        click.echo("Registered for deletion:")
+        for key in to_delete:
+            click.echo('- "{}" : "{}"'.format(key, rc[key]))
+        delete = click.confirm("Are you sure you want to delete all this ?")
+        if delete:
+            for key in to_delete:
+                del rc[key]
+
+    _saverc(rc) 
