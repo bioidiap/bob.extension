@@ -1,7 +1,7 @@
 """The manager for bob's main configuration.
 """
 from .. import rc
-from ..rc_config import _saverc, _rc_to_str, _get_rc_path
+from ..rc_config import _saverc, _rc_to_str, _get_rc_path 
 from .click_helper import verbosity_option, AliasedGroup
 import logging
 import click
@@ -89,3 +89,41 @@ def set(key, value):
     except Exception:
         logger.error("Could not configure the rc file", exc_info=True)
         raise click.ClickException("Failed to change the configuration.")
+
+@config.command()
+@click.argument('substr')
+@click.option('-c', '--contain',  is_flag=True, default=False, type=click.BOOL, show_default=True)
+def unset(substr, contain=False):
+    """Clear all variables starting (containing) with substring.
+
+    Clear all the variables that starts with the provided substring.
+    Each key/value pair for which the key starts with substring will be
+    removed from bob's global configuration file.
+
+    \b
+    Arguments
+    ---------
+    substring : str
+        The starting substring of one or several key(s)
+    
+    \b
+    Parameters
+    ----------
+    contain : bool
+        If set, check also for keys containing substring
+    """
+    found = False
+    for key in list(rc.keys()):
+        if key.startswith(substr):
+            found = True
+            del rc[key]
+        if contain:
+            if substr in key:
+                del rc[key]
+                found = True
+    _saverc(rc) 
+    if not found:
+        if not contain:
+            logger.error("The key starting with '{}' was not found in the rc file".format(substr))
+        else:
+            logger.error("The key containing '{}' was not found in the rc file".format(substr))

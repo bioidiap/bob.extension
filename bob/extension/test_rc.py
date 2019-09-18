@@ -68,3 +68,23 @@ def test_bob_config():
 }
 '''
     assert expected_output == result.output, result.output
+  
+    # test config unset (with starting substring)
+    result = runner.invoke(main_cli, ['config', 'unset', 'bob.db.atnt'])
+    result = runner.invoke(main_cli, ['config', 'get', 'bob.db.atnt'])
+    assert_click_runner_result(result, 1)
+
+    # test config unset (with substring contained)
+    # reset the key / value pair 
+    result = runner.invoke(
+        main_cli, [
+            'config', 'set', 'bob.db.atnt.directory',
+            '/home/bob/databases/orl_faces'
+        ],
+        env={
+            ENVNAME: bobrcfile
+        })
+    result = runner.invoke(main_cli, ['config', 'unset', '--contain', 'atnt'])
+    result = runner.invoke(main_cli, ['config', 'get', 'bob.db.atnt'])
+    assert_click_runner_result(result, 1)
+
