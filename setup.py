@@ -27,7 +27,6 @@ setup(
     entry_points={
         'console_scripts': [
             'bob = bob.extension.scripts:main_cli',
-            'bob_dependecy_graph.py = bob.extension.scripts:dependency_graph',
         ],
         'bob.cli': [
             'config = bob.extension.scripts.config:config',
