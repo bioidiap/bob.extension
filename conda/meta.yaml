@@ -6,8 +6,6 @@ package:
   version: {{ environ.get('BOB_PACKAGE_VERSION', '0.0.1') }}
 
 build:
-  entry_points:
-    - bob_dependecy_graph.py = bob.extension.scripts:dependency_graph
   number: {{ environ.get('BOB_BUILD_NUMBER', 0) }}
   run_exports:
     - {{ pin_subpackage(name) }}
@@ -34,7 +32,6 @@ test:
   imports:
     - {{ name }}
   commands:
-    - bob_dependecy_graph.py --help
     - bob -h
     - bob --help
     - bob config -h
