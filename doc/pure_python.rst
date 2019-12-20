@@ -24,7 +24,7 @@ existing one. The guide heavily relies on the use of Python `setuptools`_ and
   You should also go through the `new package instructions`_ page when creating a new
   package. It is a step-by-step guide on how to setup your package, and in particular
   contains various templates that you must use. Among other stuff, you will find
-  templates for ``README.rst``, ``setup.py``, ``buildout.cfg`` files, 
+  templates for ``README.rst``, ``setup.py``, ``buildout.cfg`` files,
   for continuous integration and for the conda recipe of your package.
 
 Anatomy of a package
@@ -135,7 +135,7 @@ To be able to use the package, we first need to build and install it locally.
 This is explained in detail in :ref:`bob.extension.build_locally`.
 The buildout configuration file of the package looks like:
 
-.. code-block:: guess
+.. code-block:: cfg
 
    [buildout]
    parts = scripts
