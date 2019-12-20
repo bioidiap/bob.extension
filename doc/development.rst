@@ -44,7 +44,7 @@ locally:
     $ cd awesome-project
     $ vi buildout.cfg
 
-.. code-block:: guess
+.. code-block:: cfg
 
     [buildout]
     parts = scripts
@@ -236,7 +236,7 @@ from source:
 Create a file named ``buildout.cfg`` in the ``awesome-project`` folder with the
 following contents:
 
-.. code-block:: guess
+.. code-block:: cfg
 
     [buildout]
     parts = scripts
@@ -353,7 +353,7 @@ packages, which will be build in exactly the order that you specified. With
 this option, you can tell buildout particularly, in which directories it should
 look for some packages.
 
-.. code-block:: guess
+.. code-block:: cfg
 
     [buildout]
     parts = scripts
