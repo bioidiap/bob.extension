@@ -34,6 +34,7 @@ setup(
         # some test entry_points
         'bob.extension.test_config_load': [
             'basic_config = bob.extension.data.basic_config',
+            'verbose_config = bob.extension.data.verbose_config',
             'resource_config = bob.extension.data.resource_config',
             'subpackage_config = bob.extension.data.subpackage.config',
             'resource1 = bob.extension.data.resource_config2',
