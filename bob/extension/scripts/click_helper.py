@@ -177,20 +177,6 @@ def verbosity_option(**kwargs):
     return custom_verbosity_option
 
 
-def configs_argument(cmd, config_argument_name, entry_point_group):
-    """This a
-
-    Parameters
-    ----------
-    cmd : TYPE
-        Description
-    config_argument_name : TYPE
-        Description
-    entry_point_group : TYPE
-        Description
-    """
-
-
 class ConfigCommand(click.Command):
     """A click.Command that can take options both form command line options and
     configuration files. In order to use this class, you have to use the
@@ -204,14 +190,7 @@ class ConfigCommand(click.Command):
       The name of entry point that will be used to load the config files.
     """
 
-    def __init__(
-        self,
-        name,
-        *args,
-        help=None,
-        entry_point_group=None,
-        **kwargs
-    ):
+    def __init__(self, name, *args, help=None, entry_point_group=None, **kwargs):
         self.entry_point_group = entry_point_group
         configs_argument_name = "CONFIG"
         # Augment help for the config file argument
@@ -378,13 +357,13 @@ class ResourceOption(click.Option):
     def consume_value(self, ctx, opts):
         logger.debug("consuming resource option for option %s", self.name)
         value = opts.get(self.name)
-        # if value is not given from command line, lookup the environment variables
-        if value is None:
-            value = self.value_from_envvar(ctx)
-        # if not from environment variables, lookup the config files
+        # if value is not given from command line, lookup the config files
         if value is None:
             value = ctx.config_context.get(self.name)
-        # if not from config files, lookup the default value
+        # if not from config files, lookup the environment variables
+        if value is None:
+            value = self.value_from_envvar(ctx)
+        # if not from environment variables, lookup the default value
         if value is None:
             value = ctx.lookup_default(self.name)
         return value
