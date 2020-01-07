@@ -4,7 +4,7 @@ import pkg_resources
 from click.testing import CliRunner
 from bob.extension.scripts.click_helper import (
     verbosity_option, bool_option, list_float_option,
-    ConfigCommand, ResourceOption, AliasedGroup)
+    ConfigCommand, ResourceOption, AliasedGroup, assert_click_runner_result)
 
 
 def test_verbosity_option():
@@ -20,7 +20,7 @@ def test_verbosity_option():
 
         runner = CliRunner()
         result = runner.invoke(cli, OPTIONS, catch_exceptions=False)
-        assert result.exit_code == 0, (result.exit_code, result.output)
+        assert_click_runner_result(result)
 
 
 def test_bool_option():
@@ -43,10 +43,10 @@ def test_bool_option():
 
     runner = CliRunner()
     result = runner.invoke(cli)
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
 
     result = runner.invoke(cli2)
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
 
 
 def test_list_float_option():
@@ -61,7 +61,7 @@ def test_list_float_option():
 
     runner = CliRunner()
     result = runner.invoke(cli, ['-T', '1,2,3'])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
 
 
 def test_list_float_option_empty():
@@ -75,7 +75,7 @@ def test_list_float_option_empty():
 
     runner = CliRunner()
     result = runner.invoke(cli, ['-T', ' '])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
 
 
 def test_commands_with_config_1():
@@ -87,7 +87,7 @@ def test_commands_with_config_1():
 
     runner = CliRunner()
     result = runner.invoke(cli, ['basic_config'])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
 
 
 def test_commands_with_config_2():
@@ -102,23 +102,23 @@ def test_commands_with_config_2():
     runner = CliRunner()
 
     result = runner.invoke(cli, [])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
     assert result.output.strip() == '3', result.output
 
     result = runner.invoke(cli, ['basic_config'])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
     assert result.output.strip() == '1', result.output
 
     result = runner.invoke(cli, ['-a', 2])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
     assert result.output.strip() == '2', result.output
 
     result = runner.invoke(cli, ['-a', 3, 'basic_config'])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
     assert result.output.strip() == '3', result.output
 
     result = runner.invoke(cli, ['basic_config', '-a', 3])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
     assert result.output.strip() == '3', result.output
 
 
@@ -134,22 +134,22 @@ def test_commands_with_config_3():
     runner = CliRunner()
 
     result = runner.invoke(cli, [])
-    assert result.exit_code == 2, (result.exit_code, result.output)
+    assert_click_runner_result(result, exit_code=2)
 
     result = runner.invoke(cli, ['basic_config'])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
     assert result.output.strip() == '1', result.output
 
     result = runner.invoke(cli, ['-a', 2])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
     assert result.output.strip() == '2', result.output
 
     result = runner.invoke(cli, ['-a', 3, 'basic_config'])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
     assert result.output.strip() == '3', result.output
 
     result = runner.invoke(cli, ['basic_config', '-a', 3])
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
     assert result.output.strip() == '3', result.output
 
 
@@ -171,11 +171,11 @@ def test_prefix_aliasing():
     assert result.exit_code != 0, (result.exit_code, result.output)
 
     result = runner.invoke(cli, ['test'], catch_exceptions=False)
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
     assert 'OK' in result.output, (result.exit_code, result.output)
 
     result = runner.invoke(cli, ['test-a'], catch_exceptions=False)
-    assert result.exit_code == 0, (result.exit_code, result.output)
+    assert_click_runner_result(result)
     assert 'AAA' in result.output, (result.exit_code, result.output)
 
 
@@ -186,7 +186,7 @@ def _assert_config_dump(ref, ref_date):
     with open('TEST_CONF', 'r') as f, open(ref, 'r') as f2:
         text = f.read()
         ref_text = f2.read().replace(ref_date, today)
-        assert text == ref_text, '\n'.join([text, ref_text])
+        assert text == ref_text, '\n'.join([text, "########################\n"*2, ref_text])
 
 
 def test_config_dump():
@@ -197,7 +197,7 @@ def test_config_dump():
     @cli.command(cls=ConfigCommand, epilog='Examples!')
     @click.option('-t', '--test', required=True, default="/my/path/test.txt",
                   help="Path leading to test blablabla", cls=ResourceOption)
-    @verbosity_option()
+    @verbosity_option(cls=ResourceOption)
     def test(config, test, **kwargs):
         """Test command"""
         pass
@@ -207,7 +207,7 @@ def test_config_dump():
             cli, ['test', '-H', 'TEST_CONF'], catch_exceptions=False)
         ref = pkg_resources.resource_filename('bob.extension',
                                               'data/test_dump_config.py')
-        assert result.exit_code == 0, (result.exit_code, result.output)
+        assert_click_runner_result(result)
         _assert_config_dump(ref, '08/07/2018')
 
 
@@ -250,5 +250,19 @@ def test_config_dump2():
             cli, ['test', '-H', 'TEST_CONF'], catch_exceptions=False)
         ref = pkg_resources.resource_filename('bob.extension',
                                               'data/test_dump_config2.py')
-        assert result.exit_code == 0, (result.exit_code, result.output)
+        assert_click_runner_result(result)
         _assert_config_dump(ref, '08/07/2018')
+
+
+def test_config_command_with_callback_options():
+
+    @click.command(cls=ConfigCommand, entry_point_group='bob.extension.test_config_load')
+    @verbosity_option(cls=ResourceOption)
+    @click.pass_context
+    def cli(ctx, **kwargs):
+        verbose = ctx.meta['verbosity']
+        assert verbose == 2, verbose
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ['verbose_config'], catch_exceptions=False)
+    assert_click_runner_result(result)
