@@ -257,7 +257,7 @@ def test_config_dump2():
 def test_config_command_with_callback_options():
 
     @click.command(cls=ConfigCommand, entry_point_group='bob.extension.test_config_load')
-    @verbosity_option(cls=ResourceOption)
+    @verbosity_option(cls=ResourceOption, envvar='VERBOSE')
     @click.pass_context
     def cli(ctx, **kwargs):
         verbose = ctx.meta['verbosity']
@@ -265,4 +265,12 @@ def test_config_command_with_callback_options():
 
     runner = CliRunner()
     result = runner.invoke(cli, ['verbose_config'], catch_exceptions=False)
+    assert_click_runner_result(result)
+
+    runner = CliRunner(env=dict(VERBOSE='1'))
+    result = runner.invoke(cli, ['verbose_config'], catch_exceptions=False)
+    assert_click_runner_result(result)
+
+    runner = CliRunner(env=dict(VERBOSE='2'))
+    result = runner.invoke(cli, catch_exceptions=False)
     assert_click_runner_result(result)
