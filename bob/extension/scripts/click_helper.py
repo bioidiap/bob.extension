@@ -299,9 +299,21 @@ file.""".format(
 
 
 class ResourceOption(click.Option):
-    """A click.Option that is aware if the user actually provided this option
-    through command-line or it holds a default value. The option can also be a
-    resource that will be automatically loaded.
+    """A click.Option that automatically loads resources.
+    It uses :any:`load` to convert provided strings in the command line into Python
+    objects.
+    It also integrates with the ConfigCommand class.
+
+    You may use this class in three ways:
+
+    1. Using this class without using :any:`ConfigCommand` AND providing
+       `entry_point_group`.
+    2. Using this class with :any:`ConfigCommand` AND providing `entry_point_group`.
+    3. Using this class with :any:`ConfigCommand` AND without providing
+       `entry_point_group`.
+
+    Using this class without :any:`ConfigCommand` and without providing
+    `entry_point_group` does nothing and is not allowed.
 
     Attributes
     ----------
@@ -355,11 +367,25 @@ class ResourceOption(click.Option):
         )
 
     def consume_value(self, ctx, opts):
-        logger.debug("consuming resource option for option %s", self.name)
+        if (not hasattr(ctx, "config_context")) and self.entry_point_group is None:
+            raise TypeError(
+                "The ResourceOption class is not meant to be used this way. "
+                "Please see the docs of the class."
+            )
+        logger.debug("consuming resource option for %s", self.name)
         value = opts.get(self.name)
-        # if value is not given from command line, lookup the config files
+        # if value is not given from command line, lookup the config files given as
+        # arguments (not options).
         if value is None:
-            value = ctx.config_context.get(self.name)
+            # if this class is used with the ConfigCommand class. This is not always
+            # true.
+            if hasattr(ctx, "config_context"):
+                value = ctx.config_context.get(self.name)
+            else:
+                logger.debug(
+                    "config_context attribute not found in context. Did you mean to "
+                    "use the ConfigCommand class with this ResourceOption class?"
+                )
         # if not from config files, lookup the environment variables
         if value is None:
             value = self.value_from_envvar(ctx)
@@ -426,7 +452,7 @@ def log_parameters(logger_handle, ignore=tuple()):
         logger_handle.debug("%s: %s", k, v)
 
 
-def assert_click_runner_result(result, exit_code=0):
+def assert_click_runner_result(result, exit_code=0, exception_type=None):
     """Helper for asserting click runner results"""
     m = "Click command exited with code `{}' and exception:\n{}" "\nThe output was:\n{}"
     exception = (
@@ -438,3 +464,5 @@ def assert_click_runner_result(result, exit_code=0):
     assert result.exit_code == exit_code, m
     if exit_code == 0:
         assert not result.exception, m
+    if exception_type is not None:
+        assert isinstance(result.exception, exception_type), m

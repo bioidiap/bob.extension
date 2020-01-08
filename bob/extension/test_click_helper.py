@@ -274,3 +274,27 @@ def test_config_command_with_callback_options():
     runner = CliRunner(env=dict(VERBOSE='2'))
     result = runner.invoke(cli, catch_exceptions=False)
     assert_click_runner_result(result)
+
+def test_resource_option():
+    # tests of ResourceOption used with ConfigCommand are done in other tests.
+
+    # test usage without ConfigCommand and with entry_point_group
+    @click.command()
+    @click.option('-a', '--a', cls=ResourceOption, entry_point_group='bob.extension.test_config_load')
+    def cli(a):
+        assert a == 1, a
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ['-a', 'bob.extension.data.resource_config2'], catch_exceptions=False)
+    assert_click_runner_result(result)
+
+    # test usage without ConfigCommand and without entry_point_group
+    # should raise a TypeError
+    @click.command()
+    @click.option('-a', '--a', cls=ResourceOption)
+    def cli(a):
+        raise ValueError("Should not have reached here!")
+
+    runner = CliRunner()
+    result = runner.invoke(cli, ['-a', '1'], catch_exceptions=True)
+    assert_click_runner_result(result, exit_code=1, exception_type=TypeError)
