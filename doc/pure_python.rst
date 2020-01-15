@@ -135,7 +135,8 @@ To be able to use the package, we first need to build and install it locally.
 This is explained in detail in `bob development tools`_.
 The buildout configuration file of the package looks like:
 
-.. code-block:: cfg
+
+.. code-block:: ini
 
    [buildout]
    parts = scripts
