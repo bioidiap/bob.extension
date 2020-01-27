@@ -38,12 +38,10 @@ Documentation
    cplusplus_modules
    cplusplus_library
    documenting
-   additional
    rc
    framework
    py_api
    cpp_api
-   pip
 
 Indices and tables
 ------------------
