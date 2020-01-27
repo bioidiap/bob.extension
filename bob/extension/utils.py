@@ -509,6 +509,15 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
       _add_index('scipy', 'https://docs.scipy.org/doc/scipy/reference/')
 
 
+  def _add_click_index():
+    """Helper to add the click manual"""
+
+    import click
+    major = click.__version__.split('.')[0]
+    ver = major + '.x'
+    _add_index('click', 'https://click.palletsprojects.com/en/%s/' % ver)
+
+
   mapping = {}
 
   # add indexes for common packages used in Bob
@@ -523,7 +532,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   _add_index('scikit-learn', 'http://scikit-learn.org/stable/')
   _add_index('scikit-image', 'http://scikit-image.org/docs/dev/')
   _add_index('pillow', 'http://pillow.readthedocs.io/en/latest/')
-  _add_index('click', 'http://click.pocoo.org/')
+  _add_click_index()
   _add_index('torch', 'https://pytorch.org/docs/')
 
 
