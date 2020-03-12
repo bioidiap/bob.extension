@@ -483,14 +483,11 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     try:
       import numpy
       ver = numpy.version.version
-      if smaller_than(ver, '1.5.z'):
-        ver = '.'.join(ver.split('.')[:-1]) + '.x'
-      else:
-        ver = '.'.join(ver.split('.')[:-1]) + '.0'
-      _add_index('numpy', 'https://docs.scipy.org/doc/numpy-%s/' % ver)
+      ver = '.'.join(ver.split('.')[:-1])
+      _add_index('numpy', 'https://numpy.org/doc/%s/' % ver)
 
     except ImportError:
-      _add_index('numpy', 'https://docs.scipy.org/doc/numpy/')
+      _add_index('numpy', 'https://numpy.org/devdocs/')
 
 
   def _add_scipy_index():
