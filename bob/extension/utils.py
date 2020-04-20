@@ -529,6 +529,9 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   _add_index('scikit-learn', 'http://scikit-learn.org/stable/')
   _add_index('scikit-image', 'http://scikit-image.org/docs/dev/')
   _add_index('pillow', 'http://pillow.readthedocs.io/en/latest/')
+  _add_index('dask', 'https://docs.dask.org/en/latest/')
+  _add_index('dask-jobqueue', 'https://jobqueue.dask.org/en/latest/')
+  _add_index('distributed', 'https://distributed.dask.org/en/latest/')
   _add_click_index()
   _add_index('torch', 'https://pytorch.org/docs/')
 
