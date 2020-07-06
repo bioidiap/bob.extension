@@ -1,5 +1,8 @@
 """A script to help annotate databases.
 """
+# Avoid importing packages here! Importing packages here will slowdown your command
+# line's --help option and its auto-complete feature in terminal (if enabled). Instead,
+# put your imports inside the function.
 import logging
 import click
 from bob.extension.scripts.click_helper import (
@@ -8,16 +11,13 @@ from bob.extension.scripts.click_helper import (
 logger = logging.getLogger(__name__)
 
 
-ANNOTATE_EPILOG = '''\b
+@click.command(entry_point_group='bob.bio.config', cls=ConfigCommand,
+               epilog='''\b
 Examples:
 
   $ bob bio annotate -vvv -d <database> -a <annotator> -o /tmp/annotations
   $ jman submit --array 64 -- bob bio annotate ... --array 64
-'''
-
-
-@click.command(entry_point_group='bob.bio.config', cls=ConfigCommand,
-               epilog=ANNOTATE_EPILOG)
+''')
 @click.option('--database', '-d', required=True, cls=ResourceOption,
               entry_point_group='bob.bio.database',
               help='''The database that you want to annotate.''')
@@ -40,3 +40,8 @@ def annotate(database, annotator, output_dir, force, array, **kwargs):
     back using :any:`bob.db.base.read_annotation_file` (annotation_type='json')
     """
     log_parameters(logger)
+
+    # Add imports needed for your code here:
+    import numpy as np
+
+    np.zeros(10)

@@ -6,10 +6,6 @@ import logging
 import traceback
 
 logger = logging.getLogger(__name__)
-try:
-    basestring
-except NameError:
-    basestring = str
 
 
 def bool_option(name, short_name, desc, dflt=False, **kwargs):
@@ -179,7 +175,7 @@ def verbosity_option(**kwargs):
 
 class ConfigCommand(click.Command):
     """A click.Command that can take options both form command line options and
-    configuration files. In order to use this class, you have to use the
+    configuration files. In order to use this class, you **have to** use the
     :any:`ResourceOption` class also.
 
     Attributes
@@ -299,18 +295,30 @@ file.""".format(
 
 
 class ResourceOption(click.Option):
-    """A click.Option that automatically loads resources.
-    It uses :any:`load` to convert provided strings in the command line into Python
-    objects.
-    It also integrates with the ConfigCommand class.
+    """An extended click.Option that automatically loads resources from config
+    files.
+
+    This class comes with two different functionalities that are independent and
+    could be combined:
+
+    1. If used in commands that are inherited from :any:`ConfigCommand`, it will
+       lookup inside the config files (that are provided as argument to the
+       command) to resolve its value. Values given explicitly in the command
+       line take precedence.
+
+    2. If `entry_point_group` is provided, it will treat values given to it (by
+       any means) as resources to be loaded. Loading is done using :any:`load`.
+       See :ref:`bob.extension.config.resource` for more information. The final
+       value cannot be a string.
 
     You may use this class in three ways:
 
-    1. Using this class without using :any:`ConfigCommand` AND providing
-       `entry_point_group`.
-    2. Using this class with :any:`ConfigCommand` AND providing `entry_point_group`.
-    3. Using this class with :any:`ConfigCommand` AND without providing
-       `entry_point_group`.
+    1. Using this class (without using :any:`ConfigCommand`) AND (providing
+       `entry_point_group`).
+    2. Using this class (with :any:`ConfigCommand`) AND (providing
+       `entry_point_group`).
+    3. Using this class (with :any:`ConfigCommand`) AND (without providing
+       `entry_point_group`).
 
     Using this class without :any:`ConfigCommand` and without providing
     `entry_point_group` does nothing and is not allowed.
@@ -381,11 +389,7 @@ class ResourceOption(click.Option):
             # true.
             if hasattr(ctx, "config_context"):
                 value = ctx.config_context.get(self.name)
-            else:
-                logger.debug(
-                    "config_context attribute not found in context. Did you mean to "
-                    "use the ConfigCommand class with this ResourceOption class?"
-                )
+
         # if not from config files, lookup the environment variables
         if value is None:
             value = self.value_from_envvar(ctx)
@@ -399,12 +403,11 @@ class ResourceOption(click.Option):
 
         # if the value is a string and an entry_point_group is provided, load it
         if self.entry_point_group is not None:
-            attribute_name = self.entry_point_group.split(".")[-1]
-            while isinstance(value, basestring):
+            while isinstance(value, str):
                 value = load(
                     [value],
                     entry_point_group=self.entry_point_group,
-                    attribute_name=attribute_name,
+                    attribute_name=self.name,
                 )
         return value
 

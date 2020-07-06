@@ -17,7 +17,7 @@ Python-based Configuration System
 ---------------------------------
 
 This package also provides a configuration system that can be used by packages
-in the |project|-echosystem to load *run-time* configuration for applications
+in the |project|-ecosystem to load *run-time* configuration for applications
 (for package-level static variable configuration use :ref:`bob.extension.rc`).
 It can be used to accept complex configurations from users through
 command-line.
@@ -59,7 +59,7 @@ Then, the object ``configuration`` would look like this:
 
 .. doctest::
 
-   >>> print("a = %d\nb = %d"%(configuration.a, configuration.b))
+   >>> print(f"a = {configuration.a}\nb = {configuration.b}")
    a = 1
    b = 3
 
@@ -96,9 +96,10 @@ Then, one can chain-load them like this:
    >>> file1 = os.path.join(path, 'basic_config.py')
    >>> file2 = os.path.join(path, 'load_config.py')
    >>> configuration = load([file1, file2])
-   >>> print("a = %d \nb = %d"%(configuration.a, configuration.b)) # doctest: +NORMALIZE_WHITESPACE
+   >>> print(f"a = {configuration.a} \nb = {configuration.b} \nc = {configuration.c}") # doctest: +NORMALIZE_WHITESPACE
    a = 1
    b = 6
+   c = 4
 
 
 The user wanting to override the values needs to manage the overriding and the
@@ -123,6 +124,8 @@ to provide the group name of the entry points:
    b = 6
 
 
+.. _bob.extension.config.resource:
+
 Resource Loading
 ================
 
@@ -140,70 +143,13 @@ The loaded value can be either 1 or 2:
 .. doctest:: load_resource
 
    >>> group = 'bob.extension.test_config_load'  # the group name of entry points
-   >>> attribute_name = 'test_config_load'  # the common variable name
+   >>> attribute_name = 'a'  # the common variable name
    >>> value = load(['bob.extension.data.resource_config2'], entry_point_group=group, attribute_name=attribute_name)
    >>> value == 1
    True
+   >>> # attribute_name can be ovverriden using the `path:attribute_name` syntax
    >>> value = load(['bob.extension.data.resource_config2:b'], entry_point_group=group, attribute_name=attribute_name)
    >>> value == 2
-   True
-
-
-.. _bob.extension.processors:
-
-Stacked Processing
-------------------
-
-:any:`bob.extension.processors.SequentialProcessor` and
-:any:`bob.extension.processors.ParallelProcessor` are provided to help you
-build complex processing mechanisms. You can use these processors to apply a
-chain of processes on your data. For example,
-:any:`bob.extension.processors.SequentialProcessor` accepts a list of callables
-and applies them on the data one by one sequentially. :
-
-
-.. doctest::
-
-   >>> import numpy as np; from numpy import array
-   >>> from functools import partial
-   >>> from bob.extension.processors import SequentialProcessor
-   >>> raw_data = np.array([[1, 2, 3], [1, 2, 3]])
-   >>> seq_processor = SequentialProcessor(
-   ...     [np.cast['float64'], lambda x: x / 2, partial(np.mean, axis=1)])
-   >>> np.allclose(seq_processor(raw_data),
-   ...             array([ 1.,  1.]))
-   True
-   >>> np.all(seq_processor(raw_data) ==
-   ...        np.mean(np.cast['float64'](raw_data) / 2, axis=1))
-   True
-
-:any:`bob.extension.processors.ParallelProcessor` accepts a list of callables
-and applies each them on the data independently and returns all the results.
-For example:
-
-.. doctest::
-
-   >>> from bob.extension.processors import ParallelProcessor
-   >>> raw_data = np.array([[1, 2, 3], [1, 2, 3]])
-   >>> parallel_processor = ParallelProcessor(
-   ...     [np.cast['float64'], lambda x: x / 2.0])
-   >>> np.allclose(list(parallel_processor(raw_data)),
-   ...             [array([[ 1.,  2.,  3.],
-   ...                     [ 1.,  2.,  3.]]),
-   ...              array([[ 0.5,  1. ,  1.5],
-   ...                     [ 0.5,  1. ,  1.5]])])
-   True
-
-The data may be further processed using a
-:any:`bob.extension.processors.SequentialProcessor`:
-
-.. doctest::
-
-   >>> total_processor = SequentialProcessor(
-   ...     [parallel_processor, list, partial(np.concatenate, axis=1)])
-   >>> np.allclose(total_processor(raw_data),
-   ...             array([[ 1. ,  2. ,  3. ,  0.5,  1. ,  1.5],
-   ...                    [ 1. ,  2. ,  3. ,  0.5,  1. ,  1.5]]))
    True
 
 
@@ -228,11 +174,6 @@ commands by default::
       config  The manager for bob's global configuration.
       ...
 
-.. warning::
-
-   This feature is experimental and most probably will break compatibility.
-   If you are not willing to fix your code after changes are made here,
-   please do not use this feature.
 
 This command line is implemented using click_. You can extend the commands of
 this script through setuptools entry points (this is implemented using
@@ -243,15 +184,13 @@ independently; then, advertise it as a command under bob script using the
 .. note::
 
    If you are still not sure how this must be done, maybe you don't know how
-   to use click_ yet.
+   to use click_ and `click-plugins`_ yet.
 
-This feature is experimental and may change and break compatibility in future.
 For a best practice example, please look at how the ``bob config`` command is
 implemented:
 
 .. literalinclude:: ../bob/extension/scripts/config.py
-   :caption: "bob/extension/scripts/config.py" implementation of the ``bob
-       config`` command.
+   :caption: "bob/extension/scripts/config.py" implementation of the ``bob config`` command.
    :language: python
 
 
@@ -364,6 +303,64 @@ different mechanism. Normally to keep things simple, you would encourage users
 to just provide one or several configuration files as entry point names or as
 module names and maybe have them provide simple options like ``--verbose`` or
 ``--force`` through the command line options.
+
+
+.. _bob.extension.processors:
+
+Stacked Processing
+------------------
+
+:any:`bob.extension.processors.SequentialProcessor` and
+:any:`bob.extension.processors.ParallelProcessor` are provided to help you
+build complex processing mechanisms. You can use these processors to apply a
+chain of processes on your data. For example,
+:any:`bob.extension.processors.SequentialProcessor` accepts a list of callables
+and applies them on the data one by one sequentially. :
+
+
+.. doctest::
+
+   >>> import numpy as np; from numpy import array
+   >>> from functools import partial
+   >>> from bob.extension.processors import SequentialProcessor
+   >>> raw_data = np.array([[1, 2, 3], [1, 2, 3]])
+   >>> seq_processor = SequentialProcessor(
+   ...     [np.cast['float64'], lambda x: x / 2, partial(np.mean, axis=1)])
+   >>> np.allclose(seq_processor(raw_data),
+   ...             array([ 1.,  1.]))
+   True
+   >>> np.all(seq_processor(raw_data) ==
+   ...        np.mean(np.cast['float64'](raw_data) / 2, axis=1))
+   True
+
+:any:`bob.extension.processors.ParallelProcessor` accepts a list of callables
+and applies each them on the data independently and returns all the results.
+For example:
+
+.. doctest::
+
+   >>> from bob.extension.processors import ParallelProcessor
+   >>> raw_data = np.array([[1, 2, 3], [1, 2, 3]])
+   >>> parallel_processor = ParallelProcessor(
+   ...     [np.cast['float64'], lambda x: x / 2.0])
+   >>> np.allclose(list(parallel_processor(raw_data)),
+   ...             [array([[ 1.,  2.,  3.],
+   ...                     [ 1.,  2.,  3.]]),
+   ...              array([[ 0.5,  1. ,  1.5],
+   ...                     [ 0.5,  1. ,  1.5]])])
+   True
+
+The data may be further processed using a
+:any:`bob.extension.processors.SequentialProcessor`:
+
+.. doctest::
+
+   >>> total_processor = SequentialProcessor(
+   ...     [parallel_processor, list, partial(np.concatenate, axis=1)])
+   >>> np.allclose(total_processor(raw_data),
+   ...             array([[ 1. ,  2. ,  3. ,  0.5,  1. ,  1.5],
+   ...                    [ 1. ,  2. ,  3. ,  0.5,  1. ,  1.5]]))
+   True
 
 
 .. include:: links.rst
