@@ -533,7 +533,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   _add_index('dask-jobqueue', 'https://jobqueue.dask.org/en/latest/')
   _add_index('distributed', 'https://distributed.dask.org/en/latest/')
   _add_click_index()
-  _add_index('torch', 'https://pytorch.org/docs/')
+  _add_index('torch', 'https://pytorch.org/docs/stable/')
   _add_index('xarray', 'https://xarray.pydata.org/en/stable/')
 
 
