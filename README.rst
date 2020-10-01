@@ -3,10 +3,10 @@
 
 .. image:: https://img.shields.io/badge/docs-available-orange.svg
    :target: https://www.idiap.ch/software/bob/docs/bob/bob.extension/master/index.html
-.. image:: https://gitlab.idiap.ch/bob/bob.extension/badges/v5.0.1/pipeline.svg
-   :target: https://gitlab.idiap.ch/bob/bob.extension/commits/v5.0.1
-.. image:: https://gitlab.idiap.ch/bob/bob.extension/badges/v5.0.1/coverage.svg
-   :target: https://gitlab.idiap.ch/bob/bob.extension/commits/v5.0.1
+.. image:: https://gitlab.idiap.ch/bob/bob.extension/badges/master/pipeline.svg
+   :target: https://gitlab.idiap.ch/bob/bob.extension/commits/master
+.. image:: https://gitlab.idiap.ch/bob/bob.extension/badges/master/coverage.svg
+   :target: https://gitlab.idiap.ch/bob/bob.extension/commits/master
 .. image:: https://img.shields.io/badge/gitlab-project-0000c0.svg
    :target: https://gitlab.idiap.ch/bob/bob.extension
 
