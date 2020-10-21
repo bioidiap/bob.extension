@@ -41,7 +41,8 @@ def _load_context(path, mod):
   '''
 
   # executes the module code on the context of previously imported modules
-  exec(compile(open(path, "rb").read(), path, 'exec'), mod.__dict__)
+  with open(path, "rb") as f:
+    exec(compile(f.read(), path, 'exec'), mod.__dict__)
 
   return mod
 
