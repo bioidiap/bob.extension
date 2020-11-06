@@ -59,13 +59,6 @@ Configuration
     bob.extension.rc_config.RCFILENAME
     bob.extension.config.load
 
-Stacked Processors
-^^^^^^^^^^^^^^^^^^
-
-.. autosummary::
-    bob.extension.processors.SequentialProcessor
-    bob.extension.processors.ParallelProcessor
-
 Scripts
 ^^^^^^^
 
