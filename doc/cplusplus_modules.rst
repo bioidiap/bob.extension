@@ -245,12 +245,12 @@ Particularly, we provide three preprocessor directives:
 
    Starts a try-catch block to protect your bound function against exceptions of any kinds (which would lead to a Python interpreter crash otherwise).
 
-.. c:macro:: BOB_CATCH_FUNCTION(char* message, void* ret)
+.. c:macro:: BOB_CATCH_FUNCTION(message, ret)
 
    Catches C++ exceptions of any kind, adds the ``message`` in case an unknown exception is caught, and returns with the given error return (which is usually 0 for normal functions or -1 for constructors and setter functions).
    This macro should be used when binding a stand-alone function, for binding class member functions, please use :c:macro:`BOB_CATCH_MEMBER`.
 
-.. c:macro:: BOB_CATCH_MEMBER(char* message, void* ret)
+.. c:macro:: BOB_CATCH_MEMBER(message, ret)
 
    Catches C++ exceptions of any kind, adds the ``message`` in case an unknown exception is caught, and returns with the given error return (which is usually 0 for normal functions or -1 for constructors and setter functions).
    This macro should be used when binding a member function of a class, for binding stand-alone functions, please use :c:macro:`BOB_CATCH_FUNCTION`.
@@ -265,7 +265,7 @@ These preprocessor directives will catch any C++ exception that is raised inside
 
 Additionally, we added some preprocessor directives that help in the bindings:
 
-.. c:macro:: PyBob_NumberCheck(PyObject* o)
+.. c:macro:: PyBob_NumberCheck(o)
 
    Checks if the given object ``o`` is a number, i.e., an int, a long, a float
    or a complex.

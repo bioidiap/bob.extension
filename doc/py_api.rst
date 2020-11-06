@@ -103,17 +103,6 @@ Configuration
 .. automodule:: bob.extension.config
 
 
-Stacked Processors
-------------------
-
-.. autosummary::
-    bob.extension.processors.SequentialProcessor
-    bob.extension.processors.ParallelProcessor
-
-.. automodule:: bob.extension.processors
-    :special-members: __init__, __call__
-
-
 Logging
 -------
 
