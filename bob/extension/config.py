@@ -4,7 +4,7 @@
 '''Functionality to implement python-based config file parsing and loading.
 '''
 
-import imp
+import types
 import pkgutil
 from os.path import isfile
 import logging
@@ -29,8 +29,8 @@ def _load_context(path, mod):
       from
   mod : module
       A preloaded module to use as context for the next module
-      loading. You can create a new module using :py:mod:`imp` as in ``m =
-      imp.new_module('name'); m.__dict__.update(ctxt)`` where ``ctxt`` is a
+      loading. You can create a new module using :py:mod:`types` as in ``m =
+      types.ModuleType('name'); m.__dict__.update(ctxt)`` where ``ctxt`` is a
       python dictionary with string -> object values representing the contents
       of the module to be created.
 
@@ -210,7 +210,7 @@ def load(paths, context=None, entry_point_group=None, attribute_name=None):
   else:
     names = len(paths) * ['user_config']
 
-  ctxt = imp.new_module('initial_context')
+  ctxt = types.ModuleType('initial_context')
   if context is not None:
     ctxt.__dict__.update(context)
   # Small gambiarra (https://www.urbandictionary.com/define.php?term=Gambiarra)
@@ -223,7 +223,7 @@ def load(paths, context=None, entry_point_group=None, attribute_name=None):
 
   for k, n in zip(paths, names):
     logger.debug("Loading configuration file `%s'...", k)
-    mod = imp.new_module(n)
+    mod = types.ModuleType(n)
     # remove the keys that might break the loading of the next config file.
     ctxt.__dict__.pop('__name__', None)
     ctxt.__dict__.pop('__package__', None)
