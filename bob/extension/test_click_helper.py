@@ -341,3 +341,23 @@ def test_resource_option():
     runner = CliRunner()
     result = runner.invoke(cli, ["-a", "1"], catch_exceptions=True)
     assert_click_runner_result(result, exit_code=1, exception_type=TypeError)
+
+    # test ResourceOption with string_exceptions
+    @click.command()
+    @click.option(
+        "-a",
+        "--a",
+        cls=ResourceOption,
+        string_exceptions=("bob.extension.data.resource_config2"),
+        entry_point_group="bob.extension.test_config_load",
+    )
+    def cli(a):
+        assert a == "bob.extension.data.resource_config2", a
+
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        ["-a", "bob.extension.data.resource_config2"],
+        catch_exceptions=False,
+    )
+    assert_click_runner_result(result)
