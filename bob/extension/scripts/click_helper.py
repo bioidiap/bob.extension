@@ -43,7 +43,7 @@ def bool_option(name, short_name, desc, dflt=False, **kwargs):
             show_default=True,
             callback=callback,
             is_eager=True,
-            **kwargs
+            **kwargs,
         )(func)
 
     return custom_bool_option
@@ -97,7 +97,7 @@ def list_float_option(name, short_name, desc, nitems=None, dflt=None, **kwargs):
             show_default=True,
             help=desc + " Provide just a space (' ') to cancel default values.",
             callback=callback,
-            **kwargs
+            **kwargs,
         )(func)
 
     return custom_list_float_option
@@ -130,7 +130,7 @@ def open_file_mode_option(**kwargs):
             default="w",
             help="File open mode",
             callback=callback,
-            **kwargs
+            **kwargs,
         )(func)
 
     return custom_open_file_mode_option
@@ -167,7 +167,7 @@ def verbosity_option(**kwargs):
             "(warnings), 2 (log messages), 3 (debug information) by adding the "
             "--verbose option as often as desired (e.g. '-vvv' for debug).",
             callback=callback,
-            **kwargs
+            **kwargs,
         )(f)
 
     return custom_verbosity_option
@@ -328,6 +328,10 @@ class ResourceOption(click.Option):
     entry_point_group : str or None
         If provided, the strings values to this option are assumed to be entry
         points from ``entry_point_group`` that need to be loaded.
+    string_exceptions : tuple or None
+        If provided and ``entry_point_group`` is provided, the code will not
+        treat strings in ``string_exceptions`` as entry points and does not try
+        to load them.
     """
 
     def __init__(
@@ -346,7 +350,8 @@ class ResourceOption(click.Option):
         help=None,
         entry_point_group=None,
         required=False,
-        **kwargs
+        string_exceptions=None,
+        **kwargs,
     ):
         self.entry_point_group = entry_point_group
         if entry_point_group is not None:
@@ -371,8 +376,9 @@ class ResourceOption(click.Option):
             type=type,
             help=help,
             required=required,
-            **kwargs
+            **kwargs,
         )
+        self.string_exceptions = string_exceptions or []
 
     def consume_value(self, ctx, opts):
         if (not hasattr(ctx, "config_context")) and self.entry_point_group is None:
@@ -403,7 +409,7 @@ class ResourceOption(click.Option):
 
         # if the value is a string and an entry_point_group is provided, load it
         if self.entry_point_group is not None:
-            while isinstance(value, str):
+            while isinstance(value, str) and value not in self.string_exceptions:
                 value = load(
                     [value],
                     entry_point_group=self.entry_point_group,
@@ -413,7 +419,7 @@ class ResourceOption(click.Option):
 
 
 class AliasedGroup(click.Group):
-    """ Class that handles prefix aliasing for commands
+    """Class that handles prefix aliasing for commands
 
     Basically just implements get_command that is used by click to choose the
     comamnd based on the name.
