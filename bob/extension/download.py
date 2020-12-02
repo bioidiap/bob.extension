@@ -4,6 +4,7 @@
 
 import os
 import logging
+
 logger = logging.getLogger(__name__)
 
 
@@ -24,18 +25,20 @@ def _untar(tar_file, directory, ext):
         mode = "r"
 
     import tarfile
+
     with tarfile.open(name=tar_file, mode=mode) as t:
         t.extractall(directory)
 
 
 def _unbz2(bz2_file):
     import bz2
+
     with bz2.BZ2File(bz2_file) as t:
-        open(os.path.splitext(bz2_file)[0], 'wb').write(t.read())
+        open(os.path.splitext(bz2_file)[0], "wb").write(t.read())
 
 
 def download_file(url, out_file):
-  """Downloads a file from a given url
+    """Downloads a file from a given url
 
   Parameters
   ----------
@@ -45,21 +48,24 @@ def download_file(url, out_file):
   out_file : str
       Where to save the file.
   """
-  import sys
-  if sys.version_info[0] < 3:
-    # python2 technique for downloading a file
-    from urllib2 import urlopen
-    with open(out_file, 'wb') as f:
-      response = urlopen(url)
-      f.write(response.read())
+    import sys
 
-  else:
-    # python3 technique for downloading a file
-    from urllib.request import urlopen
-    from shutil import copyfileobj
-    with urlopen(url) as response:
-      with open(out_file, 'wb') as f:
-        copyfileobj(response, f)
+    if sys.version_info[0] < 3:
+        # python2 technique for downloading a file
+        from urllib2 import urlopen
+
+        with open(out_file, "wb") as f:
+            response = urlopen(url)
+            f.write(response.read())
+
+    else:
+        # python3 technique for downloading a file
+        from urllib.request import urlopen
+        from shutil import copyfileobj
+
+        with urlopen(url) as response:
+            with open(out_file, "wb") as f:
+                copyfileobj(response, f)
 
 
 def download_and_unzip(urls, filename):
@@ -88,15 +94,12 @@ def download_and_unzip(urls, filename):
 
     for url in urls:
         try:
-            logger.info(
-                "Downloading from "
-                "{} ...".format(url))
+            logger.info("Downloading from " "{} ...".format(url))
             download_file(url, filename)
 
             break
         except Exception:
-            logger.warning(
-                "Could not download from the %s url", url, exc_info=True)
+            logger.warning("Could not download from the %s url", url, exc_info=True)
     else:  # else is for the for loop
         if not os.path.isfile(filename):
             raise RuntimeError("Could not download the file.")
@@ -107,7 +110,7 @@ def download_and_unzip(urls, filename):
     if ext == ".zip":
         logger.info("Unziping in {0}".format(filename))
         _unzip(filename, os.path.dirname(filename))
- 
+
     elif header[-4:] == ".tar" or ext in [".tgz", ".tbz2"]:
         logger.info("Untar/gzip in {0}".format(filename))
         _untar(filename, os.path.dirname(filename), ext)
@@ -116,3 +119,40 @@ def download_and_unzip(urls, filename):
         logger.info("Unbz2 in {0}".format(filename))
         _unbz2(filename)
 
+
+def find_element_in_tarball(filename, target_path):
+    """
+    Search an element in a tarball.
+    
+    Parameters
+    ----------
+    
+    filename: str
+       Tarball file name
+       
+    target_path: str
+       Target path to be searched inside of the tarball
+    
+    
+    Returns
+    -------
+       It returns an opened file
+    
+    """
+    import tarfile
+    import io
+
+    f = tarfile.open(filename)
+    for member in f.getmembers():
+        if member.isdir():
+            continue
+
+        if (
+            member.isfile()
+            and target_path in member.name
+            and os.path.split(target_path)[-1] == os.path.split(member.name)[-1]
+        ):
+
+            return io.TextIOWrapper(f.extractfile(member), encoding="utf-8")
+    else:
+        return None
