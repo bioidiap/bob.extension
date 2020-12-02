@@ -16,3 +16,4 @@ dist
 build
 .coverage
 record.txt
+*.DS_Store
