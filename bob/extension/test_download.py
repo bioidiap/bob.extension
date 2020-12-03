@@ -1,10 +1,10 @@
 import pkg_resources
 import os
 import shutil
-from .download import download_and_unzip, find_element_in_tarball
+from .download import download_and_unzip, find_element_in_tarball, download_files
 
 
-def test_download():
+def test_download_unzip():
     def download(filename):
         download_and_unzip(
             "http://www.idiap.ch/software/bob/databases/latest/mnist.tar.bz2", filename
@@ -20,6 +20,43 @@ def test_download():
     # testing Untar
     filename = pkg_resources.resource_filename(__name__, "data/mnist.tar.bz2")
     download(filename)
+
+
+def test_download_files():
+
+    filename = "mnist.tar.bz2"
+
+    download_files(
+        ["http://www.idiap.ch/software/bob/databases/latest/mnist.tar.bz2"],
+        filename,
+        cache_subdir="databases",
+        file_hash="d72c7e80534d980d1df23f78242c595a",
+        hash_algorithm="auto",
+    )
+    final_filename = os.path.join(
+        os.path.expanduser("~"), ".bob", "databases", filename
+    )
+    assert os.path.exists(final_filename)
+
+    # Download again. to check the cache
+    download_files(
+        ["http://www.idiap.ch/software/bob/databases/latest/mnist.tar.bz2"],
+        filename,
+        cache_subdir="databases",
+        file_hash="d72c7e80534d980d1df23f78242c595a",
+        hash_algorithm="auto",
+    )
+    assert os.path.exists(final_filename)
+
+    # Download again, no hash. to check the cache
+    download_files(
+        ["http://www.idiap.ch/software/bob/databases/latest/mnist.tar.bz2"],
+        filename,
+        cache_subdir="databases",
+    )
+    assert os.path.exists(final_filename)
+
+    os.unlink(final_filename)
 
 
 def test_find_element_in_tarball():
