@@ -68,6 +68,34 @@ def download_file(url, out_file):
                 copyfileobj(response, f)
 
 
+def download_files(urls, out_file):
+    """Downloads a file from a given a list of URLS.
+    In case the first link fails, the following ones will be tried.
+
+    Parameters
+    ----------
+    urls : list
+        List containing the all the URLs.
+        The function will try to download them in order
+        
+    out_file : str
+        Where to save the file.
+    """
+
+    for url in urls:
+        try:
+            logger.info("Downloading from " "{} ...".format(url))
+            os.makedirs(os.path.dirname(out_file), exist_ok=True)
+            download_file(url, out_file)
+
+            break
+        except Exception:
+            logger.warning("Could not download from the %s url", url, exc_info=True)
+    else:  # else is for the for loop
+        if not os.path.isfile(out_file):
+            raise RuntimeError("Could not download the file.")
+
+
 def download_and_unzip(urls, filename):
     """
     Download a file from a given URL list, save it somewhere and unzip/untar if necessary
@@ -92,17 +120,7 @@ def download_and_unzip(urls, filename):
     if isinstance(urls, str):
         urls = [urls]
 
-    for url in urls:
-        try:
-            logger.info("Downloading from " "{} ...".format(url))
-            download_file(url, filename)
-
-            break
-        except Exception:
-            logger.warning("Could not download from the %s url", url, exc_info=True)
-    else:  # else is for the for loop
-        if not os.path.isfile(filename):
-            raise RuntimeError("Could not download the file.")
+    download_files(urls, filename)
 
     # Uncompressing if it is the case
     ext = os.path.splitext(filename)[-1].lower()
