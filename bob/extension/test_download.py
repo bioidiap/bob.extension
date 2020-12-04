@@ -1,7 +1,13 @@
-import pkg_resources
 import os
 import shutil
-from .download import download_and_unzip, find_element_in_tarball, download_files
+import tempfile
+
+import pkg_resources
+from bob.extension import rc
+from bob.extension import rc_context
+from bob.extension.download import download_and_unzip
+from bob.extension.download import find_element_in_tarball
+from bob.extension.download import get_file
 
 
 def test_download_unzip():
@@ -22,41 +28,40 @@ def test_download_unzip():
     download(filename)
 
 
-def test_download_files():
+def test_get_file():
 
     filename = "mnist.tar.bz2"
+    urls = ["http://www.idiap.ch/software/bob/databases/latest/mnist.tar.bz2"]
+    file_hash = "d72c7e80534d980d1df23f78242c595a"
 
-    download_files(
-        ["http://www.idiap.ch/software/bob/databases/latest/mnist.tar.bz2"],
-        filename,
-        cache_subdir="databases",
-        file_hash="d72c7e80534d980d1df23f78242c595a",
-        hash_algorithm="auto",
-    )
-    final_filename = os.path.join(
-        os.path.expanduser("~"), ".bob", "databases", filename
-    )
-    assert os.path.exists(final_filename)
+    with tempfile.TemporaryDirectory() as temp_dir, rc_context(
+        {"bob_data_folder": temp_dir}
+    ):
 
-    # Download again. to check the cache
-    download_files(
-        ["http://www.idiap.ch/software/bob/databases/latest/mnist.tar.bz2"],
-        filename,
-        cache_subdir="databases",
-        file_hash="d72c7e80534d980d1df23f78242c595a",
-        hash_algorithm="auto",
-    )
-    assert os.path.exists(final_filename)
+        final_filename = get_file(
+            filename,
+            urls,
+            cache_subdir="databases",
+            file_hash=file_hash,
+        )
+        assert os.path.exists(final_filename)
 
-    # Download again, no hash. to check the cache
-    download_files(
-        ["http://www.idiap.ch/software/bob/databases/latest/mnist.tar.bz2"],
-        filename,
-        cache_subdir="databases",
-    )
-    assert os.path.exists(final_filename)
+        # Download again. to check the cache
+        final_filename = get_file(
+            filename,
+            urls,
+            cache_subdir="databases",
+            file_hash=file_hash,
+        )
+        assert os.path.exists(final_filename)
 
-    os.unlink(final_filename)
+        # Download again, no hash. to check the cache
+        final_filename = get_file(
+            filename,
+            urls,
+            cache_subdir="databases",
+        )
+        assert os.path.exists(final_filename)
 
 
 def test_find_element_in_tarball():
@@ -79,4 +84,3 @@ def test_find_element_in_tarball():
     )
 
     assert find_element_in_tarball(filename, "NOTHING") is None
-
