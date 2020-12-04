@@ -26,7 +26,7 @@ def bool_option(name, short_name, desc, dflt=False, **kwargs):
 
     Returns
     -------
-    callable
+    ``callable``
         A decorator to be used for adding this option.
     """
 
@@ -69,7 +69,7 @@ def list_float_option(name, short_name, desc, nitems=None, dflt=None, **kwargs):
 
     Returns
     -------
-    callable
+    ``callable``
         A decorator to be used for adding this option.
     """
 
@@ -113,7 +113,7 @@ def open_file_mode_option(**kwargs):
 
     Returns
     -------
-    callable
+    ``callable``
         A decorator to be used for adding this option.
     """
 
@@ -146,7 +146,7 @@ def verbosity_option(**kwargs):
 
     Returns
     -------
-    callable
+    ``callable``
         A decorator to be used for adding this option.
     """
 
@@ -422,7 +422,7 @@ class AliasedGroup(click.Group):
     """Class that handles prefix aliasing for commands
 
     Basically just implements get_command that is used by click to choose the
-    comamnd based on the name.
+    command based on the name.
 
     Example
     -------
@@ -431,6 +431,7 @@ class AliasedGroup(click.Group):
     """
 
     def get_command(self, ctx, cmd_name):
+        """get_command with prefix aliasing"""
         rv = click.Group.get_command(self, ctx, cmd_name)
         if rv is not None:
             return rv

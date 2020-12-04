@@ -6,6 +6,7 @@
 """A custom build class for Pkg-config based extensions
 """
 
+import contextlib
 import os
 import sys
 import platform
@@ -40,6 +41,30 @@ __version__ = pkg_resources.require(__name__)[0].version
 rc = _loadrc()
 """The content of the global configuration file loaded as a dictionary.
 The value for any non-existing key is ``None``."""
+
+@contextlib.contextmanager
+def rc_context(dict):
+  """A context manager for bob.extension.rc.
+  You can use this context manager to temporarily change a value in
+  ``bob.extension.rc``.
+
+  Example
+  -------
+  >>> from bob.extension import rc, rc_context
+  >>> assert rc.get("non-existing-key") is None
+  >>> with rc_context({"non-existing-key": 1}):
+  ...     a = rc.get("non-existing-key")
+  >>> a
+  1
+  """
+  old_rc = rc.copy()
+  try:
+    rc.update(dict)
+    yield
+  finally:
+    rc.clear()
+    rc.update(old_rc)
+
 
 def check_packages(packages):
   """Checks if the requirements for the given packages are satisfied.
