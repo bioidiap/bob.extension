@@ -223,7 +223,12 @@ def get_file(
     extract=False,
     force=False,
 ):
-    """Summary
+    """Downloads a file from a given a list of URLS.
+    In case the first link fails, the following ones will be tried.
+    The downloaded files will be saved in ``~/bob_data`` by default. You may change the
+    location of this folder using::
+
+        $ bob config set bob_data_folder /another/location/
 
     Parameters
     ----------
