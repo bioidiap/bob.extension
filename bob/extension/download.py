@@ -149,7 +149,7 @@ def _hash_file(fpath, algorithm="sha256", chunk_size=65535):
 def download_files(
     urls,
     filename,
-    cache_dir=os.path.join(os.path.expanduser("~"), ".bob"),
+    cache_dir=os.path.join(os.path.expanduser("~"), "bob_data"),
     cache_subdir="",
     file_hash=None,
     hash_algorithm="auto",
