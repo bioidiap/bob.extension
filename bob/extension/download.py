@@ -282,7 +282,8 @@ def get_file(
                 f" so, will be re-download."
             )
 
-    if download:
+    if download or force:
+        logger.info("Downloading %s", final_filename)
         download_file_from_possible_urls(urls, final_filename)
         if extract:
             extract_compressed_file(final_filename)
