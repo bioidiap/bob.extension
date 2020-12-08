@@ -6,8 +6,9 @@ import pkg_resources
 from bob.extension import rc
 from bob.extension import rc_context
 from bob.extension.download import download_and_unzip
-from bob.extension.download import find_element_in_tarball
+from bob.extension.download import find_element_in_tarball, search_file, _untar
 from bob.extension.download import get_file
+import shutil
 
 
 def test_download_unzip():
@@ -39,28 +40,18 @@ def test_get_file():
     ):
 
         final_filename = get_file(
-            filename,
-            urls,
-            cache_subdir="databases",
-            file_hash=file_hash,
+            filename, urls, cache_subdir="databases", file_hash=file_hash,
         )
         assert os.path.exists(final_filename)
 
         # Download again. to check the cache
         final_filename = get_file(
-            filename,
-            urls,
-            cache_subdir="databases",
-            file_hash=file_hash,
+            filename, urls, cache_subdir="databases", file_hash=file_hash,
         )
         assert os.path.exists(final_filename)
 
         # Download again, no hash. to check the cache
-        final_filename = get_file(
-            filename,
-            urls,
-            cache_subdir="databases",
-        )
+        final_filename = get_file(filename, urls, cache_subdir="databases",)
         assert os.path.exists(final_filename)
 
 
@@ -84,3 +75,24 @@ def test_find_element_in_tarball():
     )
 
     assert find_element_in_tarball(filename, "NOTHING") is None
+
+
+def test_search_file():
+    filename = pkg_resources.resource_filename(
+        __name__, "data/example_csv_filelist.tar.gz"
+    )
+    # Search in the tarball
+    assert search_file(filename, "protocol_dev_eval/norm/train_world.csv") is not None
+    assert search_file(filename, "protocol_dev_eval/norm/xuxa.csv") is None
+
+    # Search in a file structure
+    final_path = "./test_search_file"
+
+    pass
+
+    _untar(filename, final_path, ".gz")
+
+    assert search_file(final_path, "protocol_dev_eval/norm/train_world.csv") is not None
+    assert search_file(final_path, "protocol_dev_eval/norm/xuxa.csv") is None
+
+    shutil.rmtree(final_path)
