@@ -6,6 +6,7 @@ import os
 import logging
 import hashlib
 from . import rc
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -364,3 +365,62 @@ def find_element_in_tarball(filename, target_path):
             return io.TextIOWrapper(f.extractfile(member), encoding="utf-8")
     else:
         return None
+
+
+def search_file(base_path, options):
+    """
+    Search for files either in a file structure, or in a tarball.
+
+    Parameters
+    ----------
+
+    base_path: str
+       Base path to start the search, or the tarball to be searched
+
+    options: list
+       Files to be searched. This function will return the first occurency
+
+    Returns
+    -------
+    object
+        It returns an opened file
+
+    """
+
+    if not isinstance(options, list):
+        options = [options]
+
+    # If the input is a directory
+    if os.path.isdir(base_path):
+
+        def get_fs():
+            fs = []
+            for root, _, files in os.walk(base_path, topdown=False):
+                for name in files:
+                    fs.append(os.path.join(root, name))
+            return fs
+
+        def search_in_list(o, lst):
+            for i, l in enumerate(lst):
+                if o in l:
+                    return i
+            else:
+                return -1
+
+        fs = get_fs()
+        for o in options:
+            index = search_in_list(o, fs)
+            if index >= 0:
+                return open(fs[index])
+        else:
+            return None
+    else:
+        # If it's not a directory is a tarball
+
+        for o in options:
+            f = find_element_in_tarball(base_path, o)
+            if f is not None:
+                return f
+
+        else:
+            return None
