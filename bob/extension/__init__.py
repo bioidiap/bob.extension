@@ -435,7 +435,10 @@ class Extension(DistutilsExtension):
 
     # Compilation options for macOS builds
     if platform.system() == 'Darwin':
-
+      logger.warn(str(os.environ))
+      logger.warn(rc['bob.extension.macosx_deployment_target'])
+      logger.warn("######################################")
+      
       target = os.environ.get('MACOSX_DEPLOYMENT_TARGET')
       if target is None:  #not set on the environment, try resource
         target = rc['bob.extension.macosx_deployment_target']
