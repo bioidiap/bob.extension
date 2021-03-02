@@ -411,26 +411,63 @@ def search_file(base_path, options):
             return None
 
 
-def list_folders(base_path):
+def list_dir(base_path, inner_folder="", folders=True, files=True):
+    """Lists the files and folders inside a folder or a tarball.
+    To list an inner level folder (useful when base_path is a tarball),
+    provide the inner_folder argument.
+
+    Parameters
+    ----------
+    base_path : str
+        Path to a folder or a tarball
+    inner_folder : str
+        Path to an inner folder inside base_path. If given, the folders inside
+        this folder are listed.
+    folders : bool
+        If False, will exclude folders from the results.
+    files : bool
+        If False, will exclude files from the results.
+
+    Returns
+    -------
+    list
+        Sorted list of file and directory names
+
+    Raises
+    ------
+    ValueError
+        If base_path is not a folder or a tarball
+    """
     # If the input is a directory
     path = Path(base_path)
+    results = []
     if path.is_dir():
-        return sorted(x.name for x in path.iterdir() if x.is_dir())
-    # If it's not a directory is a tarball
+        path = path / inner_folder
+        for x in path.iterdir():
+            if x.is_dir() and folders:
+                results.append(x.name)
+            if x.is_file() and files:
+                results.append(x.name)
+
+    # If it's not a directory, is it a tarball?
     elif tarfile.is_tarfile(base_path):
         with tarfile.open(base_path, mode="r") as t:
             tar_infos = t.getmembers()
             commonpath = os.path.commonpath([info.name for info in tar_infos])
-            commonpath = Path(commonpath)
-            top_folders = []
+            commonpath = Path(commonpath) / inner_folder
             for info in tar_infos:
-                if not info.isdir():
+                if info.name == ".":
                     continue
                 path = Path(info.name)
-                if path.parent == commonpath:
-                    top_folders.append(path.name)
-            return sorted(top_folders)
+                if path.parent != commonpath:
+                    continue
+                if info.isdir() and folders:
+                    results.append(path.name)
+                if info.isfile() and files:
+                    results.append(path.name)
     else:
         raise ValueError(
             f"The provided path: `{base_path}` should be a directory or a tarball."
         )
+
+    return sorted(results)
