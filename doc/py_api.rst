@@ -50,6 +50,9 @@ Utilities
     bob.extension.utils.find_packages
     bob.extension.utils.link_documentation
     bob.extension.utils.load_requirements
+    bob.extension.download.get_file
+    bob.extension.download.search_file
+    bob.extension.download.list_dir
 
 Configuration
 ^^^^^^^^^^^^^

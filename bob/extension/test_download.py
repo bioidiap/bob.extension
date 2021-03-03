@@ -3,12 +3,10 @@ import shutil
 import tempfile
 
 import pkg_resources
-from bob.extension import rc
 from bob.extension import rc_context
 from bob.extension.download import download_and_unzip
 from bob.extension.download import find_element_in_tarball, search_file, _untar
-from bob.extension.download import get_file
-import shutil
+from bob.extension.download import get_file, list_dir
 
 
 def test_download_unzip():
@@ -40,18 +38,28 @@ def test_get_file():
     ):
 
         final_filename = get_file(
-            filename, urls, cache_subdir="databases", file_hash=file_hash,
+            filename,
+            urls,
+            cache_subdir="databases",
+            file_hash=file_hash,
         )
         assert os.path.exists(final_filename)
 
         # Download again. to check the cache
         final_filename = get_file(
-            filename, urls, cache_subdir="databases", file_hash=file_hash,
+            filename,
+            urls,
+            cache_subdir="databases",
+            file_hash=file_hash,
         )
         assert os.path.exists(final_filename)
 
         # Download again, no hash. to check the cache
-        final_filename = get_file(filename, urls, cache_subdir="databases",)
+        final_filename = get_file(
+            filename,
+            urls,
+            cache_subdir="databases",
+        )
         assert os.path.exists(final_filename)
 
 
@@ -96,3 +104,35 @@ def test_search_file():
     assert search_file(final_path, "protocol_dev_eval/norm/xuxa.csv") is None
 
     shutil.rmtree(final_path)
+
+
+def test_list_dir():
+    data_folder = pkg_resources.resource_filename(__name__, "data")
+
+    folder = os.path.join(data_folder, "test_list_folders")
+    tar1 = os.path.join(data_folder, "test_list_folders1.tar.gz")
+    tar2 = os.path.join(data_folder, "test_list_folders2.tar.gz")
+
+    for root_folder in (folder, tar1, tar2):
+        fldrs = list_dir(root_folder)
+        assert fldrs == ["README.rst", "database1", "database2"], (fldrs, root_folder)
+        fldrs = list_dir(root_folder, files=False)
+        assert fldrs == ["database1", "database2"], (fldrs, root_folder)
+        fldrs = list_dir(root_folder, folders=False)
+        assert fldrs == ["README.rst"], (fldrs, root_folder)
+        fldrs = list_dir(root_folder, folders=False, files=False)
+        assert fldrs == [], (fldrs, root_folder)
+
+        fldrs = list_dir(root_folder, "database1")
+        assert fldrs == ["README1.rst", "protocol1", "protocol2"], (fldrs, root_folder)
+        fldrs = list_dir(root_folder, "database1", files=False)
+        assert fldrs == ["protocol1", "protocol2"], (fldrs, root_folder)
+        fldrs = list_dir(root_folder, "database1", folders=False)
+        assert fldrs == ["README1.rst"], (fldrs, root_folder)
+
+        fldrs = list_dir(root_folder, "database1/protocol1")
+        assert fldrs == ["dev.csv", "train.csv"], (fldrs, root_folder)
+        fldrs = list_dir(root_folder, "database1/protocol1", files=False)
+        assert fldrs == [], (fldrs, root_folder)
+        fldrs = list_dir(root_folder, "database1/protocol1", folders=False)
+        assert fldrs == ["dev.csv", "train.csv"], (fldrs, root_folder)

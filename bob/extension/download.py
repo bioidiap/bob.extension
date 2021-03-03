@@ -1,12 +1,18 @@
 #!/usr/bin/env python
 # vim: set fileencoding=utf-8 :
-# Tiago de Freitas Pereira <tiago.pereira@idiap.ch>
 
-import os
-import logging
+import bz2
 import hashlib
-from . import rc
+import io
+import logging
 import os
+import tarfile
+import zipfile
+from pathlib import Path
+from shutil import copyfileobj
+from urllib.request import urlopen
+
+from . import rc
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +22,6 @@ def _bob_data_folder():
 
 
 def _unzip(zip_file, directory):
-    import zipfile
 
     with zipfile.ZipFile(zip_file) as myzip:
         myzip.extractall(directory)
@@ -31,14 +36,11 @@ def _untar(tar_file, directory, ext):
     else:
         mode = "r"
 
-    import tarfile
-
     with tarfile.open(name=tar_file, mode=mode) as t:
         t.extractall(directory)
 
 
 def _unbz2(bz2_file):
-    import bz2
 
     with bz2.BZ2File(bz2_file) as t:
         open(os.path.splitext(bz2_file)[0], "wb").write(t.read())
@@ -88,24 +90,9 @@ def download_file(url, out_file):
     out_file : str
         Where to save the file.
     """
-    import sys
-
-    if sys.version_info[0] < 3:
-        # python2 technique for downloading a file
-        from urllib2 import urlopen
-
+    with urlopen(url) as response:
         with open(out_file, "wb") as f:
-            response = urlopen(url)
-            f.write(response.read())
-
-    else:
-        # python3 technique for downloading a file
-        from urllib.request import urlopen
-        from shutil import copyfileobj
-
-        with urlopen(url) as response:
-            with open(out_file, "wb") as f:
-                copyfileobj(response, f)
+            copyfileobj(response, f)
 
 
 def download_file_from_possible_urls(urls, out_file):
@@ -348,8 +335,6 @@ def find_element_in_tarball(filename, target_path):
     object
         It returns an opened file
     """
-    import tarfile
-    import io
 
     f = tarfile.open(filename)
     for member in f.getmembers():
@@ -424,3 +409,65 @@ def search_file(base_path, options):
 
         else:
             return None
+
+
+def list_dir(base_path, inner_folder="", folders=True, files=True):
+    """Lists the files and folders inside a folder or a tarball.
+    To list an inner level folder (useful when base_path is a tarball),
+    provide the inner_folder argument.
+
+    Parameters
+    ----------
+    base_path : str
+        Path to a folder or a tarball
+    inner_folder : str
+        Path to an inner folder inside base_path. If given, the folders inside
+        this folder are listed.
+    folders : bool
+        If False, will exclude folders from the results.
+    files : bool
+        If False, will exclude files from the results.
+
+    Returns
+    -------
+    list
+        Sorted list of file and directory names
+
+    Raises
+    ------
+    ValueError
+        If base_path is not a folder or a tarball
+    """
+    # If the input is a directory
+    path = Path(base_path)
+    results = []
+    if path.is_dir():
+        path = path / inner_folder
+        for x in path.iterdir():
+            if x.is_dir() and folders:
+                results.append(x.name)
+            if x.is_file() and files:
+                results.append(x.name)
+
+    # If it's not a directory, is it a tarball?
+    elif tarfile.is_tarfile(base_path):
+        with tarfile.open(base_path, mode="r") as t:
+            tar_infos = t.getmembers()
+            commonpath = os.path.commonpath([info.name for info in tar_infos])
+            commonpath = Path(commonpath) / inner_folder
+            for info in tar_infos:
+                if info.name == ".":
+                    continue
+                path = Path(info.name)
+                if path.parent != commonpath:
+                    continue
+                if info.isdir() and folders:
+                    results.append(path.name)
+                if info.isfile() and files:
+                    results.append(path.name)
+    else:
+        raise ValueError(
+            f"The provided path: `{base_path}` should be a directory or a tarball."
+        )
+
+    return sorted(results)
