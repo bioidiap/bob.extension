@@ -149,13 +149,13 @@ def validate_file(fpath, file_hash, algorithm="auto", chunk_size=65535):
     """
     # Code from https://github.com/tensorflow/tensorflow/blob/v2.3.1/tensorflow/python/keras/utils/data_utils.py#L312
     # Very useful
-
-    if (algorithm == "sha256") or (algorithm == "auto" and len(file_hash) == 64):
-        hasher = "sha256"
-    else:
+    file_hash = str(file_hash)
+    if (algorithm == "md5") or (algorithm == "auto" and len(file_hash) == 32):
         hasher = "md5"
+    else:
+        hasher = "sha256"
 
-    if str(_hash_file(fpath, hasher, chunk_size)) == str(file_hash):
+    if _hash_file(fpath, hasher, chunk_size).startswith(file_hash):
         return True
     else:
         return False
@@ -190,7 +190,7 @@ def _hash_file(fpath, algorithm="sha256", chunk_size=65535):
     # Code from https://github.com/tensorflow/tensorflow/blob/v2.3.1/tensorflow/python/keras/utils/data_utils.py#L312
     # Very useful
 
-    if (algorithm == "sha256") or (algorithm == "auto" and len(hash) == 64):
+    if algorithm == "sha256":
         hasher = hashlib.sha256()
     else:
         hasher = hashlib.md5()
@@ -199,7 +199,7 @@ def _hash_file(fpath, algorithm="sha256", chunk_size=65535):
         for chunk in iter(lambda: fpath_file.read(chunk_size), b""):
             hasher.update(chunk)
 
-    return hasher.hexdigest()
+    return str(hasher.hexdigest())
 
 
 def get_file(
