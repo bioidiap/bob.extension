@@ -317,7 +317,7 @@ def download_and_unzip(urls, filename):
     extract_compressed_file(filename)
 
 
-def find_element_in_tarball(filename, target_path):
+def find_element_in_tarball(filename, target_path, open_as_stream=False):
     """
     Search an element in a tarball.
 
@@ -328,6 +328,10 @@ def find_element_in_tarball(filename, target_path):
 
     target_path : str
        Target path to be searched inside of the tarball
+
+    open_as_stream: bool
+       If `True`, will load the element from the tarball as a byte_stream.
+       If `False`, will load as text
 
 
     Returns
@@ -346,8 +350,10 @@ def find_element_in_tarball(filename, target_path):
             and target_path in member.name
             and os.path.split(target_path)[-1] == os.path.split(member.name)[-1]
         ):
-
-            return io.TextIOWrapper(f.extractfile(member), encoding="utf-8")
+            if open_as_stream:
+                return io.BufferedReader(f.extractfile(member)).read()
+            else:
+                return io.TextIOWrapper(f.extractfile(member), encoding="utf-8")
     else:
         return None
 
