@@ -1,5 +1,6 @@
 from ..log import set_verbosity_level
 from ..config import load, mod_to_context, resource_keys
+from click.core import ParameterSource
 import time
 import click
 import logging
@@ -388,6 +389,9 @@ class ResourceOption(click.Option):
             )
         logger.debug("consuming resource option for %s", self.name)
         value = opts.get(self.name)
+
+        source = ParameterSource.COMMANDLINE
+
         # if value is not given from command line, lookup the config files given as
         # arguments (not options).
         if value is None:
@@ -399,13 +403,21 @@ class ResourceOption(click.Option):
         # if not from config files, lookup the environment variables
         if value is None:
             value = self.value_from_envvar(ctx)
+            source = ParameterSource.ENVIRONMENT
+
         # if not from environment variables, lookup the default value
         if value is None:
             value = ctx.lookup_default(self.name)
-        return value
+            source = ParameterSource.DEFAULT_MAP
 
-    def full_process_value(self, ctx, value):
-        value = super().full_process_value(ctx, value)
+        if value is None:
+            value = self.get_default(ctx)
+            source = ParameterSource.DEFAULT
+
+        return value, source
+
+    def type_cast_value(self, ctx, value):
+        value = super().type_cast_value(ctx, value)
 
         # if the value is a string and an entry_point_group is provided, load it
         if self.entry_point_group is not None:
@@ -415,6 +427,7 @@ class ResourceOption(click.Option):
                     entry_point_group=self.entry_point_group,
                     attribute_name=self.name,
                 )
+
         return value
 
 

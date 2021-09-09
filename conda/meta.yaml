@@ -20,6 +20,7 @@ requirements:
   host:
     - python {{ python }}
     - setuptools {{ setuptools }}
+    - click >=8
     - click {{ click }}
     - click-plugins {{ click_plugins }}
   run:
