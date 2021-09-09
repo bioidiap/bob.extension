@@ -510,8 +510,11 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     """Helper to add the click manual"""
 
     import click
-    major = click.__version__.split('.')[0]
-    ver = major + '.x'
+    major, minor = [int(x) for x in click.__version__.split('.')[0:2]]
+    if major < 8:
+      ver = f"{major}.x"
+    else:
+      ver = f"{major}.{minor}.x"
     _add_index('click', 'https://click.palletsprojects.com/en/%s/' % ver)
 
 
