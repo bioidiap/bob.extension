@@ -44,17 +44,17 @@ test:
     - conda inspect linkages -p $PREFIX {{ name }}  # [not win]
     - conda inspect objects -p $PREFIX {{ name }}  # [osx]
   requires:
-    - nose
-    - coverage
-    - sphinx
-    - sphinx_rtd_theme
-    - boost
-    - cmake
-    - make
-    - pkg-config
-    - freetype
-    - libblitz
-    - numpy
+    - nose {{ nose }}
+    - coverage {{ coverage }}
+    - sphinx {{ sphinx }}
+    - sphinx_rtd_theme {{ sphinx_rtd_theme }}
+    - boost {{ boost }}
+    - cmake {{ cmake }}
+    - make {{ make }}
+    - pkg-config {{ pkg_config }}
+    - freetype {{ freetype }}
+    - libblitz {{ libblitz }}
+    - numpy {{ numpy }}
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
 
