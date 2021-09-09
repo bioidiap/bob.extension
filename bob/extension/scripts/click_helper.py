@@ -417,6 +417,10 @@ class ResourceOption(click.Option):
         return value, source
 
     def type_cast_value(self, ctx, value):
+        """Convert and validate a value against the option's
+        ``type``, ``multiple``, and ``nargs``.
+        Furthermore, if the an entry_point_group is provided, it will load it.
+        """
         value = super().type_cast_value(ctx, value)
 
         # if the value is a string and an entry_point_group is provided, load it
