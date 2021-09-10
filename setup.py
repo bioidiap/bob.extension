@@ -22,7 +22,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
 
-    install_requires=['setuptools', 'click', 'click-plugins'],
+    install_requires=['setuptools', 'click >= 8', 'click-plugins'],
 
     entry_points={
         'console_scripts': [
