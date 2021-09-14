@@ -99,15 +99,12 @@ def test_commands_with_config_2():
     @click.command(
         cls=ConfigCommand, entry_point_group="bob.extension.test_config_load"
     )
-    @click.option("-a", cls=ResourceOption, default=3)
+    @click.option("-a", cls=ResourceOption)
     def cli(a, **kwargs):
+        assert type(a) == int, (type(a), a)
         click.echo("{}".format(a))
 
     runner = CliRunner()
-
-    result = runner.invoke(cli, [])
-    assert_click_runner_result(result)
-    assert result.output.strip() == "3", result.output
 
     result = runner.invoke(cli, ["basic_config"])
     assert_click_runner_result(result)

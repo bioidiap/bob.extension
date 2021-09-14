@@ -1,10 +1,14 @@
-from ..log import set_verbosity_level
-from ..config import load, mod_to_context, resource_keys
-from click.core import ParameterSource
-import time
-import click
 import logging
+import time
 import traceback
+
+import click
+from click.core import ParameterSource
+
+from ..config import load
+from ..config import mod_to_context
+from ..config import resource_keys
+from ..log import set_verbosity_level
 
 logger = logging.getLogger(__name__)
 
@@ -295,6 +299,10 @@ file.""".format(
         ctx.exit()
 
 
+class CustomParamType(click.ParamType):
+    name = "custom"
+
+
 class ResourceOption(click.Option):
     """An extended click.Option that automatically loads resources from config
     files.
@@ -354,6 +362,15 @@ class ResourceOption(click.Option):
         string_exceptions=None,
         **kwargs,
     ):
+        # if no type, default, count, or is_flag is given, do not convert values to strings
+        if (
+            (type is None)
+            and (kwargs.get("default") is None)
+            and (count is False)
+            and (is_flag is None)
+        ):
+            type = CustomParamType()
+
         self.entry_point_group = entry_point_group
         if entry_point_group is not None:
             name, _, _ = self._parse_decls(param_decls, kwargs.get("expose_value"))
