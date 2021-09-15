@@ -524,14 +524,14 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   _add_index('python', 'https://docs.python.org/%d.%d/' % sys.version_info[:2])
   _add_numpy_index()
   _add_scipy_index()
-  _add_index('matplotlib', 'http://matplotlib.org/')
+  _add_index('matplotlib', 'https://matplotlib.org/')
   _add_index('setuptools', 'https://setuptools.readthedocs.io/en/latest/')
   _add_index('six', 'https://six.readthedocs.io')
   _add_index('sqlalchemy', 'https://docs.sqlalchemy.org/en/latest/')
-  _add_index('docopt', 'http://docopt.readthedocs.io/en/latest/')
-  _add_index('scikit-learn', 'http://scikit-learn.org/stable/')
-  _add_index('scikit-image', 'http://scikit-image.org/docs/dev/')
-  _add_index('pillow', 'http://pillow.readthedocs.io/en/latest/')
+  _add_index('docopt', 'https://docopt.readthedocs.io/en/latest/')
+  _add_index('scikit-learn', 'https://scikit-learn.org/stable/')
+  _add_index('scikit-image', 'https://scikit-image.org/docs/dev/')
+  _add_index('pillow', 'https://pillow.readthedocs.io/en/latest/')
   _add_index('dask', 'https://docs.dask.org/en/latest/')
   _add_index('dask-jobqueue', 'https://jobqueue.dask.org/en/latest/')
   _add_index('distributed', 'https://distributed.dask.org/en/latest/')
@@ -545,7 +545,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
     if "BOB_DOCUMENTATION_SERVER" in os.environ:
       server = os.environ["BOB_DOCUMENTATION_SERVER"]
     else:
-      server = "http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/|http://www.idiap.ch/software/bob/docs/bob/%(name)s/master/"
+      server = "https://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/|https://www.idiap.ch/software/bob/docs/bob/%(name)s/master/"
 
   # array support for BOB_DOCUMENTATION_SERVER
   # transforms "(file:///path/to/dir  https://example.com/dir| http://bla )"
