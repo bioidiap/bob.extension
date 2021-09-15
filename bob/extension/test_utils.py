@@ -191,12 +191,12 @@ package-z
         ]
 
     # test linkage to official documentation
-    server = "http://www.idiap.ch/software/bob/docs/bob/%s/master/"
+    server = "https://www.idiap.ch/software/bob/docs/bob/%s/master/"
     os.environ["BOB_DOCUMENTATION_SERVER"] = server
     result = link_documentation(additional_packages, stringio(f))
     expected = [
         'https://docs.python.org/%d.%d/' % sys.version_info[:2],
-        'http://matplotlib.org/',
+        'https://matplotlib.org/',
         'https://setuptools.readthedocs.io/en/latest/',
         server % 'bob.extension',
         server % 'gridtk',
