@@ -191,7 +191,7 @@ package-z
         ]
 
     # test linkage to official documentation
-    server = "https://www.idiap.ch/software/bob/docs/bob/%s/master/"
+    server = "http://www.idiap.ch/software/bob/docs/bob/%s/master/"
     os.environ["BOB_DOCUMENTATION_SERVER"] = server
     result = link_documentation(additional_packages, stringio(f))
     expected = [
