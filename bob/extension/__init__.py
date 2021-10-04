@@ -553,7 +553,10 @@ class Extension(DistutilsExtension):
     compiler_includes = find_system_include_paths()
     system_includes = [k for k in system_includes if k not in compiler_includes]
     for k in system_includes:
-      parameters['extra_compile_args'].extend(['-isystem', k])
+      if os.name == 'nt':
+        parameters['extra_compile_args'].extend(['-I' + k])
+      else:
+        parameters['extra_compile_args'].extend(['-isystem', k])
 
     # Filter and make unique
     for key in parameters.keys():
@@ -592,6 +595,9 @@ class Extension(DistutilsExtension):
 
     # Uniq'fy library directories
     kwargs['library_dirs'] = uniq_paths(kwargs['library_dirs'])
+
+    if os.name == 'nt':
+      kwargs['define_macros'] = [(x, y.replace('"', '\\"')) for x,y in kwargs['define_macros']]      
 
     # Run the constructor for the base class
     DistutilsExtension.__init__(self, name, sources, **kwargs)
@@ -704,6 +710,7 @@ class Library (Extension):
     self.c_target_directory = os.path.join(os.path.realpath(build_directory), self.c_sub_directory)
     if not os.path.exists(self.c_target_directory):
       os.makedirs(self.c_target_directory)
+
     # generate CMakeLists.txt makefile
     generator = CMakeListsGenerator(
       name = self.c_name,
@@ -731,11 +738,22 @@ class Library (Extension):
       env['CXX'] = compiler
     # configure cmake
     command = [self.c_cmake, final_build_dir]
+
+    # if on windows and 64-bit add 64bit macro
+    if os.name == 'nt' and platform.architecture()[0] == '64bit':
+      command.extend(['-G', 'Visual Studio 14 2015 Win64'])
+
     if subprocess.call(command, cwd=final_build_dir, env=env, stdout=stdout) != 0:
       raise OSError("Could not generate makefiles with CMake")
-    # run make
-    make_call = ['make']
-    if  "BOB_BUILD_PARALLEL" in os.environ: make_call += ['-j%s' % os.environ["BOB_BUILD_PARALLEL"]]
+    # run make or cmake depending on the platform
+    if os.name == 'nt':
+      make_call = 'cmake --build . --target ALL_BUILD --config Release'.split()
+      # make_call = 'cmake --build .'.split()
+    else:
+      make_call = ['make']
+      if  "BOB_BUILD_PARALLEL" in os.environ: make_call += ['-j%s' % os.environ["BOB_BUILD_PARALLEL"]]
+
+    print("Calling the command: {}".format(make_call))
     if subprocess.call(make_call, cwd=final_build_dir, env=env, stdout=stdout) != 0:
       raise OSError("CMake compilation stopped with an error; stopping ...")
 
@@ -774,12 +792,13 @@ class build_ext(_build_ext):
     """
 
     # HACK: remove the "-Wstrict-prototypes" option keyword
-    self.compiler.compiler = [c for c in self.compiler.compiler if c != "-Wstrict-prototypes"]
-    self.compiler.compiler_so = [c for c in self.compiler.compiler_so if c != "-Wstrict-prototypes"]
-    if "-Wno-strict-aliasing" not in self.compiler.compiler:
-      self.compiler.compiler.append("-Wno-strict-aliasing")
-    if "-Wno-strict-aliasing" not in self.compiler.compiler_so:
-      self.compiler.compiler_so.append("-Wno-strict-aliasing")
+    if os.name != 'nt':
+      self.compiler.compiler = [c for c in self.compiler.compiler if c != "-Wstrict-prototypes"]
+      self.compiler.compiler_so = [c for c in self.compiler.compiler_so if c != "-Wstrict-prototypes"]
+      if "-Wno-strict-aliasing" not in self.compiler.compiler:
+        self.compiler.compiler.append("-Wno-strict-aliasing")
+      if "-Wno-strict-aliasing" not in self.compiler.compiler_so:
+        self.compiler.compiler_so.append("-Wno-strict-aliasing")
 
     # check if it is our type of extension
     if isinstance(ext, Library):

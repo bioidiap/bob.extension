@@ -63,7 +63,10 @@ def construct_search_paths(prefixes=None, subpaths=None, suffix=None):
   # Priority 4: the conda prefix
   conda_prefix = os.environ.get('CONDA_PREFIX')
   if conda_prefix:
-    search.append(conda_prefix + suffix)
+    if os.name == 'nt':
+      search.append(os.path.join(conda_prefix,'Library') + suffix)
+    else:
+      search.append(conda_prefix + suffix)
 
   # Priority 5: the default search prefixes
   search += [p + suffix for p in DEFAULT_PREFIXES]
@@ -225,6 +228,9 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
 
   libpaths += ['lib']
 
+  if os.name == 'nt':
+    libpaths += ['bin']
+
   # Exhaustive combination of paths and subpaths
   if subpaths:
     my_subpaths = []
@@ -235,12 +241,15 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
 
   # Extensions to consider
   if only_static:
-    extensions = ['.a']
+    if os.name == 'nt':
+      extensions = ['.lib']
+    else:
+      extensions = ['.a']
   else:
     if sys.platform == 'darwin':
       extensions = ['.dylib', '.a']
-    elif sys.platform == 'win32':
-      extensions = ['.dll', '.a']
+    elif os.name == 'nt':
+      extensions = ['.lib', '.dll']
     else: # linux like
       extensions = ['.so', '.a']
 
@@ -250,6 +259,8 @@ def find_library(name, version=None, subpaths=None, prefixes=None,
     for ext in extensions:
       if sys.platform == 'darwin': # version in the middle
         libname = 'lib' + name + '.' + version + ext
+      elif os.name == 'nt':
+        libname = 'lib' + name + '-' + '_'.join(version.split('.')[:2]) + ext
       else: # version at the end
         libname = 'lib' + name + ext + '.' + version
 
@@ -304,6 +315,11 @@ def find_executable(name, subpaths=None, prefixes=None):
         ]
 
   binpaths += ['bin']
+
+  # Windows
+  if os.name == 'nt':
+    binpaths += [os.path.join('mingw-w64','bin')]
+    name = name + '.exe'
 
   # Exhaustive combination of paths and subpaths
   if subpaths:
