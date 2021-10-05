@@ -34,7 +34,6 @@ test:
   imports:
     - {{ name }}
   commands:
-    - pip check
     - bob -h
     - bob --help
     - bob config -h
@@ -47,7 +46,6 @@ test:
     - conda inspect linkages -p $PREFIX {{ name }}  # [not win]
     - conda inspect objects -p $PREFIX {{ name }}  # [osx]
   requires:
-    - pip {{ pip }}
     - nose {{ nose }}
     - coverage {{ coverage }}
     - sphinx {{ sphinx }}
