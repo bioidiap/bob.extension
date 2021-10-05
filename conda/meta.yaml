@@ -20,7 +20,7 @@ requirements:
   host:
     - python {{ python }}
     - setuptools {{ setuptools }}
-    - pip
+    - pip {{ pip }}
     - click >=8
     - click {{ click }}
     - click-plugins {{ click_plugins }}
@@ -47,7 +47,7 @@ test:
     - conda inspect linkages -p $PREFIX {{ name }}  # [not win]
     - conda inspect objects -p $PREFIX {{ name }}  # [osx]
   requires:
-    - pip
+    - pip {{ pip }}
     - nose {{ nose }}
     - coverage {{ coverage }}
     - sphinx {{ sphinx }}
