@@ -12,14 +12,15 @@ build:
   script:
     - cd {{ project_dir }}
     {% if environ.get('BUILD_EGG') %}
-    - python setup.py sdist --formats=zip
+    - "{{ PYTHON }} setup.py sdist --formats=zip"
     {% endif %}
-    - python setup.py install --single-version-externally-managed --record record.txt
+    - "{{ PYTHON }} -m pip install . -vv"
 
 requirements:
   host:
     - python {{ python }}
     - setuptools {{ setuptools }}
+    - pip
     - click >=8
     - click {{ click }}
     - click-plugins {{ click_plugins }}
@@ -33,6 +34,7 @@ test:
   imports:
     - {{ name }}
   commands:
+    - pip check
     - bob -h
     - bob --help
     - bob config -h
@@ -45,6 +47,7 @@ test:
     - conda inspect linkages -p $PREFIX {{ name }}  # [not win]
     - conda inspect objects -p $PREFIX {{ name }}  # [osx]
   requires:
+    - pip
     - nose {{ nose }}
     - coverage {{ coverage }}
     - sphinx {{ sphinx }}
