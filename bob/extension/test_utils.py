@@ -117,8 +117,8 @@ package-z
 def test_find_packages():
   # tests the find-packages command inside the bob.extension package
 
-  basedir = pkg_resources.resource_filename('bob.extension', '..')
-  packages = find_packages(os.path.abspath(basedir))
+  basedir = pkg_resources.resource_filename('bob.extension', ".")
+  packages = find_packages(os.path.abspath(os.path.join(basedir, "..")))
 
   site_packages = os.path.dirname(os.path.commonprefix(packages))
   packages = [os.path.relpath(k, site_packages) for k in packages]
