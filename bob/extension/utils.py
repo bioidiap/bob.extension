@@ -524,7 +524,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   _add_index('python', 'https://docs.python.org/%d.%d/' % sys.version_info[:2])
   _add_numpy_index()
   _add_index('scipy', 'https://docs.scipy.org/doc/scipy/')
-  _add_index('matplotlib', 'https://matplotlib.org/')
+  _add_index('matplotlib', 'https://matplotlib.org/stable/')
   _add_index('setuptools', 'https://setuptools.readthedocs.io/en/latest/')
   _add_index('six', 'https://six.readthedocs.io')
   _add_index('sqlalchemy', 'https://docs.sqlalchemy.org/en/latest/')
