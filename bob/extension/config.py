@@ -227,7 +227,9 @@ def load(paths, context=None, entry_point_group=None, attribute_name=None):
     # remove the keys that might break the loading of the next config file.
     ctxt.__dict__.pop('__name__', None)
     ctxt.__dict__.pop('__package__', None)
-    mod.__dict__.update(ctxt.__dict__)
+    # do not propogate __ variables
+    context = {k: v for k, v in ctxt.__dict__.items() if not k.startswith('__')}
+    mod.__dict__.update(context)
     LOADED_CONFIGS.append(mod)
     ctxt = _load_context(k, mod)
 
