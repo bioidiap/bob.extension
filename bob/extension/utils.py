@@ -540,6 +540,7 @@ def link_documentation(additional_packages = ['python', 'numpy'], requirements_f
   _add_click_index()
   _add_index('torch', 'https://pytorch.org/docs/stable/')
   _add_index('xarray', 'https://xarray.pydata.org/en/stable/')
+  _add_index("h5py", "https://docs.h5py.org/en/stable/")
 
 
   # get the server for the other packages
