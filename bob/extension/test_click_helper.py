@@ -185,7 +185,7 @@ def _assert_config_dump(ref, ref_date):
     # uncomment below to re-write tests
     # open(ref, 'wt').write(open('TEST_CONF').read())
     with open("TEST_CONF", "r") as f, open(ref, "r") as f2:
-        text = f.read()
+        text = f.read().replace("'''", '"""')
         ref_text = f2.read().replace(ref_date, today)
         assert text == ref_text, "\n".join(
             [text, "########################\n" * 2, ref_text]
