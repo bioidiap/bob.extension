@@ -215,7 +215,7 @@ This will produce the following help message to the users::
     Annotates a database.
 
     The annotations are written in text file (json) format which can be read
-    back using :any:`bob.db.base.read_annotation_file`
+    back using :any:`bob.bio.base.utils.annotations.read_annotation_file`
     (annotation_type='json')
 
     It is possible to pass one or several Python files (or names of
