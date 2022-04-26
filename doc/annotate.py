@@ -37,7 +37,7 @@ def annotate(database, annotator, output_dir, force, array, **kwargs):
     """Annotates a database.
 
     The annotations are written in text file (json) format which can be read
-    back using :any:`bob.db.base.read_annotation_file` (annotation_type='json')
+    back using :any:`bob.bio.base.utils.annotations.read_annotation_file` (annotation_type='json')
     """
     log_parameters(logger)
 
