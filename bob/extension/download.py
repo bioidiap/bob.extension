@@ -279,8 +279,9 @@ def get_file(
         if file_hash is not None and not validate_file(
             final_filename, file_hash, algorithm=hash_algorithm
         ):
+            found_hash = _hash_file(final_filename, algorithm=hash_algorithm)
             raise ValueError(
-                "File was downloaded, but it is corrupted. Please re-do the procedure."
+                f"The downloaded file: {final_filename} has the hash of {found_hash}, but we expected {file_hash}. Please re-do the procedure."
             )
 
     return final_filename
