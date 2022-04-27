@@ -96,7 +96,7 @@ The package you cloned above is a pure-Python example package and contains all
 elements to get you started.  It defines a single library module called
 ``bob.example.project``, which declares a simple script, called ``version.py``
 that prints out the version of the dependent library
-:ref:`bob.blitz <bob.blitz>`. These information is available in your
+``bob.blitz``. These information is available in your
 ``setup.py`` file and particularly in its ``setup`` function:
 
 .. code-block:: python

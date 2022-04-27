@@ -61,7 +61,7 @@ As the second step, we need to add some lines in the header of the file to tell 
   build_requires = setup_packages + bob_packages + load_requirements()
 
 In fact, we don't use the extension from :py:class:`bob.extension.Extension`, but the one from ``bob.blitz.extension``, which is a derivation of this package.
-The difference is that in :py:class:`bob.blitz.extension.Extension` all header files and libraries for the ``Blitz++`` library are added.
+The difference is that in ``bob.blitz.extension.Extension`` all header files and libraries for the ``Blitz++`` library are added.
 
 Third, we have to add an extension using the ``Extension`` class, by listing all C/C++ files that should be compiled into the extension:
 
