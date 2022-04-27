@@ -69,7 +69,7 @@ If you would like to generate a Library out of your C++ code, simply add it in t
 
 
 Again, we use the overloaded library class
-:py:class:`bob.blitz.extension.Library` instead of the
+``bob.blitz.extension.Library`` instead of the
 :py:class:`bob.extension.Library`, but the parameters are identical, and
 identical to the ones of the :py:class:`bob.extension.Extension`.  To avoid
 later complications, you should follow the guidelines for libraries in bob
