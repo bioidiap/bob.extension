@@ -9,21 +9,14 @@
 .. todolist::
 
 This module contains information on how to build, maintain, and distribute Bob_
-packages written in pure Python or a mix of C/C++ and Python.
+packages written in Python.
 
 By following these instructions you will be able to:
 
 * Setup a local development environment.
 * Download and install |project| packages and other software into your
   development environment.
-* Implement your own package including either pure Python code, a mixture of
-  C/C++ and Python code, and even pure C/C++ libraries with clean C/C++
-  interfaces.
-
-  .. note::
-     If possible, you should try to develop new packages using Python only,
-     since they are easier to maintain.
-
+* Implement your own package.
 * Distribute your work to others in a clean and organized manner.
 
 
@@ -35,13 +28,10 @@ Documentation
 
    development
    pure_python
-   cplusplus_modules
-   cplusplus_library
    documenting
    rc
    framework
    py_api
-   cpp_api
 
 Indices and tables
 ------------------

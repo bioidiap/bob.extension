@@ -1,10 +1,12 @@
 """The manager for bob's main configuration.
 """
-from .. import rc
-from ..rc_config import _saverc, _rc_to_str, _get_rc_path 
-from .click_helper import verbosity_option, AliasedGroup
 import logging
+
 import click
+
+from .. import rc
+from ..rc_config import _get_rc_path, _rc_to_str, _saverc
+from .click_helper import AliasedGroup, verbosity_option
 
 # Use the normal logging module. Verbosity and format of logging will be set by
 # adding the verbosity_option form bob.extension.scripts.click_helper
@@ -18,8 +20,9 @@ def config(**kwargs):
     # Load the config file again. This may be needed since the environment
     # variable might change the config path during the tests. Otherwise, this
     # should not be important.
-    logger.debug('Reloading the global configuration file.')
+    logger.debug("Reloading the global configuration file.")
     from ..rc_config import _loadrc
+
     rc.clear()
     rc.update(_loadrc())
 
@@ -36,7 +39,7 @@ def show():
 
 
 @config.command()
-@click.argument('key')
+@click.argument("key")
 def get(key):
     """Prints a key.
 
@@ -57,13 +60,14 @@ def get(key):
     if value is None:
         # Exit the command line with ClickException in case of errors.
         raise click.ClickException(
-            "The requested key `{}' does not exist".format(key))
+            "The requested key `{}' does not exist".format(key)
+        )
     click.echo(value)
 
 
 @config.command()
-@click.argument('key')
-@click.argument('value')
+@click.argument("key")
+@click.argument("value")
 def set(key, value):
     """Sets the value for a key.
 
@@ -90,10 +94,25 @@ def set(key, value):
         logger.error("Could not configure the rc file", exc_info=True)
         raise click.ClickException("Failed to change the configuration.")
 
+
 @config.command()
-@click.argument('substr')
-@click.option('-c', '--contain',  is_flag=True, default=False, type=click.BOOL, show_default=True)
-@click.option('-f', '--force',  is_flag=True, default=False, type=click.BOOL, show_default=True)
+@click.argument("substr")
+@click.option(
+    "-c",
+    "--contain",
+    is_flag=True,
+    default=False,
+    type=click.BOOL,
+    show_default=True,
+)
+@click.option(
+    "-f",
+    "--force",
+    is_flag=True,
+    default=False,
+    type=click.BOOL,
+    show_default=True,
+)
 def unset(substr, contain=False, force=False):
     """Clear all variables starting (containing) with substring.
 
@@ -106,7 +125,7 @@ def unset(substr, contain=False, force=False):
     ---------
     substring : str
         The starting substring of one or several key(s)
-    
+
     \b
     Parameters
     ----------
@@ -125,15 +144,23 @@ def unset(substr, contain=False, force=False):
             if substr in key:
                 to_delete.append(key)
                 found = True
-   
+
     if not found:
         if not contain:
-            logger.error("The key starting with '{}' was not found in the rc file".format(substr))
+            logger.error(
+                "The key starting with '{}' was not found in the rc file".format(
+                    substr
+                )
+            )
         else:
-            logger.error("The key containing '{}' was not found in the rc file".format(substr))
-   
+            logger.error(
+                "The key containing '{}' was not found in the rc file".format(
+                    substr
+                )
+            )
+
         raise click.ClickException("Failed to change the configuration.")
-  
+
     if force:
         for key in to_delete:
             del rc[key]
@@ -146,4 +173,4 @@ def unset(substr, contain=False, force=False):
             for key in to_delete:
                 del rc[key]
 
-    _saverc(rc) 
+    _saverc(rc)

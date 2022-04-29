@@ -3,11 +3,10 @@ import time
 import traceback
 
 import click
+
 from click.core import ParameterSource
 
-from ..config import load
-from ..config import mod_to_context
-from ..config import resource_keys
+from ..config import load, mod_to_context, resource_keys
 from ..log import set_verbosity_level
 
 logger = logging.getLogger(__name__)
@@ -191,7 +190,9 @@ class ConfigCommand(click.Command):
       The name of entry point that will be used to load the config files.
     """
 
-    def __init__(self, name, *args, help=None, entry_point_group=None, **kwargs):
+    def __init__(
+        self, name, *args, help=None, entry_point_group=None, **kwargs
+    ):
         self.entry_point_group = entry_point_group
         configs_argument_name = "CONFIG"
         # Augment help for the config file argument
@@ -209,7 +210,9 @@ file.""".format(
 
         # Add the config argument to the command
         def configs_argument_callback(ctx, param, value):
-            config_context = load(value, entry_point_group=self.entry_point_group)
+            config_context = load(
+                value, entry_point_group=self.entry_point_group
+            )
             config_context = mod_to_context(config_context)
             ctx.config_context = config_context
             logger.debug("Augmenting context with config context")
@@ -263,7 +266,9 @@ file.""".format(
             if not isinstance(param, ResourceOption):
                 continue
 
-            config_file.write("\n# %s = %s\n" % (param.name, str(param.default)))
+            config_file.write(
+                "\n# %s = %s\n" % (param.name, str(param.default))
+            )
             config_file.write("'''")
 
             if param.required:
@@ -274,7 +279,8 @@ file.""".format(
                     " [default: {}]".format(param.default),
                 )
             config_file.write(
-                "%s: %s (%s)%s" % (begin, param.name, ", ".join(param.opts), dflt)
+                "%s: %s (%s)%s"
+                % (begin, param.name, ", ".join(param.opts), dflt)
             )
 
             if param.help is not None:
@@ -292,7 +298,9 @@ file.""".format(
 
             config_file.write("'''\n")
             click.echo(
-                "Configuration file '{}' was written; exiting".format(config_file.name)
+                "Configuration file '{}' was written; exiting".format(
+                    config_file.name
+                )
             )
 
         config_file.close()
@@ -373,7 +381,9 @@ class ResourceOption(click.Option):
 
         self.entry_point_group = entry_point_group
         if entry_point_group is not None:
-            name, _, _ = self._parse_decls(param_decls, kwargs.get("expose_value"))
+            name, _, _ = self._parse_decls(
+                param_decls, kwargs.get("expose_value")
+            )
             help = help or ""
             help += (
                 " Can be a ``{entry_point_group}`` entry point, a module name, or "
@@ -399,7 +409,9 @@ class ResourceOption(click.Option):
         self.string_exceptions = string_exceptions or []
 
     def consume_value(self, ctx, opts):
-        if (not hasattr(ctx, "config_context")) and self.entry_point_group is None:
+        if (
+            not hasattr(ctx, "config_context")
+        ) and self.entry_point_group is None:
             raise TypeError(
                 "The ResourceOption class is not meant to be used this way. "
                 "Please see the docs of the class."
@@ -442,7 +454,9 @@ class ResourceOption(click.Option):
 
         # if the value is a string and an entry_point_group is provided, load it
         if self.entry_point_group is not None:
-            while isinstance(value, str) and value not in self.string_exceptions:
+            while (
+                isinstance(value, str) and value not in self.string_exceptions
+            ):
                 value = load(
                     [value],
                     entry_point_group=self.entry_point_group,
@@ -498,7 +512,10 @@ def log_parameters(logger_handle, ignore=tuple()):
 
 def assert_click_runner_result(result, exit_code=0, exception_type=None):
     """Helper for asserting click runner results"""
-    m = "Click command exited with code `{}' and exception:\n{}" "\nThe output was:\n{}"
+    m = (
+        "Click command exited with code `{}' and exception:\n{}"
+        "\nThe output was:\n{}"
+    )
     exception = (
         "None"
         if result.exc_info is None
