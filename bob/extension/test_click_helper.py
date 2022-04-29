@@ -192,6 +192,9 @@ def _assert_config_dump(ref, ref_date):
     with open("TEST_CONF", "r") as f, open(ref, "r") as f2:
         text = f.read().replace("'''", '"""')
         ref_text = f2.read().replace(ref_date, today)
+        # remove the starting whitespace of each line so the tests are more relaxed
+        text = "\n".join(line.lstrip() for line in text.splitlines())
+        ref_text = "\n".join(line.lstrip() for line in ref_text.splitlines())
         assert text == ref_text, "\n".join(
             [text, "########################\n" * 2, ref_text]
         )
