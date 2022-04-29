@@ -1,21 +1,26 @@
-import click
 import time
+
+import click
 import pkg_resources
+
 from click.testing import CliRunner
+
 from bob.extension.scripts.click_helper import (
-    verbosity_option,
-    bool_option,
-    list_float_option,
+    AliasedGroup,
     ConfigCommand,
     ResourceOption,
-    AliasedGroup,
     assert_click_runner_result,
+    bool_option,
+    list_float_option,
+    verbosity_option,
 )
 
 
 def test_verbosity_option():
 
-    for VERBOSITY, OPTIONS in zip([0, 1, 2, 3], [[], ["-v"], ["-vv"], ["-vvv"]]):
+    for VERBOSITY, OPTIONS in zip(
+        [0, 1, 2, 3], [[], ["-v"], ["-vv"], ["-vvv"]]
+    ):
 
         @click.command()
         @verbosity_option()
@@ -187,6 +192,9 @@ def _assert_config_dump(ref, ref_date):
     with open("TEST_CONF", "r") as f, open(ref, "r") as f2:
         text = f.read().replace("'''", '"""')
         ref_text = f2.read().replace(ref_date, today)
+        # remove the starting whitespace of each line so the tests are more relaxed
+        text = "\n".join(line.lstrip() for line in text.splitlines())
+        ref_text = "\n".join(line.lstrip() for line in ref_text.splitlines())
         assert text == ref_text, "\n".join(
             [text, "########################\n" * 2, ref_text]
         )
@@ -213,7 +221,9 @@ def test_config_dump():
 
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cli, ["test", "-H", "TEST_CONF"], catch_exceptions=False)
+        result = runner.invoke(
+            cli, ["test", "-H", "TEST_CONF"], catch_exceptions=False
+        )
         ref = pkg_resources.resource_filename(
             "bob.extension", "data/test_dump_config.py"
         )
@@ -226,7 +236,9 @@ def test_config_dump2():
     def cli():
         pass
 
-    @cli.command(cls=ConfigCommand, entry_point_group="bob.extension.test_dump_config")
+    @cli.command(
+        cls=ConfigCommand, entry_point_group="bob.extension.test_dump_config"
+    )
     @click.option(
         "--database",
         "-d",
@@ -244,13 +256,21 @@ def test_config_dump2():
         help="bli bli bli",
     )
     @click.option(
-        "--output-dir", "-o", required=True, cls=ResourceOption, help="blo blo blo"
+        "--output-dir",
+        "-o",
+        required=True,
+        cls=ResourceOption,
+        help="blo blo blo",
     )
     @click.option(
         "--force", "-f", is_flag=True, cls=ResourceOption, help="lalalalalala"
     )
     @click.option(
-        "--array", type=click.INT, default=1, cls=ResourceOption, help="lililili"
+        "--array",
+        type=click.INT,
+        default=1,
+        cls=ResourceOption,
+        help="lililili",
     )
     @click.option(
         "--database-directories-file",
@@ -275,7 +295,9 @@ def test_config_dump2():
 
     runner = CliRunner()
     with runner.isolated_filesystem():
-        result = runner.invoke(cli, ["test", "-H", "TEST_CONF"], catch_exceptions=False)
+        result = runner.invoke(
+            cli, ["test", "-H", "TEST_CONF"], catch_exceptions=False
+        )
         ref = pkg_resources.resource_filename(
             "bob.extension", "data/test_dump_config2.py"
         )
