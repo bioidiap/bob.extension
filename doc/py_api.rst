@@ -15,28 +15,9 @@ Core Functionality
 ^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
-    bob.extension.boost
-    bob.extension.build_ext
-    bob.extension.check_packages
-    bob.extension.CMakeListsGenerator
-    bob.extension.construct_search_paths
-    bob.extension.DEFAULT_PREFIXES
-    bob.extension.Extension
-    bob.extension.find_executable
-    bob.extension.find_library
-    bob.extension.generate_self_macros
-    bob.extension.get_bob_libraries
     bob.extension.get_config
-    bob.extension.get_full_libname
-    bob.extension.Library
-    bob.extension.load_bob_library
-    bob.extension.normalize_requirements
-    bob.extension.pkgconfig
     bob.extension.rc
     bob.extension.rc_context
-    bob.extension.reorganize_isystem
-    bob.extension.uniq
-    bob.extension.uniq_paths
     bob.extension.download.get_file
 
 
@@ -44,9 +25,6 @@ Utilities
 ^^^^^^^^^
 
 .. autosummary::
-    bob.extension.utils.egrep
-    bob.extension.utils.find_file
-    bob.extension.utils.find_header
     bob.extension.utils.find_packages
     bob.extension.utils.link_documentation
     bob.extension.utils.load_requirements
@@ -86,7 +64,6 @@ Utilities
 ---------
 
 .. automodule:: bob.extension.utils
-    :exclude-members: find_executable,find_library,uniq,uniq_paths,construct_search_paths
 
 .. automodule:: bob.extension.download
 

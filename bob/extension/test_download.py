@@ -3,16 +3,23 @@ import shutil
 import tempfile
 
 import pkg_resources
+
 from bob.extension import rc_context
-from bob.extension.download import download_and_unzip
-from bob.extension.download import find_element_in_tarball, search_file, _untar
-from bob.extension.download import get_file, list_dir
+from bob.extension.download import (
+    _untar,
+    download_and_unzip,
+    find_element_in_tarball,
+    get_file,
+    list_dir,
+    search_file,
+)
 
 
 def test_download_unzip():
     def download(filename):
         download_and_unzip(
-            "http://www.idiap.ch/software/bob/databases/latest/mnist.tar.bz2", filename
+            "http://www.idiap.ch/software/bob/databases/latest/mnist.tar.bz2",
+            filename,
         )
         uncompressed_filename = os.path.join(os.path.dirname(filename), "data")
 
@@ -70,7 +77,8 @@ def test_find_element_in_tarball():
     )
     assert (
         find_element_in_tarball(
-            filename, "example_csv_filelist/protocol_dev_eval/norm/train_world.csv"
+            filename,
+            "example_csv_filelist/protocol_dev_eval/norm/train_world.csv",
         )
         is not None
     )
@@ -90,7 +98,10 @@ def test_search_file():
         __name__, "data/example_csv_filelist.tar.gz"
     )
     # Search in the tarball
-    assert search_file(filename, "protocol_dev_eval/norm/train_world.csv") is not None
+    assert (
+        search_file(filename, "protocol_dev_eval/norm/train_world.csv")
+        is not None
+    )
     assert search_file(filename, "protocol_dev_eval/norm/xuxa.csv") is None
 
     # Search in a file structure
@@ -100,7 +111,10 @@ def test_search_file():
 
     _untar(filename, final_path, ".gz")
 
-    assert search_file(final_path, "protocol_dev_eval/norm/train_world.csv") is not None
+    assert (
+        search_file(final_path, "protocol_dev_eval/norm/train_world.csv")
+        is not None
+    )
     assert search_file(final_path, "protocol_dev_eval/norm/xuxa.csv") is None
 
     shutil.rmtree(final_path)
@@ -115,7 +129,10 @@ def test_list_dir():
 
     for root_folder in (folder, tar1, tar2):
         fldrs = list_dir(root_folder)
-        assert fldrs == ["README.rst", "database1", "database2"], (fldrs, root_folder)
+        assert fldrs == ["README.rst", "database1", "database2"], (
+            fldrs,
+            root_folder,
+        )
         fldrs = list_dir(root_folder, files=False)
         assert fldrs == ["database1", "database2"], (fldrs, root_folder)
         fldrs = list_dir(root_folder, folders=False)
@@ -124,7 +141,10 @@ def test_list_dir():
         assert fldrs == [], (fldrs, root_folder)
 
         fldrs = list_dir(root_folder, "database1")
-        assert fldrs == ["README1.rst", "protocol1", "protocol2"], (fldrs, root_folder)
+        assert fldrs == ["README1.rst", "protocol1", "protocol2"], (
+            fldrs,
+            root_folder,
+        )
         fldrs = list_dir(root_folder, "database1", files=False)
         assert fldrs == ["protocol1", "protocol2"], (fldrs, root_folder)
         fldrs = list_dir(root_folder, "database1", folders=False)

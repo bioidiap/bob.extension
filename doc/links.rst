@@ -15,7 +15,6 @@
 .. _gitlab: https://gitlab.idiap.ch/bob/
 .. _idiap: http://www.idiap.ch
 .. _ipython: http://ipython.scipy.org
-.. _nose: https://nose.readthedocs.org/en/latest/
 .. _pep 386: http://www.python.org/dev/peps/pep-0386/
 .. _python: http://www.python.org
 .. _pypi: http://pypi.python.org

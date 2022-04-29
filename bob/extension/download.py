@@ -8,6 +8,7 @@ import logging
 import os
 import tarfile
 import zipfile
+
 from pathlib import Path
 from shutil import copyfileobj
 from urllib.request import urlopen
@@ -18,7 +19,9 @@ logger = logging.getLogger(__name__)
 
 
 def _bob_data_folder():
-    return rc.get("bob_data_folder", os.path.join(os.path.expanduser("~"), "bob_data"))
+    return rc.get(
+        "bob_data_folder", os.path.join(os.path.expanduser("~"), "bob_data")
+    )
 
 
 def _unzip(zip_file, directory):
@@ -116,7 +119,9 @@ def download_file_from_possible_urls(urls, out_file):
             download_file(url, out_file)
             break
         except Exception:
-            logger.warning("Could not download from the %s url", url, exc_info=True)
+            logger.warning(
+                "Could not download from the %s url", url, exc_info=True
+            )
     else:  # else is for the for loop
         raise RuntimeError(
             f"Could not download the requested file from the following urls: {urls}"
