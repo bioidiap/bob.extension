@@ -1,4 +1,5 @@
 import logging
+import textwrap
 import time
 import traceback
 
@@ -177,6 +178,23 @@ def verbosity_option(**kwargs):
     return custom_verbosity_option
 
 
+def _prepare_entry_points(entry_point_group):
+    if not entry_point_group:
+        return ""
+    ret = ""
+    for prj_name, prj_entry_points in resource_keys(
+        entry_point_group, with_project_names=True
+    ).items():
+        ret += f"\n\n**{prj_name}** entry points are: "
+        ret += ", ".join(prj_entry_points)
+
+    # wrap ret to 80 chars
+    ret = "\n".join(
+        textwrap.wrap(ret, 80, break_on_hyphens=False, replace_whitespace=False)
+    )
+    return ret
+
+
 class ConfigCommand(click.Command):
     """A click.Command that can take options both form command line options and
     configuration files. In order to use this class, you **have to** use the
@@ -197,13 +215,16 @@ class ConfigCommand(click.Command):
         configs_argument_name = "CONFIG"
         # Augment help for the config file argument
         self.extra_help = """\n\nIt is possible to pass one or several Python files
-(or names of ``{entry_point_group}`` entry points or module names) as {CONFIG}
-arguments to the command line which contain the parameters listed below as
-Python variables. The options through the command-line (see below) will
-override the values of configuration files. You can run this command with
-``<COMMAND> -H example_config.py`` to create a template config
+(or names of ``{entry_point_group}`` entry points or module names i.e. import
+paths) as {CONFIG} arguments to this command line which contain the parameters
+listed below as Python variables. Available entry points are: {entry_points}
+\nThe options through the command-line (see below) will
+override the values of argument provided configuration files. You can run this
+command with ``<COMMAND> -H example_config.py`` to create a template config
 file.""".format(
-            CONFIG=configs_argument_name, entry_point_group=entry_point_group
+            CONFIG=configs_argument_name,
+            entry_point_group=entry_point_group,
+            entry_points=_prepare_entry_points(entry_point_group),
         )
         help = (help or "").rstrip() + self.extra_help
         super().__init__(name, *args, help=help, **kwargs)
@@ -254,7 +275,7 @@ file.""".format(
         )
 
         if self.help:
-            h = self.help.replace(self.extra_help, "").replace("\b\n", "")
+            h = self.help.replace("\b\n", "")
             config_file.write("\n{}".format(h.rstrip()))
 
         if self.epilog:
@@ -284,24 +305,24 @@ file.""".format(
             )
 
             if param.help is not None:
-                config_file.write("\n%s" % param.help)
-
-            if (
-                isinstance(param, ResourceOption)
-                and param.entry_point_group is not None
-            ):
                 config_file.write(
-                    "\nRegistered entries are: {}".format(
-                        resource_keys(param.entry_point_group)
+                    "\n%s"
+                    % "\n".join(
+                        textwrap.wrap(
+                            param.help,
+                            80,
+                            break_on_hyphens=False,
+                            replace_whitespace=False,
+                        )
                     )
                 )
 
             config_file.write("'''\n")
-            click.echo(
-                "Configuration file '{}' was written; exiting".format(
-                    config_file.name
-                )
+        click.echo(
+            "Configuration file '{}' was written; exiting".format(
+                config_file.name
             )
+        )
 
         config_file.close()
         ctx.exit()
@@ -387,9 +408,14 @@ class ResourceOption(click.Option):
             help = help or ""
             help += (
                 " Can be a ``{entry_point_group}`` entry point, a module name, or "
-                "a path to a Python file which contains a variable named `{name}`."
+                "a path to a Python file which contains a variable named `{name}`. "
+                "Available entry points are: {entry_points}"
             )
-            help = help.format(entry_point_group=entry_point_group, name=name)
+            help = help.format(
+                entry_point_group=entry_point_group,
+                entry_points=_prepare_entry_points(entry_point_group),
+                name=name,
+            )
         super().__init__(
             param_decls=param_decls,
             show_default=show_default,

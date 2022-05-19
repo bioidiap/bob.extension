@@ -8,6 +8,7 @@ import logging
 import pkgutil
 import types
 
+from collections import defaultdict
 from os.path import isfile
 
 import pkg_resources
@@ -280,7 +281,12 @@ def mod_to_context(mod):
     }
 
 
-def resource_keys(entry_point_group, exclude_packages=[], strip=["dummy"]):
+def resource_keys(
+    entry_point_group,
+    exclude_packages=[],
+    strip=["dummy"],
+    with_project_names=False,
+):
     """Reads and returns all resources that are registered with the given
     entry_point_group. Entry points from the given ``exclude_packages`` are
     ignored.
@@ -293,18 +299,37 @@ def resource_keys(entry_point_group, exclude_packages=[], strip=["dummy"]):
         List of packages to exclude when finding resources.
     strip : :any:`list`, optional
         Entrypoint names that start with any value in ``strip`` will be ignored.
+    with_project_names : :any:`bool`, optional
+        If True, will return a list of tuples with the project name and the entry point name.
 
     Returns
     -------
     :any:`list`
-        List of found resources.
+        List of found entry point names. If ``with_project_names`` is True, will return
+        a list of tuples with the project name and the entry point name.
     """
-    ret_list = [
-        entry_point.name
-        for entry_point in pkg_resources.iter_entry_points(entry_point_group)
-        if (
+    if with_project_names:
+        ret_list = defaultdict(list)
+    else:
+        ret_list = []
+
+    for entry_point in pkg_resources.iter_entry_points(entry_point_group):
+        if not (
             entry_point.dist.project_name not in exclude_packages
             and not entry_point.name.startswith(tuple(strip))
-        )
-    ]
-    return sorted(ret_list)
+        ):
+            continue
+        if with_project_names:
+            ret_list[str(entry_point.dist.project_name)].append(
+                entry_point.name
+            )
+        else:
+            ret_list.append(entry_point.name)
+
+    if with_project_names:
+        # sort each list inside the dict
+        ret_list = {k: sorted(v) for k, v in ret_list.items()}
+    else:
+        ret_list = sorted(ret_list)
+
+    return ret_list
