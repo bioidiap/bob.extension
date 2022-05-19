@@ -190,14 +190,16 @@ def _assert_config_dump(ref, ref_date):
     # uncomment below to re-write tests
     # open(ref, 'wt').write(open('TEST_CONF').read())
     with open("TEST_CONF", "r") as f, open(ref, "r") as f2:
-        text = f.read().replace("'''", '"""')
-        ref_text = f2.read().replace(ref_date, today)
-        # remove the starting whitespace of each line so the tests are more relaxed
-        text = "\n".join(line.lstrip() for line in text.splitlines())
-        ref_text = "\n".join(line.lstrip() for line in ref_text.splitlines())
-        assert text == ref_text, "\n".join(
-            [text, "########################\n" * 2, ref_text]
-        )
+        text = f.read()
+        ref_text = f2.read()
+    ref_text = ref_text.replace(ref_date, today)
+    # remove the starting and final whitespace of each line so the tests are more relaxed
+    text = "\n".join(line.strip() for line in text.splitlines())
+    ref_text = "\n".join(line.strip() for line in ref_text.splitlines())
+    # replace ''' with """ so tests are more relaxed
+    text = text.replace("'''", '"""')
+    ref_text = ref_text.replace("'''", '"""')
+    assert text == ref_text
 
 
 def test_config_dump():
@@ -228,7 +230,7 @@ def test_config_dump():
             "bob.extension", "data/test_dump_config.py"
         )
         assert_click_runner_result(result)
-        _assert_config_dump(ref, "08/07/2018")
+        _assert_config_dump(ref, "19/05/2022")
 
 
 def test_config_dump2():
@@ -302,7 +304,7 @@ def test_config_dump2():
             "bob.extension", "data/test_dump_config2.py"
         )
         assert_click_runner_result(result)
-        _assert_config_dump(ref, "08/07/2018")
+        _assert_config_dump(ref, "19/05/2022")
 
 
 def test_config_command_with_callback_options():
