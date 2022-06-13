@@ -57,13 +57,11 @@ user's computer:
 
    >>> from bob.extension import rc
    >>> class AtntDatabase:
-   ...     def __init__(self, directory=rc['bob.db.atnt.directory']):
+   ...     def __init__(self, directory=rc.get('bob.db.atnt.directory')):
    ...         self.directory = directory
 
 
-:py:attr:`bob.extension.rc` is a dictionary which returns ``None`` for
-non-existing keys so you don't have to worry about exception handling for
-non-existing keys.
+:py:attr:`bob.extension.rc` is a dictionary.
 
 .. note::
 
