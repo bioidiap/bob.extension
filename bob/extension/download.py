@@ -2,6 +2,7 @@
 # vim: set fileencoding=utf-8 :
 
 import bz2
+import glob
 import hashlib
 import io
 import logging
@@ -347,21 +348,22 @@ def find_element_in_tarball(filename, target_path, open_as_stream=False):
     """
 
     f = tarfile.open(filename)
-    for member in f.getmembers():
-        if member.isdir():
+    # iterate over the members of the tarball
+    while True:
+        member = f.next()
+        if member is None:
+            return None
+
+        if not member.isfile():
             continue
 
-        if (
-            member.isfile()
-            and target_path in member.name
-            and os.path.split(target_path)[-1] == os.path.split(member.name)[-1]
-        ):
-            if open_as_stream:
-                return io.BufferedReader(f.extractfile(member)).read()
-            else:
-                return io.TextIOWrapper(f.extractfile(member), encoding="utf-8")
-    else:
-        return None
+        if not member.name.endswith(target_path):
+            continue
+
+        if open_as_stream:
+            return io.BufferedReader(f.extractfile(member)).read()
+        else:
+            return io.TextIOWrapper(f.extractfile(member), encoding="utf-8")
 
 
 def search_file(base_path, options):
@@ -372,16 +374,18 @@ def search_file(base_path, options):
     ----------
 
     base_path: str
-       Base path to start the search, or the tarball to be searched
+        Base folder to start the search, or the tarball to be searched
 
     options: list
-       Files to be searched. This function will return the first occurency
+        Files to be searched. This function will return the first occurrence.
+        The option can be an incomplete relative path. For example, if you have
+        a file called ``"/a/b/c/d.txt"``, and base_path is ``"/a/b"``, then
+        options can be ``["d.txt"]``.
 
     Returns
     -------
     object
         It returns an opened file
-
     """
 
     if not isinstance(options, list):
@@ -389,26 +393,13 @@ def search_file(base_path, options):
 
     # If the input is a directory
     if os.path.isdir(base_path):
-
-        def get_fs():
-            fs = []
-            for root, _, files in os.walk(base_path, topdown=False):
-                for name in files:
-                    fs.append(os.path.join(root, name))
-            return fs
-
-        def search_in_list(o, lst):
-            for i, l in enumerate(lst):
-                if o in l:
-                    return i
-            else:
-                return -1
-
-        fs = get_fs()
         for o in options:
-            index = search_in_list(o, fs)
-            if index >= 0:
-                return open(fs[index])
+            # we append './' to o because o might start with /
+            pattern = os.path.join(base_path, "**", f"./{o}")
+            for path in glob.iglob(pattern, recursive=True):
+                if not os.path.isfile(path):
+                    continue
+                return open(path)
         else:
             return None
     else:

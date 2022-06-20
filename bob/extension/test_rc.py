@@ -74,8 +74,14 @@ def test_bob_config():
         assert expected_output == result.output, result.output
 
         # test config unset (with starting substring)
-        result = runner.invoke(main_cli, ["config", "unset", "bob.db.atnt"])
-        result = runner.invoke(main_cli, ["config", "get", "bob.db.atnt"])
+        result = runner.invoke(
+            main_cli,
+            ["config", "unset", "bob.db.atnt"],
+            env={ENVNAME: bobrcfile},
+        )
+        result = runner.invoke(
+            main_cli, ["config", "get", "bob.db.atnt"], env={ENVNAME: bobrcfile}
+        )
         assert_click_runner_result(result, 1)
 
         # test config unset (with substring contained)
@@ -91,7 +97,11 @@ def test_bob_config():
             env={ENVNAME: bobrcfile},
         )
         result = runner.invoke(
-            main_cli, ["config", "unset", "--contain", "atnt"]
+            main_cli,
+            ["config", "unset", "--contain", "atnt"],
+            env={ENVNAME: bobrcfile},
         )
-        result = runner.invoke(main_cli, ["config", "get", "bob.db.atnt"])
+        result = runner.invoke(
+            main_cli, ["config", "get", "bob.db.atnt"], env={ENVNAME: bobrcfile}
+        )
         assert_click_runner_result(result, 1)
