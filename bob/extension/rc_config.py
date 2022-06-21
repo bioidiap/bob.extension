@@ -97,3 +97,4 @@ def _saverc(context):
     path = _get_rc_path()
     with open(path, "wt") as f:
         f.write(_rc_to_str(context))
+        f.write("\n")

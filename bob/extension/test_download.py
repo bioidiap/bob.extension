@@ -97,27 +97,37 @@ def test_search_file():
     filename = pkg_resources.resource_filename(
         __name__, "data/example_csv_filelist.tar.gz"
     )
-    # Search in the tarball
-    assert (
-        search_file(filename, "protocol_dev_eval/norm/train_world.csv")
-        is not None
-    )
-    assert search_file(filename, "protocol_dev_eval/norm/xuxa.csv") is None
 
-    # Search in a file structure
-    final_path = "./test_search_file"
+    with tempfile.TemporaryDirectory(suffix="_extracted") as tmpdir:
 
-    pass
+        _untar(filename, tmpdir, ".gz")
 
-    _untar(filename, final_path, ".gz")
+        # Search in the tarball and in its extracted folder
+        for final_path in (filename, tmpdir):
+            in_extracted_folder = final_path.endswith("_extracted")
+            all_files = list_dir(final_path)
 
-    assert (
-        search_file(final_path, "protocol_dev_eval/norm/train_world.csv")
-        is not None
-    )
-    assert search_file(final_path, "protocol_dev_eval/norm/xuxa.csv") is None
+            output_file = search_file(
+                final_path, "protocol_dev_eval/norm/train_world.csv"
+            )
+            assert output_file is not None, all_files
 
-    shutil.rmtree(final_path)
+            # test to see if using / we can force an exact match
+            output_file = search_file(
+                final_path, "/protocol_dev_eval/norm/train_world.csv"
+            )
+            assert output_file is not None, all_files
+            assert "my_data" not in output_file.read()
+            if in_extracted_folder:
+                assert "my_protocol" not in output_file.name
+
+            assert (
+                search_file(final_path, "norm/train_world.csv") is not None
+            ), all_files
+            assert (
+                search_file(final_path, "protocol_dev_eval/norm/xuxa.csv")
+                is None
+            ), all_files
 
 
 def test_list_dir():
