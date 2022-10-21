@@ -198,7 +198,7 @@ def link_documentation(
         if "BOB_DOCUMENTATION_SERVER" in os.environ:
             server = os.environ["BOB_DOCUMENTATION_SERVER"]
         else:
-            server = "http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/|http://www.idiap.ch/software/bob/docs/bob/%(name)s/master/"
+            server = "http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/|http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/sphinx|http://www.idiap.ch/software/bob/docs/bob/%(name)s/master/|http://www.idiap.ch/software/bob/docs/bob/%(name)s/master/sphinx"
 
     # array support for BOB_DOCUMENTATION_SERVER
     # transforms "(file:///path/to/dir  https://example.com/dir| http://bla )"
