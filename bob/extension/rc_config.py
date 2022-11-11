@@ -95,7 +95,7 @@ def _rc_to_str(context):
         "rc from bob.extension is deprecated. Please use exposed.rc instead.",
         DeprecationWarning,
     )
-    return str(UserDefaults(path=RCFILENAME, envname=ENVNAME, logger=logger))
+    return str(context)
 
 
 def _saverc(context):
