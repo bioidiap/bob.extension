@@ -89,7 +89,7 @@ def set(key, value):
     """
     try:
         rc[key] = value
-        _saverc(rc)
+        rc.write()
     except Exception:
         logger.error("Could not configure the rc file", exc_info=True)
         raise click.ClickException("Failed to change the configuration.")

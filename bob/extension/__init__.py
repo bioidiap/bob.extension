@@ -11,6 +11,8 @@ import logging
 
 import pkg_resources
 
+from copy import deepcopy
+
 from .rc_config import _loadrc
 
 logger = logging.getLogger(__name__)
@@ -39,7 +41,7 @@ def rc_context(dict):
     >>> a
     1
     """
-    old_rc = rc.copy()
+    old_rc = deepcopy(rc)
     try:
         rc.update(dict)
         yield
