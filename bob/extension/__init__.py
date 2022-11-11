@@ -9,9 +9,9 @@
 import contextlib
 import logging
 
-import pkg_resources
-
 from copy import deepcopy
+
+import pkg_resources
 
 from .rc_config import _loadrc
 

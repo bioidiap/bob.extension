@@ -3,13 +3,12 @@
 
 """Implements a global configuration system for bob using json."""
 
-import json
 import logging
 import os
 
-from exposed.rc import UserDefaults
-
 from warnings import warn
+
+from exposed.rc import UserDefaults
 
 logger = logging.getLogger(__name__)
 
