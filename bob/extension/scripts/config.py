@@ -4,8 +4,10 @@ import logging
 
 import click
 
+from exposed.rc import UserDefaults
+
 from .. import rc
-from ..rc_config import _get_rc_path, _rc_to_str, _saverc
+from ..rc_config import ENVNAME, RCFILENAME, _get_rc_path, _rc_to_str, _saverc
 from .click_helper import AliasedGroup, verbosity_option
 
 # Use the normal logging module. Verbosity and format of logging will be set by
@@ -88,8 +90,9 @@ def set(key, value):
     * If something goes wrong.
     """
     try:
+        rc = UserDefaults(path=RCFILENAME, envname=ENVNAME, logger=logger)
         rc[key] = value
-        _saverc(rc)
+        rc.write()
     except Exception:
         logger.error("Could not configure the rc file", exc_info=True)
         raise click.ClickException("Failed to change the configuration.")
