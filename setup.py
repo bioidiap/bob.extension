@@ -21,6 +21,9 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=["setuptools", "click >= 8", "click-plugins"],
+    project_urls={
+        "Documentation": "https://www.idiap.ch/software/bob/docs/bob/bob.extension/master/",
+    },
     entry_points={
         "console_scripts": [
             "bob = bob.extension.scripts:main_cli",
