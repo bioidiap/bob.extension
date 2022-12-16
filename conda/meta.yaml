@@ -21,14 +21,12 @@ requirements:
     - python {{ python }}
     - setuptools {{ setuptools }}
     - pip {{ pip }}
-    - exposed
     - click >=8
     - click {{ click }}
     - click-plugins {{ click_plugins }}
   run:
     - python
     - setuptools
-    - exposed
     - {{ pin_compatible('click') }}
     - {{ pin_compatible('click-plugins') }}
 

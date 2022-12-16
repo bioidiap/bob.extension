@@ -9,8 +9,6 @@
 import contextlib
 import logging
 
-from copy import deepcopy
-
 import pkg_resources
 
 from .rc_config import _loadrc
@@ -41,7 +39,7 @@ def rc_context(dict):
     >>> a
     1
     """
-    old_rc = deepcopy(rc)
+    old_rc = rc.copy()
     try:
         rc.update(dict)
         yield

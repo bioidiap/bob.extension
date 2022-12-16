@@ -17,14 +17,13 @@ def test_rc_env():
 
     os.environ[ENVNAME] = os.path.join(path, "defaults-config")
     c = _loadrc()  # should load from environment variable
-    REFERENCE = """[bob.db.atnt]
-directory = "/home/bob/databases/atnt"
+    REFERENCE = {
+        "bob.db.atnt.directory": "/home/bob/databases/atnt",
+        "bob.db.mobio.directory": "/home/bob/databases/mobio",
+    }
 
-[bob.db.mobio]
-directory = "/home/bob/databases/mobio"
-"""
-    assert str(c) == REFERENCE
-    assert "random" not in c
+    assert c == REFERENCE
+    assert c["random"] is None
 
 
 def test_bob_config():
@@ -41,8 +40,9 @@ def test_bob_config():
     result = runner.invoke(main_cli, ["config", "get", "bob.db.atnt.directory"])
     assert_click_runner_result(result, 0)
     assert result.output == "/home/bob/databases/atnt\n", result.output
+
     # test config get (non-existing key)
-    result = runner.invoke(main_cli, ["config", "get", "not.an.existing.key"])
+    result = runner.invoke(main_cli, ["config", "get", "bob.db.atnt"])
     assert_click_runner_result(result, 1)
 
     # test config set
@@ -67,8 +67,41 @@ def test_bob_config():
         )
         assert_click_runner_result(result, 0)
         expected_output = """Displaying `bobrc':
-[bob.db.atnt]
-directory = "/home/bob/databases/orl_faces"
-
+{
+    "bob.db.atnt.directory": "/home/bob/databases/orl_faces"
+}
 """
         assert expected_output == result.output, result.output
+
+        # test config unset (with starting substring)
+        result = runner.invoke(
+            main_cli,
+            ["config", "unset", "bob.db.atnt"],
+            env={ENVNAME: bobrcfile},
+        )
+        result = runner.invoke(
+            main_cli, ["config", "get", "bob.db.atnt"], env={ENVNAME: bobrcfile}
+        )
+        assert_click_runner_result(result, 1)
+
+        # test config unset (with substring contained)
+        # reset the key / value pair
+        result = runner.invoke(
+            main_cli,
+            [
+                "config",
+                "set",
+                "bob.db.atnt.directory",
+                "/home/bob/databases/orl_faces",
+            ],
+            env={ENVNAME: bobrcfile},
+        )
+        result = runner.invoke(
+            main_cli,
+            ["config", "unset", "--contain", "atnt"],
+            env={ENVNAME: bobrcfile},
+        )
+        result = runner.invoke(
+            main_cli, ["config", "get", "bob.db.atnt"], env={ENVNAME: bobrcfile}
+        )
+        assert_click_runner_result(result, 1)
