@@ -66,7 +66,6 @@ def extract_compressed_file(filename):
     # Uncompressing if it is the case
     header, ext = os.path.splitext(filename)
     header, ext = header.lower(), ext.lower()
-
     if ext == ".zip":
         logger.info("Unziping in {0}".format(filename))
         _unzip(filename, os.path.dirname(filename))
@@ -279,8 +278,6 @@ def get_file(
     if download or force:
         logger.info("Downloading %s", final_filename)
         download_file_from_possible_urls(urls, final_filename)
-        if extract:
-            extract_compressed_file(final_filename)
 
         if file_hash is not None and not validate_file(
             final_filename, file_hash, algorithm=hash_algorithm
@@ -289,6 +286,12 @@ def get_file(
             raise ValueError(
                 f"The downloaded file: {final_filename} has the hash of {found_hash}, but we expected {file_hash}. Please re-do the procedure."
             )
+
+    # Finally extract if wanted. This will always extract over what would already exist
+    # so that if a new version of the archive is downloaded, the extracted folder is
+    # updated.
+    if extract:
+        extract_compressed_file(final_filename)
 
     return final_filename
 
