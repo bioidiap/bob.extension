@@ -5,7 +5,7 @@
 ==================================
 
 It is often required to extend the functionality of your package as a
-framework. :ref:`bob.bio.base <bob.bio.base>` is a good example; it provides an
+framework. `bob.bio.base <https://gitlab.idiap.ch/bob/bob.bio.base>`__ is a good example; it provides an
 API and other packages build upon it. The utilities provided in this page are
 helpful in creating framework packages and building complex
 toolchians/pipelines.
