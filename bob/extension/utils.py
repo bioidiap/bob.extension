@@ -198,7 +198,14 @@ def link_documentation(
         if "BOB_DOCUMENTATION_SERVER" in os.environ:
             server = os.environ["BOB_DOCUMENTATION_SERVER"]
         else:
-            server = "http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/|http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/sphinx|http://www.idiap.ch/software/bob/docs/bob/%(name)s/master/|http://www.idiap.ch/software/bob/docs/bob/%(name)s/master/sphinx"
+            server = (
+                "http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/"
+                "|http://www.idiap.ch/software/bob/docs/bob/%(name)s/%(version)s/sphinx"
+                "|http://www.idiap.ch/software/bob/docs/bob/%(name)s/main/"
+                "|http://www.idiap.ch/software/bob/docs/bob/%(name)s/main/sphinx"
+                "|http://www.idiap.ch/software/bob/docs/bob/%(name)s/master/"
+                "|http://www.idiap.ch/software/bob/docs/bob/%(name)s/master/sphinx"
+            )
 
     # array support for BOB_DOCUMENTATION_SERVER
     # transforms "(file:///path/to/dir  https://example.com/dir| http://bla )"
@@ -226,7 +233,7 @@ def link_documentation(
                     )
                 except pkg_resources.DistributionNotFound:
                     version = "stable"  # package is not a runtime dep, only referenced
-                url = s % {"name": package_name, "version": version}
+                url = s.format(name=package_name, version=version)
 
             try:
                 # otherwise, urlopen will fail
@@ -249,6 +256,7 @@ def link_documentation(
                     # url request failed with a something else than 404 Error
                     print("Requesting URL %s returned error: %s" % (url, exc))
                     # notice mapping is not updated here, as the URL does not exist
+                print(f"Nothing found at {url}.")
 
             except URLError as exc:
                 print(
