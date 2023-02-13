@@ -106,7 +106,6 @@ package-z
             "python",
             "matplotlib",
             "bob.extension",
-            "gridtk",
             "other.bob.package",
         ]
 
@@ -124,7 +123,6 @@ package-z
             "https://matplotlib.org/stable/",
             "https://setuptools.readthedocs.io/en/latest/",
             server[0] % "bob.extension",
-            server[3] % "gridtk",
         ]
         result = [k[0] for k in result.values()]
         assert sorted(result) == sorted(expected)
