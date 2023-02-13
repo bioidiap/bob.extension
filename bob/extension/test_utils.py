@@ -106,20 +106,23 @@ package-z
             "python",
             "matplotlib",
             "bob.extension",
-            "gridtk",
             "other.bob.package",
         ]
 
         # test linkage to official documentation
-        server = "http://www.idiap.ch/software/bob/docs/bob/%s/master/"
-        os.environ["BOB_DOCUMENTATION_SERVER"] = server
+        server = (
+            "http://www.idiap.ch/software/bob/docs/bob/%s/master/",
+            "http://www.idiap.ch/software/bob/docs/bob/%s/master/sphinx",
+            "http://www.idiap.ch/software/bob/docs/bob/%s/main/",
+            "http://www.idiap.ch/software/bob/docs/bob/%s/main/sphinx",
+        )
+        os.environ["BOB_DOCUMENTATION_SERVER"] = "|".join(server)
         result = link_documentation(additional_packages, stringio(f))
         expected = [
             "https://docs.python.org/%d.%d/" % sys.version_info[:2],
             "https://matplotlib.org/stable/",
             "https://setuptools.readthedocs.io/en/latest/",
-            server % "bob.extension",
-            server % "gridtk",
+            server[0] % "bob.extension",
         ]
         result = [k[0] for k in result.values()]
         assert sorted(result) == sorted(expected)
