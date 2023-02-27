@@ -233,7 +233,7 @@ def link_documentation(
                     )
                 except pkg_resources.DistributionNotFound:
                     version = "stable"  # package is not a runtime dep, only referenced
-                url = s.format(name=package_name, version=version)
+                url = s % {"name":package_name, "version":version}
 
             try:
                 # otherwise, urlopen will fail
